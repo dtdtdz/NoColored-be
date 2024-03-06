@@ -14,11 +14,9 @@ import java.util.Map;
 public class GameInfo {
     private LocalDateTime startTime;
     private long time;
-    private Map<WebSocketSession, Integer> sessions = new LinkedHashMap();
+    private Map<WebSocketSession, Integer> sessions = new LinkedHashMap<>();
     private MapInfo mapInfo;
     private CharacterInfo[] characterInfoArr;
-    private float[][] characters;//0: x, 1: y, 2: velx, 3: vely
-
 
     //이거 둘다 위치 바꿔야하나?
     private int characterSize = 48;
@@ -34,16 +32,25 @@ public class GameInfo {
             characterInfoArr[i].setX((1+i)*100);
             characterInfoArr[i].setVelX(DEFAULT_SPEED);
         }
-        characters = new float[2][4];
-        for (int i=0; i<1; i++){
-            characters[i][0] = 200;
-            characters[i][2] = DEFAULT_SPEED;
-        }
+
         mapInfo = new MapInfo();
     }
+
     public GameInfo(int num){
         startTime = LocalDateTime.now();
         time = System.currentTimeMillis();
+    }
+
+    public void toLeft(int id){
+        characterInfoArr[id].setVelX(-Math.abs(characterInfoArr[id].getVelX()));
+    }
+
+    public void toRight(int id){
+        characterInfoArr[id].setVelX(Math.abs(characterInfoArr[id].getVelX()));
+    }
+
+    public void Jump(int id){
+        characterInfoArr[id].setVelY(-300);
     }
 
     public long tick(){

@@ -53,14 +53,15 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                     put((byte) (4*4*characterInfoArr.length)).
                     put((byte) 0).put((byte) 0);
 
-            for (CharacterInfo cInfo:characterInfoArr){
+            for (int i=0; i<characterInfoArr.length; i++){
+                CharacterInfo cInfo = characterInfoArr[i];
                 float tarx = cInfo.getX()+(dt/1000f)*cInfo.getVelX();
                 float halfSize = gameInfo.getCharacterSize()/2f;
                 if (tarx + halfSize > mapInfo.getRight()){
-                    cInfo.setVelX(-Math.abs(cInfo.getVelX()));
+                    gameInfo.toLeft(i);
                     tarx = -tarx+2*(mapInfo.getRight()-halfSize);
                 } else if (tarx - halfSize < mapInfo.getLeft()){
-                    cInfo.setVelX(Math.abs(cInfo.getVelX()));
+                    gameInfo.toRight(i);
                     tarx = 2*(mapInfo.getLeft()+halfSize)-tarx;
                 }
                 cInfo.setX(tarx);
@@ -82,9 +83,10 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
 //                    roomInfo.getSessions().remove(session);
                     throw new RuntimeException(e);
                 } catch (Exception e){
+                    System.out.println("can't find session");
                     SessionRepository.inGameUser.remove(entry.getKey());
                     SessionRepository.inGameList.remove(gameInfo);
-                    e.printStackTrace();
+//                    e.printStackTrace();
                 }
             }
         }
@@ -116,23 +118,33 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
 
         ReceiveBinaryMessageType binaryMessageType = ReceiveBinaryMessageType.valueOf(arr[0]);
         if (binaryMessageType==null) return;
+        System.out.println(binaryMessageType);
         switch (binaryMessageType){
-            case RECEIVE_JUMP -> applyJump(session);
-            case RECEIVE_DIRECTION -> applyDirectionChange(session);
+            case LEFT -> applyLeft(session);
+            case RIGHT -> applyRight(session);
+            case JUMP -> applyJump(session);
             case TEST_START -> testStart(session);
             case TEST_LOGIN -> testLogin(session);
         }
 
     }
-
-    private void applyDirectionChange(WebSocketSession session){
-        //반대 방향으로 변경
+    private void applyLeft(WebSocketSession session){
+        GameInfo gameInfo = SessionRepository.inGameUser.get(session);
+        int id = gameInfo.getSessions().get(session);
+        gameInfo.toLeft(id);
+//        System.out.println(0);
+    }
+    private void applyRight(WebSocketSession session){
+        GameInfo gameInfo = SessionRepository.inGameUser.get(session);
+        int id = gameInfo.getSessions().get(session);
+        gameInfo.toRight(id);
+//        System.out.println(1);
     }
 
     private void applyJump(WebSocketSession session){
         //바닥에 있으면 점프
         GameInfo gameInfo = SessionRepository.inGameUser.get(session);
-
+        int id = gameInfo.getSessions().get(session);
     }
 
     private void testStart(WebSocketSession session){
