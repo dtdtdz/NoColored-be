@@ -1,10 +1,7 @@
 package com.ssafy.backend.websocket.application;
 
 import com.ssafy.backend.websocket.dao.SessionRepository;
-import com.ssafy.backend.websocket.domain.MapInfo;
-import com.ssafy.backend.websocket.domain.GameInfo;
-import com.ssafy.backend.websocket.domain.ReceiveBinaryMessageType;
-import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
+import com.ssafy.backend.websocket.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,7 +21,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     @Autowired
     private SessionRepository sessionRepository;
 
-    private ByteBuffer buffer = ByteBuffer.allocate(256);
+    private ByteBuffer buffer = ByteBuffer.allocate(1024);
     @Override
     public void setRoom(WebSocketSession session) {
 
@@ -49,25 +46,29 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
             long dt = gameInfo.tick();
 
             MapInfo mapInfo = gameInfo.getMapInfo();
+            CharacterInfo[] characterInfoArr = gameInfo.getCharacterInfoArr();
+
             buffer.clear();
             buffer.put(SendBinaryMessageType.PHYSICS_STATE.getValue()).
-                    put((byte) (4*2)).
+                    put((byte) (4*4*characterInfoArr.length)).
                     put((byte) 0).put((byte) 0);
-            for (float[] posvel : gameInfo.getCharacters()){
-                float tarx = posvel[0]+(dt/1000f)*posvel[2];
+
+            for (CharacterInfo cInfo:characterInfoArr){
+                float tarx = cInfo.getX()+(dt/1000f)*cInfo.getVelX();
                 float halfSize = gameInfo.getCharacterSize()/2f;
                 if (tarx + halfSize > mapInfo.getRight()){
-                    posvel[2] = -Math.abs(posvel[2]);
+                    cInfo.setVelX(-Math.abs(cInfo.getVelX()));
                     tarx = -tarx+2*(mapInfo.getRight()-halfSize);
-                } else if ( tarx - halfSize < mapInfo.getLeft()){
-                    posvel[2] = Math.abs(posvel[2]);
+                } else if (tarx - halfSize < mapInfo.getLeft()){
+                    cInfo.setVelX(Math.abs(cInfo.getVelX()));
                     tarx = 2*(mapInfo.getLeft()+halfSize)-tarx;
                 }
+                cInfo.setX(tarx);
+                buffer.putFloat(cInfo.getX());
+                buffer.putFloat(cInfo.getY());
+                buffer.putFloat(cInfo.getVelX());
+                buffer.putFloat(cInfo.getVelY());
 
-                posvel[0] = tarx;
-                buffer.putFloat(tarx);
-                System.out.println(tarx);
-//                System.out.println(tarx +":"+ dt +":"+dt+":"+(dt*posvel[2]/1000));
             }
 
 //                System.out.println("game logic");
@@ -135,7 +136,11 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     }
 
     private void testStart(WebSocketSession session){
+//        RoomInfo roomInfo = new RoomInfo(SessionRepository.loginUserMap(session));
+
+
         GameInfo gameInfo = new GameInfo();
+        //수정 필요
         gameInfo.putSession(session);
         SessionRepository.inGameList.add(gameInfo);
         SessionRepository.inGameUser.put(session, gameInfo);

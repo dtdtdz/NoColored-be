@@ -5,14 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dc9b2387-9528-4766-932c-6e65fff09909" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/domain/CharacterInfo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/domain/RoomInfo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.gitignore.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/dao/SessionRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/dao/SessionRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/domain/GameInfo.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/domain/GameInfo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/handler/MyWebSocketHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/handler/MyWebSocketHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/domain/RoomInfo.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/domain/RoomInfo.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/config/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/config/WebSocketConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/domain/GameInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/domain/GameInfo.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,8 +44,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -68,7 +72,7 @@
     "JUnit.BackendApplicationTests.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "be-dev",
+    "git-widget-placeholder": "S10P22A608-26-be",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/SSAFY/Documents/GitHub/S10P22A608/backend",
     "project.structure.last.edited": "Modules",
@@ -85,6 +89,26 @@
     <key name="MoveInnerDialog.RECENTS_KEY">
       <recent name="com.ssafy.backend.websocket.application" />
     </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="BackendApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.ssafy.backend.BackendApplication" />
+      <module name="backend.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.ssafy.backend.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.BackendApplication" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
