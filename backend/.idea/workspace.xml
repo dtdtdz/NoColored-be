@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="dc9b2387-9528-4766-932c-6e65fff09909" name="Changes" comment="" />
+    <list default="true" id="dc9b2387-9528-4766-932c-6e65fff09909" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/application/BinaryMessageServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/dao/SessionRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/dao/SessionRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/domain/GameInfo.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/domain/GameInfo.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/handler/MyWebSocketHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/classes/com/ssafy/backend/websocket/handler/MyWebSocketHandler.class" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -50,24 +59,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.BackendApplication.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Build backend.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.backend [:BackendApplication.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.backend.executor&quot;: &quot;Run&quot;,
-    &quot;JUnit.BackendApplicationTests.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;S10P21A608-72&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/SSAFY/Documents/GitHub/S10P12A709&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;File.Encoding&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.BackendApplication.executor": "Run",
+    "Gradle.Build backend.executor": "Run",
+    "Gradle.backend [:BackendApplication.main()].executor": "Run",
+    "Gradle.backend.executor": "Run",
+    "JUnit.BackendApplicationTests.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "be-dev",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/SSAFY/Documents/GitHub/S10P22A608/backend",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "File.Encoding"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\SSAFY\Documents\GitHub\S10P21A608\backend\src\main\resources" />
