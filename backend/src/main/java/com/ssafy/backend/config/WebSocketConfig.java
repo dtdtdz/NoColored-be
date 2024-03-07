@@ -16,6 +16,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         return new MyWebSocketHandler();
     }
 
+    // 요청경로: /game
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(myWebSocketHandler(), "/game").setAllowedOrigins("*");

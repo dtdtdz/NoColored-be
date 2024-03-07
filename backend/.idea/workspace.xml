@@ -7,11 +7,11 @@
     <list default="true" id="dc9b2387-9528-4766-932c-6e65fff09909" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/application/TextMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/application/TextMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/config/WebSocketConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/config/WebSocketConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/application/TextMessageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/application/TextMessageServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/handler/MyWebSocketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/handler/MyWebSocketHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/dao/SessionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/dao/SessionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/domain/UserInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/ssafy/backend/websocket/domain/UserInfo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/ssafy/backend/BackendApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/ssafy/backend/BackendApplicationTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,9 +43,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Enum" />
         <option value="Interface" />
         <option value="Class" />
-        <option value="Enum" />
       </list>
     </option>
   </component>
@@ -66,15 +66,16 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.BackendApplication.executor": "Run",
+    "Application.RandomNickname.executor": "Run",
     "Gradle.Build backend.executor": "Run",
     "Gradle.backend [:BackendApplication.main()].executor": "Run",
     "Gradle.backend.executor": "Run",
     "JUnit.BackendApplicationTests.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "be-dev",
+    "git-widget-placeholder": "S10P22A608-22",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/SSAFY/Desktop/cb0306_2/S10P22A608/backend/build.gradle",
+    "last_opened_file_path": "C:/Users/SSAFY/Desktop/cb0306-3/S10P22A608/backend/build.gradle",
     "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2",
