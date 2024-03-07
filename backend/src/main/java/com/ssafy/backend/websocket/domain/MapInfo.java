@@ -7,17 +7,17 @@ import java.util.Map;
 @Getter
 public class MapInfo {
 
-    private int top; //0
-    private int bottom;
-    private int left; //0
-    private int right;
+    private final int top; //0
+    private final int bottom;
+    private final int left; //0
+    private final int right;
 
 
 
     public MapInfo(){
         top = 0;
-        bottom = 600;
-        left = 0;
-        right = 800;
+        bottom = 342;
+        left = 54;
+        right = 540;
     }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 public enum SendBinaryMessageType {
 
     START((byte) 0),
-    CHARACTER_CHANGE((byte)1),
+    SET_CHARACTER((byte) 1),
     PHYSICS_STATE((byte) 2),
     GAME_END((byte) 10);
 

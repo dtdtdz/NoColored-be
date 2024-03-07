@@ -2,6 +2,7 @@ package com.ssafy.backend.websocket.application;
 
 import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.websocket.domain.*;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 @Service
 public class BinaryMessageServiceImpl implements BinaryMessageService {
 
@@ -21,7 +23,15 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     @Autowired
     private SessionRepository sessionRepository;
 
-    private ByteBuffer buffer = ByteBuffer.allocate(1024);
+    private ByteBuffer[] buffer;
+
+    @PostConstruct
+    public void construct(){
+        buffer = new ByteBuffer[GameInfo.MAX_PLAYER];
+        for (int i=0; i<buffer.length; i++){
+            buffer[i] = ByteBuffer.allocate(1024);
+        }
+    }
     @Override
     public void setRoom(WebSocketSession session) {
 
@@ -32,79 +42,72 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
 
     }
 
-    @Override
-    public byte[][] calPhysics(GameInfo gameInfo) {
-        if (Duration.between(gameInfo.getStartTime(), LocalDateTime.now()).getSeconds()>=100){
-            System.out.println("game close");
-            for (Map.Entry<WebSocketSession, Integer> entry: gameInfo.getSessions().entrySet()){
-                SessionRepository.inGameUser.remove(entry.getKey());
-            }
-
-            SessionRepository.inGameList.remove(gameInfo);
-
-        } else {
-            long dt = gameInfo.tick();
-
-            MapInfo mapInfo = gameInfo.getMapInfo();
-            CharacterInfo[] characterInfoArr = gameInfo.getCharacterInfoArr();
-
-            buffer.clear();
-            buffer.put(SendBinaryMessageType.PHYSICS_STATE.getValue()).
-                    put((byte) (4*4*characterInfoArr.length)).
-                    put((byte) 0).put((byte) 0);
-
-            for (int i=0; i<characterInfoArr.length; i++){
-                CharacterInfo cInfo = characterInfoArr[i];
-                float tarx = cInfo.getX()+(dt/1000f)*cInfo.getVelX();
-                float halfSize = gameInfo.getCharacterSize()/2f;
-                if (tarx + halfSize > mapInfo.getRight()){
-                    gameInfo.toLeft(i);
-                    tarx = -tarx+2*(mapInfo.getRight()-halfSize);
-                } else if (tarx - halfSize < mapInfo.getLeft()){
-                    gameInfo.toRight(i);
-                    tarx = 2*(mapInfo.getLeft()+halfSize)-tarx;
-                }
-                cInfo.setX(tarx);
-                buffer.putFloat(cInfo.getX());
-                buffer.putFloat(cInfo.getY());
-                buffer.putFloat(cInfo.getVelX());
-                buffer.putFloat(cInfo.getVelY());
-
-            }
-
-//                System.out.println("game logic");
-            for (Map.Entry<WebSocketSession,Integer> entry: gameInfo.getSessions().entrySet()){
-                try {
-                    //UserInfo?
-                    buffer.flip();
-                    entry.getKey().sendMessage(new BinaryMessage(buffer));
-                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    roomInfo.getSessions().remove(session);
-                    throw new RuntimeException(e);
-                } catch (Exception e){
-                    System.out.println("can't find session");
-                    SessionRepository.inGameUser.remove(entry.getKey());
-                    SessionRepository.inGameList.remove(gameInfo);
-//                    e.printStackTrace();
-                }
-            }
-        }
-        return null;
-    }
-
     @Scheduled(fixedRate = 15)
     private void physics (){
 //        System.out.println("p");
         for (GameInfo gameInfo : SessionRepository.inGameList){
-            byte[][] bytes = calPhysics(gameInfo);
-//            for (int i=0; i< bytes.length; i++){
-//                try {
-//                    roomInfo.getSessions().k(new BinaryMessage(bytes[i]));
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
+            if (Duration.between(gameInfo.getStartTime(), LocalDateTime.now()).getSeconds()>=100){
+                System.out.println("game close");
+                for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
+                    SessionRepository.inGameUser.remove(entry.getKey());
+                }
+
+                SessionRepository.inGameList.remove(gameInfo);
+
+            } else {
+                long dt = gameInfo.tick();
+
+                MapInfo mapInfo = gameInfo.getMapInfo();
+                CharacterInfo[] characterInfoArr = gameInfo.getCharacterInfoArr();
+
+                for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
+                    int bufferNum = entry.getValue().getBufferNum();
+                    buffer[bufferNum].clear();
+                    buffer[bufferNum].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
+                            .put((byte) (4*4*characterInfoArr.length))
+                            .put((byte) 0).put((byte) 0);
+                }
+
+
+                for (int i=0; i<characterInfoArr.length; i++){
+                    CharacterInfo cInfo = characterInfoArr[i];
+                    float tarX = cInfo.getX()+(dt/1000f)*cInfo.getVelX();
+                    float halfSize = gameInfo.getCharacterSize()/2f;
+                    if (tarX + halfSize > mapInfo.getRight()){
+                        gameInfo.toLeft(i);
+                        tarX = -tarX+2*(mapInfo.getRight()-halfSize);
+                    } else if (tarX - halfSize < mapInfo.getLeft()){
+                        gameInfo.toRight(i);
+                        tarX = 2*(mapInfo.getLeft()+halfSize)-tarX;
+                    }
+                    cInfo.setX(tarX);
+                    for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()) {
+                        int bufferNum = entry.getValue().getBufferNum();
+                        buffer[bufferNum].putFloat(cInfo.getX());
+                        buffer[bufferNum].putFloat(cInfo.getY());
+                        buffer[bufferNum].putFloat(cInfo.getVelX());
+                        buffer[bufferNum].putFloat(cInfo.getVelY());
+                    }
+                }
+
+//                System.out.println("game logic");
+                for (Map.Entry<WebSocketSession,UserGameInfo> entry: gameInfo.getUsers().entrySet()){
+                    try {
+                        int bufferNum = entry.getValue().getBufferNum();
+                        buffer[bufferNum].flip();
+                        entry.getKey().sendMessage(new BinaryMessage(buffer[bufferNum]));
+                    } catch (IOException e) {
+//                    e.printStackTrace();
+//                    roomInfo.getSessions().remove(session);
+                        throw new RuntimeException(e);
+                    } catch (Exception e){
+                        System.out.println("can't find session");
+                        SessionRepository.inGameUser.remove(entry.getKey());
+                        SessionRepository.inGameList.remove(gameInfo);
+//                    e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 
@@ -130,25 +133,26 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     }
     private void applyLeft(WebSocketSession session){
         GameInfo gameInfo = SessionRepository.inGameUser.get(session);
-        int id = gameInfo.getSessions().get(session);
-        gameInfo.toLeft(id);
+        int idx = gameInfo.getUsers().get(session).getCharacterNum();
+        gameInfo.toLeft(idx);
 //        System.out.println(0);
     }
     private void applyRight(WebSocketSession session){
         GameInfo gameInfo = SessionRepository.inGameUser.get(session);
-        int id = gameInfo.getSessions().get(session);
-        gameInfo.toRight(id);
+        int idx = gameInfo.getUsers().get(session).getCharacterNum();
+        gameInfo.toRight(idx);
 //        System.out.println(1);
     }
 
     private void applyJump(WebSocketSession session){
         //바닥에 있으면 점프
         GameInfo gameInfo = SessionRepository.inGameUser.get(session);
-        int id = gameInfo.getSessions().get(session);
+        int idx = gameInfo.getUsers().get(session).getCharacterNum();
+        gameInfo.jump(idx);
     }
 
     private void testStart(WebSocketSession session){
-//        RoomInfo roomInfo = new RoomInfo(SessionRepository.loginUserMap(session));
+//        RoomInfo roomInfoEx = new RoomInfo(SessionRepository.loginUserMap(session));
 
 
         GameInfo gameInfo = new GameInfo();

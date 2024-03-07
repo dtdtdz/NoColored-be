@@ -8,8 +8,6 @@ public interface BinaryMessageService {
 
     void setRoom(WebSocketSession session);
     void getRoomInfoList();
-    byte[][] calPhysics(GameInfo gameInfo);
-
     void binaryMessageProcessing(WebSocketSession session, BinaryMessage message);
 
 }
