@@ -4,6 +4,8 @@ import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.websocket.domain.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.BinaryMessage;
@@ -14,11 +16,15 @@ import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 @Service
 public class BinaryMessageServiceImpl implements BinaryMessageService {
 
+    @Autowired
+    private ScheduledExecutorService scheduledExecutorService;
 
     @Autowired
     private SessionRepository sessionRepository;
@@ -41,8 +47,16 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     public void getRoomInfoList() {
 
     }
+    @EventListener(ApplicationReadyEvent.class)
+    public void scheduleTaskAfterStartup() {
+        long initialDelay = 0; // 시작 지연 없음
+        long period = 16_666; // 17ms
 
-    @Scheduled(fixedRate = 15)
+        // 여기에 반복 실행할 태스크의 로직을 작성
+        //            System.out.println("태스크 실행: " + System.currentTimeMillis());
+        scheduledExecutorService.scheduleAtFixedRate(this::physics, initialDelay, period, TimeUnit.MICROSECONDS);
+    }
+
     private void physics (){
 //        System.out.println("p");
         for (GameInfo gameInfo : SessionRepository.inGameList){
@@ -67,12 +81,11 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                             .put((byte) (4*4*characterInfoArr.length))
                             .put((byte) 0).put((byte) 0);
                 }
-
-
+//phaser.js 에서 x좌표 이동 후 중력가속도 적용하는것처럼 작동함
                 for (int i=0; i<characterInfoArr.length; i++){
                     CharacterInfo cInfo = characterInfoArr[i];
                     float tarX = cInfo.getX()+(dt/1000f)*cInfo.getVelX();
-                    float halfSize = gameInfo.getCharacterSize()/2f;
+                    float halfSize = GameInfo.CHARACTER_SIZE/2f;
                     if (tarX + halfSize > mapInfo.getRight()){
                         gameInfo.toLeft(i);
                         tarX = -tarX+2*(mapInfo.getRight()-halfSize);
@@ -80,6 +93,15 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                         gameInfo.toRight(i);
                         tarX = 2*(mapInfo.getLeft()+halfSize)-tarX;
                     }
+
+                    float tarY = cInfo.getY()+(dt/1000f)*cInfo.getVelY();
+                    float halfSIze = GameInfo.CHARACTER_SIZE/2f;
+
+//                    if ()
+//                    o->o, o->x, x->o, x->x
+//                    플랫폼위에 없으면 중력가속도 적용
+//                    플랫폼위에 있다면 velY = 0;
+
                     cInfo.setX(tarX);
                     for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()) {
                         int bufferNum = entry.getValue().getBufferNum();
@@ -117,11 +139,11 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
 
         // 여기에서 바이너리 데이터 처리
         byte[] arr = byteBuffer.array();
-        System.out.println("Received binary message of size: " + byteBuffer.remaining());
+//        System.out.println("Received binary message of size: " + byteBuffer.remaining());
 
         ReceiveBinaryMessageType binaryMessageType = ReceiveBinaryMessageType.valueOf(arr[0]);
         if (binaryMessageType==null) return;
-        System.out.println(binaryMessageType);
+//        System.out.println(binaryMessageType);
         switch (binaryMessageType){
             case LEFT -> applyLeft(session);
             case RIGHT -> applyRight(session);
@@ -129,7 +151,6 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
             case TEST_START -> testStart(session);
             case TEST_LOGIN -> testLogin(session);
         }
-
     }
     private void applyLeft(WebSocketSession session){
         GameInfo gameInfo = SessionRepository.inGameUser.get(session);

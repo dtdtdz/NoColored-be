@@ -19,9 +19,12 @@ public class GameInfo {
     private CharacterInfo[] characterInfoArr;
 
     //이거 둘다 위치 바꿔야하나?
-    private int characterSize = 36;
+    public static final int CHARACTER_SIZE = 36;
     public static final float DEFAULT_SPEED = 160;
     public static final int MAX_PLAYER = 4;
+    public static final float GRAVITY = 200;
+    public static final float BLOCK_SIZE = 18;
+
     int roomId;
     public GameInfo(){
         startTime = LocalDateTime.now();
@@ -30,6 +33,7 @@ public class GameInfo {
         for (int i=0; i<characterInfoArr.length; i++){
             characterInfoArr[i] = new CharacterInfo();
             characterInfoArr[i].setX((1+i)*100);
+            characterInfoArr[i].setY(0);
             characterInfoArr[i].setVelX(DEFAULT_SPEED);
         }
 
