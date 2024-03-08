@@ -9,8 +9,9 @@ import java.util.Map;
 public enum SendBinaryMessageType {
 
     START((byte) 0),
-    PHYSICS_STATE((byte) 1),
-    GAME_END((byte) 2);
+    SET_CHARACTER((byte) 1),
+    PHYSICS_STATE((byte) 2),
+    GAME_END((byte) 10);
 
     private final byte value;
     private static final Map<Byte, SendBinaryMessageType> map = new HashMap<>();
