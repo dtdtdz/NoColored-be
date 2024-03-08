@@ -1,4 +1,4 @@
-package com.ssafy.backend.websocket.domain;
+package com.ssafy.backend.websocket.user;
 
 import java.security.SecureRandom;
 import java.util.Arrays;

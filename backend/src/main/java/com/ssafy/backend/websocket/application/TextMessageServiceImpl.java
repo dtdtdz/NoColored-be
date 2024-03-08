@@ -4,13 +4,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssafy.backend.websocket.dao.SessionRepository;
-import com.ssafy.backend.websocket.dao.UserInfoRepository;
+import com.ssafy.backend.websocket.user.entity.UserInfo;
+import com.ssafy.backend.websocket.user.repository.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+
+import static com.ssafy.backend.websocket.dao.SessionRepository.loginUserMap;
+import static com.ssafy.backend.websocket.dao.SessionRepository.userSessionMap;
+import static com.ssafy.backend.websocket.user.RandomNickname.makeNickname;
 
 @Service
 public class TextMessageServiceImpl implements TextMessageService{
@@ -40,7 +45,74 @@ public class TextMessageServiceImpl implements TextMessageService{
             String userId = jsonNode.get("data").get("userId").asText();
             String userPwd = jsonNode.get("data").get("userPwd").asText();
 
-            // 여기서 사용자 정보 검증 로직 구현 (임시 로직)
+            responseNode.put("status", "success");
+
+        } else if ("GuestLogin".equals(action)) { // 게스트 로그인+회원가입 처리 로직
+            // UserInfo 객체 생성
+            UserInfo guestUser = UserInfo.builder()
+                    .userNickname(makeNickname())
+                    .userSkin("") // 기본 스킨 설정
+                    .isGuest(true) // 게스트 사용자로 설정
+                    .userExp(0L) // 경험치 초기값 설정
+                    .userTitle("") // 타이틀 설정
+                    .userLevel(0) // 레벨 설정
+                    .build();
+
+            // UserInfo 객체를 데이터베이스에 저장
+            userInfoRepository.save(guestUser);
+
+            // 응답 노드에 게스트 사용자 정보 추가
+            responseNode.put("status", "success");
+            responseNode.put("userId", guestUser.getId().toString());
+            responseNode.put("userNickname", guestUser.getUserNickname());
+            responseNode.put("userSkin", guestUser.getUserSkin());
+            responseNode.put("isGuest", guestUser.isGuest());
+            responseNode.put("userExp", guestUser.getUserExp());
+            responseNode.put("userTitle", guestUser.getUserTitle());
+            responseNode.put("userLevel", guestUser.getUserLevel());
+
+            // 웹소켓 세션에 사용자 정보 저장
+            session.getAttributes().put("usrInfo", guestUser);
+
+            // 맵에 매핑
+            loginUserMap.put(session, guestUser);
+            userSessionMap.put(guestUser, session);
+
+            // loginUserMap 순회
+//            loginUserMap.forEach((session, userInfo) -> {
+//                // 각 UserInfo 객체의 정보 출력
+//                System.out.println("Session ID: " + session.getId());
+//                System.out.println("User ID: " + userInfo.getId());
+//                System.out.println("Nickname: " + userInfo.getUserNickname());
+//                System.out.println("Is Guest: " + userInfo.isGuest());
+//                System.out.println("User Skin: " + userInfo.getUserSkin());
+//                System.out.println("User Exp: " + userInfo.getUserExp());
+//                System.out.println("User Title: " + userInfo.getUserTitle());
+//                System.out.println("User Level: " + userInfo.getUserLevel());
+//                System.out.println("----------------------------------");
+//            });
+
+
+
+        } else {
+            // 지원되지 않는 액션 처리
+            responseNode.put("action", "Error");
+            responseNode.put("message", "Action not supported");
+        }
+
+
+
+
+        // 메시지 처리 결과를 송신자(클라이언트)에게 반환
+        session.sendMessage(new TextMessage(responseNode.toString()));
+        return responseNode.toString();
+
+    }
+}
+
+
+/*
+* // 여기서 사용자 정보 검증 로직 구현 (임시 로직)
             boolean canFindUserInfo = validateUser(userId, userPwd);
 
             if (isValidUser) {
@@ -58,20 +130,11 @@ public class TextMessageServiceImpl implements TextMessageService{
                 responseNode.put("status", "failure");
                 responseNode.put("message", "Invalid userId or password.");
             }
-        } else if ("GuestLogin".equals(action)) {
-            // 게스트 로그인 처리 로직...
-        } else {
-            // 지원되지 않는 액션 처리
-            responseNode.put("action", "Error");
-            responseNode.put("message", "Action not supported");
-        }
+*
+*
+* */
 
-        // 메시지 처리 결과를 송신자(클라이언트)에게 반환
-        session.sendMessage(new TextMessage(responseNode.toString()));
-        return responseNode.toString();
 
-    }
-}
 
 /*
 * // message에서 action을 가져온다

@@ -1,15 +1,18 @@
-package com.ssafy.backend.websocket.domain;
+package com.ssafy.backend.websocket.user.entity;
 
+import com.ssafy.backend.websocket.user.RandomNickname;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
-@Table(name = "UserInfo")
+@Table(name = "userinfo")
 @Getter
 @Setter
+@Builder
 public class UserInfo {
 
     @Id
@@ -25,6 +28,7 @@ public class UserInfo {
     @Column(columnDefinition = "LONGTEXT")
     private String userSkin;
 
+    @Column(columnDefinition = "TINYINT(1)")
     private boolean isGuest = false; // 기본값 설정
 
     @Column(columnDefinition = "DEFAULT 0")

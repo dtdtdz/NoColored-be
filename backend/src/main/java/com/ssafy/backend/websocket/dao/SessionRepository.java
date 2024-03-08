@@ -2,6 +2,7 @@ package com.ssafy.backend.websocket.dao;
 
 
 import com.ssafy.backend.websocket.domain.GameInfo;
+import com.ssafy.backend.websocket.user.entity.UserInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -16,9 +17,9 @@ public class SessionRepository {//redis 고려
     public final static LinkedList<GameInfo> inGameList = new LinkedList<>();
 
     //세션으로 유저찾기
-    public final static HashMap<WebSocketSession, String> loginUserMap = new HashMap<>();
+    public final static HashMap<WebSocketSession, UserInfo> loginUserMap = new HashMap<>();
 
     // 유저로 세션찾기
-    public final static HashMap<String,WebSocketSession> userSessionMap = new HashMap<>();
+    public final static HashMap<UserInfo, WebSocketSession> userSessionMap = new HashMap<>();
 
 }
