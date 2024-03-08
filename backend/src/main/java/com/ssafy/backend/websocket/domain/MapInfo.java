@@ -20,8 +20,12 @@ public class MapInfo {
         left = 54;
         right = 540;//594-54
         floor = new boolean[27][19];
-        for (int i=0; i<floor.length; i++){
-            floor[i][18] = true;
+        for (int i=6; i<floor.length-6; i++){
+            floor[i][17] = true;
+        }
+
+        for (int i=10; i<17; i++){
+            floor[i][13] = true;
         }
     }
 }

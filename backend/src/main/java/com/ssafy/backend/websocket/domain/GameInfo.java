@@ -18,12 +18,16 @@ public class GameInfo {
     private MapInfo mapInfo;
     private CharacterInfo[] characterInfoArr;
 
-    //이거 둘다 위치 바꿔야하나?
+    //이것들 위치 바꿔야하나?
     public static final int CHARACTER_SIZE = 36;
     public static final float DEFAULT_SPEED = 160;
     public static final int MAX_PLAYER = 4;
     public static final float GRAVITY = 200;
-    public static final float BLOCK_SIZE = 18;
+    public static final int BLOCK_SIZE = 18;
+    public static final int MAP_HEIGHT = 19;
+    public static final int MAP_WIDTH = 27;
+    public static final int WALL_WIDTH = 3;
+
 
     int roomId;
     public GameInfo(){
@@ -54,7 +58,7 @@ public class GameInfo {
     }
 
     public void jump(int idx){
-        characterInfoArr[idx].setVelY(-300);
+        characterInfoArr[idx].setJump(true);
     }
 
     public long tick(){
@@ -66,7 +70,10 @@ public class GameInfo {
 
     //세션과 캐릭터를 매핑한다.
     public void putSession(WebSocketSession session){
-        users.put(session, new UserGameInfo(session, users.size(), users.size()));
+        int num = users.size();
+
+        users.put(session, new UserGameInfo(session, num, num));
+        characterInfoArr[num].setPlayer(true);
     }
 
     //사용 안하나?

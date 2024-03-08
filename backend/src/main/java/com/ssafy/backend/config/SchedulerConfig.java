@@ -37,6 +37,7 @@ public class SchedulerConfig {
                     System.err.println("스레드 풀이 즉시 종료되지 않았습니다.");
             }
         } catch (InterruptedException ie) {
+            ie.printStackTrace();
             // 현재 스레드가 대기 중 인터럽트 되면 즉시 종료
             pool.shutdownNow();
             // 현재 스레드의 인터럽트 상태를 복구

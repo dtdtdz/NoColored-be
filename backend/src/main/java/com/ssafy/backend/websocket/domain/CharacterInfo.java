@@ -15,6 +15,7 @@ public class CharacterInfo {
     private float velX;
     private float velY;
     private boolean isPlayer;
+    private boolean jump;
 
     //속도와 방향을 따로 설정할까?
     public CharacterInfo(float x, float y){
@@ -22,6 +23,8 @@ public class CharacterInfo {
         this.y = y;
         velX = 160f;
         velY = 0;
+        isPlayer = false;
+        jump = false;
     }
 
 }
