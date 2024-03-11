@@ -1,0 +1,15 @@
+{
+  "name": "s10p11a608",
+  "version": "1.0.0",
+  "description": ". \"$(dirname -- \"$0\")/\\_/husky.sh\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "husky": "^8.0.0"
+  }
+}

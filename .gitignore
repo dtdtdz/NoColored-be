@@ -3,7 +3,7 @@ frontend/.env
 node_modules
 frontend/node_modules/
 
-
+package-lock.json
 backend/HELP.md
 backend/.gradle
 backend/build/
