@@ -2,7 +2,8 @@
 frontend/.env
 node_modules
 frontend/node_modules/
-
+.husky
+package.json
 package-lock.json
 backend/HELP.md
 backend/.gradle
