@@ -12,5 +12,5 @@ BRANCH_EXCLUDED=$(echo "$BRANCHES_TO_SKIP" | grep -c "^$BRANCH_NAME$")
 BRANCH_IN_COMMIT=$(grep -c "$JIRA_ID" "$1")
 
 if [ -n "$JIRA_ID" ] && [ "$BRANCH_EXCLUDED" -ne 1 ] && [ "$BRANCH_IN_COMMIT" -lt 1 ]; then 
-  sed -i.bak -e "\$s/$/ # relate $JIRA_ID/" "$1"
+  sed -i.bak -e "\$s/$/ Relate to $JIRA_ID/" "$1"
 fi
