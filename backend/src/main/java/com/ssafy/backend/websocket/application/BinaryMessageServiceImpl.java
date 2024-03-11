@@ -259,6 +259,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
             case LEFT -> applyLeft(session);
             case RIGHT -> applyRight(session);
             case JUMP -> applyJump(session);
+            case TEST_START2 -> testStart2(session);
             case TEST_START -> testStart(session);
             case TEST_LOGIN -> testLogin(session);
         }
@@ -292,6 +293,45 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     private void putTime(ByteBuffer buffer, GameInfo gameInfo){
         buffer.put(SendBinaryMessageType.TIME.getValue())
                 .put((byte) 1).put((byte)1).put((byte)gameInfo.getSecond());
+    }
+    private void testStart2(WebSocketSession session) {
+        GameInfo gameInfo = null;
+        for (GameInfo game:SessionRepository.inGameList){
+            gameInfo = game;
+            break;
+        }
+
+        if (gameInfo==null) return;
+        System.out.println(2);
+        gameInfo.putSession(session);
+        SessionRepository.inGameUser.put(session, gameInfo);
+
+        ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
+
+        putTime(tmpbuffer, gameInfo);
+
+        tmpbuffer.put(SendBinaryMessageType.TEST_MAP.getValue()).
+                put((byte) 3).put((byte) gameInfo.getMapInfo().getFloorList().size());
+        for (int[] arr:gameInfo.getMapInfo().getFloorList()){
+            tmpbuffer.put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
+        }
+
+        try {
+            tmpbuffer.flip();
+            synchronized (session){
+                session.sendMessage(new BinaryMessage(tmpbuffer));
+            }
+
+        } catch (IOException e) {
+//                    e.printStackTrace();
+//                    roomInfo.getSessions().remove(session);
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e){
+            System.out.println("can't find session");
+            e.printStackTrace();
+        }
+
     }
     private void testStart(WebSocketSession session){
 //        RoomInfo roomInfoEx = new RoomInfo(SessionRepository.loginUserMap(session));
