@@ -1,5 +1,5 @@
 {
-  "name": "s10p11a608",
+  "name": "s10p22a608",
   "version": "1.0.0",
   "description": ". \"$(dirname -- \"$0\")/\\_/husky.sh\"",
   "main": "index.js",
