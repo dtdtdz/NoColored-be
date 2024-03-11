@@ -6,7 +6,6 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -60,7 +59,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     private void physics (){
 //        System.out.print("1");
         for (GameInfo gameInfo : SessionRepository.inGameList){
-            if (Duration.between(gameInfo.getStartTime(), LocalDateTime.now()).getSeconds()>=100){
+            if (Duration.between(gameInfo.getStartDate(), LocalDateTime.now()).getSeconds()>=100){
                 System.out.println("game close");
                 for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
                     SessionRepository.inGameUser.remove(entry.getKey());
@@ -73,16 +72,20 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
 
                 MapInfo mapInfo = gameInfo.getMapInfo();
                 CharacterInfo[] characterInfoArr = gameInfo.getCharacterInfoArr();
-                boolean[][] floor = mapInfo.getFloor();
+                boolean[][] floor = gameInfo.getFloor();
 
                 PriorityQueue<CharacterInfo> characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
 
+
+                boolean checkSecond = gameInfo.checkSecond();
                 for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
                     int bufferNum = entry.getValue().getBufferNum();
                     buffer[bufferNum].clear();
+                    if (checkSecond) putTime(buffer[bufferNum], gameInfo);
+
                     buffer[bufferNum].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
-                            .put((byte) (4*4*characterInfoArr.length))
-                            .put((byte) 0).put((byte) 0);
+                            .put((byte) (16))
+                            .put((byte) characterInfoArr.length);
                 }
 //                System.out.print(2);
 //phaser.js 에서 x좌표 이동 후 중력가속도 적용하는것처럼 작동함
@@ -97,7 +100,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                         gameInfo.toRight(i);
                         tarX = 2*(mapInfo.getLeft()+halfSize)-tarX;
                     }
-//                    System.out.print(3+":"+i+":1");
+//                    System.out.print(3+":"+i+":1 ");
                     float velY = cInfo.getVelY();
                     float tarY = cInfo.getY();
 //                    +(dt/1000f)*cInfo.getVelY()
@@ -117,9 +120,9 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
 
                             if (indexCheck(blockY, floor[0].length)
                                     && ((indexCheck(blockLeft, floor.length)
-                                    && mapInfo.getFloor()[blockLeft][blockY])
+                                    && floor[blockLeft][blockY])
                                     || (indexCheck(blockRight, floor.length)
-                                    && mapInfo.getFloor()[blockRight][blockY]))){
+                                    && floor[blockRight][blockY]))){
                                 tarY = blockY*GameInfo.BLOCK_SIZE-halfSize;
                                 isPlatForm = true;
                             }
@@ -139,9 +142,9 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                             if (velY>=0 &&((bottom%GameInfo.BLOCK_SIZE<=4)||blockY<nextBlockY)){
                                 if (indexCheck(nextBlockY, floor[0].length)
                                         && ((indexCheck(blockLeft, floor.length)
-                                        && mapInfo.getFloor()[blockLeft][nextBlockY])
+                                        && floor[blockLeft][nextBlockY])
                                         || (indexCheck(blockRight, floor.length)
-                                        && mapInfo.getFloor()[blockRight][nextBlockY]))
+                                        && floor[blockRight][nextBlockY]))
                                 ){
                                     tarY = nextBlockY*GameInfo.BLOCK_SIZE-halfSize;
                                     isPlatForm = true;
@@ -153,7 +156,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                         e.printStackTrace();
                     }
 
-//                    System.out.print(3+":"+i+":2");
+//                    System.out.print(3+":"+i+":2 ");
                     if (isPlatForm) {
                         if (cInfo.isJump()){
                             velY = -190;
@@ -164,10 +167,6 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                     } else {
                         cInfo.setJump(false);
                     }
-//                    if (gameInfo.getMapInfo().getFloor()[(int)(tarX-halfSize)])
-//                    o->o, o->x, x->o, x->x
-//                    플랫폼위에 없으면 중력가속도 적용
-//                    플랫폼위에 있다면 velY = 0;
 
                     cInfo.setX(tarX);
                     cInfo.setY(tarY);
@@ -221,7 +220,10 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                     try {
 
                         buffer[bufferNum].flip();
-                        entry.getKey().sendMessage(new BinaryMessage(buffer[bufferNum]));
+
+                        synchronized (entry.getKey()){
+                            entry.getKey().sendMessage(new BinaryMessage(buffer[bufferNum]));
+                        }
                     } catch (IOException e) {
 //                    e.printStackTrace();
 //                    roomInfo.getSessions().remove(session);
@@ -231,7 +233,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                         System.out.println("can't find session");
                         SessionRepository.inGameUser.remove(entry.getKey());
                         SessionRepository.inGameList.remove(gameInfo);
-//                    e.printStackTrace();
+                        e.printStackTrace();
                     }
                 }
             }
@@ -280,17 +282,50 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         int idx = gameInfo.getUsers().get(session).getCharacterNum();
         gameInfo.jump(idx);
 //        System.out.println(1);
+//        try {
+//            session.sendMessage(new TextMessage("a"));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
+    private void putTime(ByteBuffer buffer, GameInfo gameInfo){
+        buffer.put(SendBinaryMessageType.TIME.getValue())
+                .put((byte) 1).put((byte)1).put((byte)gameInfo.getSecond());
+    }
     private void testStart(WebSocketSession session){
 //        RoomInfo roomInfoEx = new RoomInfo(SessionRepository.loginUserMap(session));
-
-
         GameInfo gameInfo = new GameInfo();
         //수정 필요
         gameInfo.putSession(session);
         SessionRepository.inGameList.add(gameInfo);
         SessionRepository.inGameUser.put(session, gameInfo);
+
+        ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
+
+        putTime(tmpbuffer, gameInfo);
+
+        tmpbuffer.put(SendBinaryMessageType.TEST_MAP.getValue()).
+                put((byte) 3).put((byte) gameInfo.getMapInfo().getFloorList().size());
+        for (int[] arr:gameInfo.getMapInfo().getFloorList()){
+            tmpbuffer.put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
+        }
+
+        try {
+            tmpbuffer.flip();
+            synchronized (session){
+                session.sendMessage(new BinaryMessage(tmpbuffer));
+            }
+
+        } catch (IOException e) {
+//                    e.printStackTrace();
+//                    roomInfo.getSessions().remove(session);
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (Exception e){
+            System.out.println("can't find session");
+            e.printStackTrace();
+        }
     }
 
     private void testLogin(WebSocketSession session){

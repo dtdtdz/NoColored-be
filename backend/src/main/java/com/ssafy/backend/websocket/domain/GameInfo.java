@@ -6,17 +6,21 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
 @Getter
 @AllArgsConstructor
 public class GameInfo {
-    private LocalDateTime startTime;
+    private LocalDateTime startDate;
+    private long startTime;
     private long time;
     private Map<WebSocketSession, UserGameInfo> users = new LinkedHashMap<>();
     private MapInfo mapInfo;
     private CharacterInfo[] characterInfoArr;
+    private boolean[][] floor;
+    private int second;
 
     //이것들 위치 바꿔야하나?
     public static final int CHARACTER_SIZE = 36;
@@ -27,12 +31,14 @@ public class GameInfo {
     public static final int MAP_HEIGHT = 19;
     public static final int MAP_WIDTH = 27;
     public static final int WALL_WIDTH = 3;
-
+    public static final int DEFAULT_TIME = 120;
 
     int roomId;
     public GameInfo(){
-        startTime = LocalDateTime.now();
-        time = System.currentTimeMillis();
+        startDate = LocalDateTime.now();
+        startTime = System.currentTimeMillis();
+        time = startTime;
+        second = DEFAULT_TIME;
         characterInfoArr = new CharacterInfo[3];
         for (int i=0; i<characterInfoArr.length; i++){
             characterInfoArr[i] = new CharacterInfo();
@@ -42,11 +48,30 @@ public class GameInfo {
         }
 
         mapInfo = new MapInfo();
+        floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
+        List<int[]> list = mapInfo.getFloorList();
+        for (int[] arr:list){
+            for (int i=0; i<arr[2]; i++){
+                floor[arr[0]+i-WALL_WIDTH][arr[1]] = true;
+            }
+        }
     }
 
-    public GameInfo(int num){
-        startTime = LocalDateTime.now();
-        time = System.currentTimeMillis();
+    private GameInfo(int num){
+        startDate = LocalDateTime.now();
+        startTime = System.currentTimeMillis();
+        time = startTime;
+        second = DEFAULT_TIME;
+        characterInfoArr = new CharacterInfo[3];
+        for (int i=0; i<characterInfoArr.length; i++){
+            characterInfoArr[i] = new CharacterInfo();
+            characterInfoArr[i].setX((1+i)*100);
+            characterInfoArr[i].setY(0);
+            characterInfoArr[i].setVelX(DEFAULT_SPEED);
+        }
+
+        mapInfo = new MapInfo();//num
+        floor = new boolean[MAP_HEIGHT][MAP_WIDTH];
     }
 
     public void toLeft(int idx){
@@ -65,7 +90,17 @@ public class GameInfo {
         long now = System.currentTimeMillis();
         long result = now - time;
         time = now;
+
         return result;
+    }
+
+    public boolean checkSecond(){
+        int newSecond = DEFAULT_TIME-(int)((time-startTime)/1000);
+        if (newSecond<second){
+            second = newSecond;
+            return true;
+        }
+        return false;
     }
 
     //세션과 캐릭터를 매핑한다.
