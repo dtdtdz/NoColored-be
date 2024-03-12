@@ -12,6 +12,7 @@ public enum SendBinaryMessageType {
     SET_CHARACTER((byte) 1),
     PHYSICS_STATE((byte) 2),
     TIME((byte) 3),
+    STEP((byte) 4),
     GAME_END((byte) 10),
     TEST_MAP((byte) 100);
 

@@ -105,10 +105,10 @@ public class GameInfo {
 
     //세션과 캐릭터를 매핑한다.
     public void putSession(WebSocketSession session){
-        int num = users.size();
-
-        users.put(session, new UserGameInfo(session, num, num));
-        characterInfoArr[num].setPlayer(true);
+        byte num = (byte) users.size();
+        UserGameInfo user = new UserGameInfo(session, num, num, num, (byte) 0);
+        users.put(session, user);
+        characterInfoArr[num].setUserGameInfo(user);
     }
 
     //사용 안하나?
