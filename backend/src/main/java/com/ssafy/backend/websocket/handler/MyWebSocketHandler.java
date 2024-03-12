@@ -15,10 +15,14 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 @Component
 public class MyWebSocketHandler extends AbstractWebSocketHandler {
 
-    @Autowired
-    private BinaryMessageService binaryMessageService;
-    @Autowired
-    private TextMessageService textMessageService;
+    private final BinaryMessageService binaryMessageService;
+    private final TextMessageService textMessageService;
+
+    public MyWebSocketHandler(BinaryMessageService binaryMessageService,
+                       TextMessageService textMessageService){
+        this.binaryMessageService = binaryMessageService;
+        this.textMessageService = textMessageService;
+    }
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {

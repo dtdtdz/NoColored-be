@@ -12,6 +12,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
 public class SessionRepository {//redis 고려
+    //이것들 생성자 주입할까?
+    //component가 static이라 얘네들 static아니어도 될듯..
     public final static CopyOnWriteArraySet<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     public final static HashMap<WebSocketSession, GameInfo> inGameUser = new HashMap<>();
     public final static LinkedList<GameInfo> inGameList = new LinkedList<>();

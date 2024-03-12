@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.user.entity.UserInfo;
-import com.ssafy.backend.user.repository.UserInfoRepository;
+import com.ssafy.backend.user.dao.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;

@@ -22,19 +22,17 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class BinaryMessageServiceImpl implements BinaryMessageService {
 
-    @Autowired
-    private ScheduledExecutorService scheduledExecutorService;
+    private final ScheduledExecutorService scheduledExecutorService;
 
-    @Autowired
-    private SessionRepository sessionRepository;
-
+    private final SessionRepository sessionRepository;
     private ByteBuffer[] buffer;
     PriorityQueue<CharacterInfo> characterQueue;
     List<byte[]> stepList;
+    BinaryMessageServiceImpl(ScheduledExecutorService scheduledExecutorService,
+                             SessionRepository sessionRepository){
+        this.scheduledExecutorService = scheduledExecutorService;
+        this.sessionRepository = sessionRepository;
 
-
-    @PostConstruct
-    public void construct(){
         buffer = new ByteBuffer[GameInfo.MAX_PLAYER];
         for (int i=0; i<buffer.length; i++){
             buffer[i] = ByteBuffer.allocate(1024);
@@ -42,6 +40,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
         stepList = new ArrayList<>();
     }
+
     @Override
     public void setRoom(WebSocketSession session) {
 
