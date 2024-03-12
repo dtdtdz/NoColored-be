@@ -1,6 +1,6 @@
-package com.ssafy.backend.websocket.user.entity;
+package com.ssafy.backend.user.entity;
 
-import com.ssafy.backend.websocket.user.RandomNickname;
+import com.ssafy.backend.user.util.RandomNickname;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

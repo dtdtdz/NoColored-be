@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssafy.backend.websocket.dao.SessionRepository;
-import com.ssafy.backend.websocket.user.entity.UserInfo;
-import com.ssafy.backend.websocket.user.repository.UserInfoRepository;
+import com.ssafy.backend.user.entity.UserInfo;
+import com.ssafy.backend.user.repository.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
@@ -15,7 +15,7 @@ import java.io.IOException;
 
 import static com.ssafy.backend.websocket.dao.SessionRepository.loginUserMap;
 import static com.ssafy.backend.websocket.dao.SessionRepository.userSessionMap;
-import static com.ssafy.backend.websocket.user.RandomNickname.makeNickname;
+import static com.ssafy.backend.user.util.RandomNickname.makeNickname;
 
 @Service
 public class TextMessageServiceImpl implements TextMessageService{

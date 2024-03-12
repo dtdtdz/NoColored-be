@@ -1,4 +1,4 @@
-package com.ssafy.backend.websocket.user.entity;
+package com.ssafy.backend.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;

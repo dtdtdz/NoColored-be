@@ -15,7 +15,7 @@ public class UserController {
     }
     @PostMapping("/login")
     public ResponseEntity<String> login(){
-        return ResponseEntity.ok("1");
+        return ResponseEntity.ok("2");
     }
 
 }

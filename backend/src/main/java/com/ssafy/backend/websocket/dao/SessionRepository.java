@@ -2,7 +2,7 @@ package com.ssafy.backend.websocket.dao;
 
 
 import com.ssafy.backend.websocket.domain.GameInfo;
-import com.ssafy.backend.websocket.user.entity.UserInfo;
+import com.ssafy.backend.user.entity.UserInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 

@@ -1,7 +1,7 @@
-package com.ssafy.backend.websocket.user.service;
+package com.ssafy.backend.user.service;
 
-import com.ssafy.backend.websocket.user.repository.UserInfoRepository;
-import com.ssafy.backend.websocket.user.entity.UserInfo;
+import com.ssafy.backend.user.entity.UserInfo;
+import com.ssafy.backend.user.repository.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

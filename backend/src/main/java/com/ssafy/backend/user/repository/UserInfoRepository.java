@@ -1,6 +1,6 @@
-package com.ssafy.backend.websocket.user.repository;
+package com.ssafy.backend.user.repository;
 
-import com.ssafy.backend.websocket.user.entity.UserInfo;
+import com.ssafy.backend.user.entity.UserInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
