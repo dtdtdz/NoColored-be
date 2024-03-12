@@ -1,8 +1,8 @@
 package com.ssafy.backend.websocket.handler;
 
 
-import com.ssafy.backend.websocket.application.BinaryMessageService;
-import com.ssafy.backend.websocket.application.TextMessageService;
+import com.ssafy.backend.websocket.service.BinaryMessageService;
+import com.ssafy.backend.websocket.service.TextMessageService;
 import com.ssafy.backend.websocket.dao.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

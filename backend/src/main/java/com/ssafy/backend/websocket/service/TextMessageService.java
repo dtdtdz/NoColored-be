@@ -1,4 +1,4 @@
-package com.ssafy.backend.websocket.application;
+package com.ssafy.backend.websocket.service;
 
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;

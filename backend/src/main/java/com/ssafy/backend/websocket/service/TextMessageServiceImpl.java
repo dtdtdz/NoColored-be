@@ -1,4 +1,4 @@
-package com.ssafy.backend.websocket.application;
+package com.ssafy.backend.websocket.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;

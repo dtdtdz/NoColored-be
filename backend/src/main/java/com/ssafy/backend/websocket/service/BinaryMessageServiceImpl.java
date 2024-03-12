@@ -1,4 +1,4 @@
-package com.ssafy.backend.websocket.application;
+package com.ssafy.backend.websocket.service;
 
 import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.websocket.domain.*;
