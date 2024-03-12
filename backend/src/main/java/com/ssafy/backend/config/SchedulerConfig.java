@@ -17,11 +17,20 @@ public class SchedulerConfig {
         return Executors.newScheduledThreadPool(1); // 예: 스레드 풀 크기를 1로 설정
     }
 
+    @Bean
+    ScheduledExecutorService authScheduledExecutorService(){
+        return Executors.newScheduledThreadPool(1);
+    }
+
     // 스프링 컨텍스트가 종료될 때 이벤트 리스너
     @EventListener
     public void onApplicationEvent(ContextClosedEvent event) {
-        ScheduledExecutorService executorService = event.getApplicationContext().getBean(ScheduledExecutorService.class);
+        ScheduledExecutorService executorService = event.getApplicationContext()
+                .getBean("scheduledExecutorService",ScheduledExecutorService.class);
         shutdownAndAwaitTermination(executorService);
+        ScheduledExecutorService authExecutorService = event.getApplicationContext()
+                .getBean("authScheduledExecutorService", ScheduledExecutorService.class);
+        shutdownAndAwaitTermination(authExecutorService);
     }
 
     // 스레드 풀 종료를 위한 메서드

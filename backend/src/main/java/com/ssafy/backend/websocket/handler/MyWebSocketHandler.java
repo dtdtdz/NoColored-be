@@ -40,6 +40,7 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("Connection established");
+//        session.get
         SessionRepository.sessions.add(session);
     }
 

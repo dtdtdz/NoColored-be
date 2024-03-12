@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssafy.backend.websocket.dao.SessionRepository;
-import com.ssafy.backend.user.entity.UserInfo;
+import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.dao.UserInfoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,7 @@ public class TextMessageServiceImpl implements TextMessageService{
 
         } else if ("GuestLogin".equals(action)) { // 게스트 로그인+회원가입 처리 로직
             // UserInfo 객체 생성
-            UserInfo guestUser = UserInfo.builder()
+            UserProfile guestUser = UserProfile.builder()
                     .userNickname(makeNickname())
                     .userSkin("") // 기본 스킨 설정
                     .isGuest(true) // 게스트 사용자로 설정

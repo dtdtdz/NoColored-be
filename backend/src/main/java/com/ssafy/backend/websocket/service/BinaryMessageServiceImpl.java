@@ -4,6 +4,7 @@ import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.websocket.domain.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,12 @@ import java.util.concurrent.TimeUnit;
 public class BinaryMessageServiceImpl implements BinaryMessageService {
 
     private final ScheduledExecutorService scheduledExecutorService;
-
+//    private final ScheduledExecutorService
     private final SessionRepository sessionRepository;
     private ByteBuffer[] buffer;
     PriorityQueue<CharacterInfo> characterQueue;
     List<byte[]> stepList;
-    BinaryMessageServiceImpl(ScheduledExecutorService scheduledExecutorService,
+    BinaryMessageServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
                              SessionRepository sessionRepository){
         this.scheduledExecutorService = scheduledExecutorService;
         this.sessionRepository = sessionRepository;

@@ -1,11 +1,11 @@
 package com.ssafy.backend.user.entity;
 
-import com.ssafy.backend.user.util.RandomNickname;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -19,35 +19,20 @@ public class UserInfo {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Column(length = 8)
-    private String userCode;
-
-    @Column(nullable = false, length = 9)
-    private String userNickname;
-
-    @Column(columnDefinition = "LONGTEXT")
-    private String userSkin;
-
-    @Column(columnDefinition = "TINYINT(1)")
-    private boolean isGuest = false; // 기본값 설정
-
-    @Column(columnDefinition = "DEFAULT 0")
-    private Long userExp = 0L; // 기본값 설정
+    @Column(length = 30)
+    private String userId;
 
     @Column(length = 30)
-    private String userTitle;
+    private String userPwd;
 
-    @Column(columnDefinition = "DEFAULT 0")
-    private Integer userLevel = 0; // 기본값 설정
+    @Column
+    private LocalDateTime userCreateDate;
 
-    // 엔티티가 영속화되기 전에 필요한 설정
-    @PrePersist
-    private void userSetting() {
-        if (id == null) {
-            id = UUID.randomUUID();
-        }
-        if (userCode == null) {
-            userCode = RandomNickname.generateRandomString();
-        }
-    }
+    @Column
+    private boolean isDelete = false; // 기본값 설정
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId // 이를 통해 UserInfo 테이블의 PK를 UserProfile 테이블의 PK와 동일하게 사용
+    @JoinColumn(name = "id") // UserInfo 엔티티의 ID 필드를 참조하는 외래 키
+    private UserProfile userInfo;
 }

@@ -1,8 +1,7 @@
 package com.ssafy.backend.user.service;
 
-import com.ssafy.backend.user.entity.UserInfo;
+import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.dao.UserInfoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,7 +15,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         this.userInfoRepository = userInfoRepository;
     }
 
-    Optional<UserInfo> findUserInfoByUserCode(String userCode){
+    Optional<UserProfile> findUserInfoByUserCode(String userCode){
         return userInfoRepository.findByUserCode(userCode);
     }
 
