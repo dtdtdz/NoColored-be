@@ -12,7 +12,9 @@ import org.springframework.web.socket.WebSocketSession;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserGameInfo {
-    WebSocketSession webSocketSession;
-    int characterNum;
-    int bufferNum;
+    private WebSocketSession webSocketSession;
+    private byte characterNum;
+    private byte bufferNum;
+    private byte playerNum;
+    private byte score;
 }

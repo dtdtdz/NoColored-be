@@ -29,6 +29,9 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     private SessionRepository sessionRepository;
 
     private ByteBuffer[] buffer;
+    PriorityQueue<CharacterInfo> characterQueue;
+    List<byte[]> stepList;
+
 
     @PostConstruct
     public void construct(){
@@ -36,6 +39,8 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         for (int i=0; i<buffer.length; i++){
             buffer[i] = ByteBuffer.allocate(1024);
         }
+        characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
+        stepList = new ArrayList<>();
     }
     @Override
     public void setRoom(WebSocketSession session) {
@@ -74,10 +79,12 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                 CharacterInfo[] characterInfoArr = gameInfo.getCharacterInfoArr();
                 boolean[][] floor = gameInfo.getFloor();
 
-                PriorityQueue<CharacterInfo> characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
-
+                characterQueue.clear();
+                stepList.clear();
 
                 boolean checkSecond = gameInfo.checkSecond();
+
+
                 for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
                     int bufferNum = entry.getValue().getBufferNum();
                     buffer[bufferNum].clear();
@@ -192,10 +199,18 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
 //                            속도 위에있는게 아래 밟을 수 있나?
                             listC.setVelY(-100);
                             flag = true;
-                            break;
+
+                            if (curC.getUserGameInfo()!=null){
+                                UserGameInfo user = listC.getUserGameInfo();
+                                user.setScore((byte) (user.getScore()+1));
+                                stepList.add(new byte[]{ user.getPlayerNum(),
+                                        curC.getUserGameInfo().getPlayerNum(), user.getScore()});
+                            }
+
+                            break;//밟힌 캐릭터는 더 밟힐 수 없다.
                         }
                     }
-                    if (!flag && curC.isPlayer()){
+                    if (!flag && curC.getUserGameInfo()!=null){
                         validCharacter.offer(curC);
                     }
 
@@ -215,6 +230,11 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                         buffer[bufferNum].putFloat(cInfo.getY());
                         buffer[bufferNum].putFloat(cInfo.getVelX());
                         buffer[bufferNum].putFloat(cInfo.getVelY());
+                    }
+
+                    if (!stepList.isEmpty()){
+                        putStep(buffer[bufferNum]);
+//                        System.out.println(stepList.size());
                     }
 
                     try {
@@ -289,6 +309,13 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
 //            throw new RuntimeException(e);
 //        }
     }
+    private void putStep(ByteBuffer buffer){
+        buffer.put(SendBinaryMessageType.STEP.getValue())
+                .put((byte) 3).put((byte) stepList.size());
+        for (int i=0; i<stepList.size(); i++){
+            buffer.put(stepList.get(i)[0]).put(stepList.get(i)[1]).put(stepList.get(i)[2]);
+        }
+    }
 
     private void putTime(ByteBuffer buffer, GameInfo gameInfo){
         buffer.put(SendBinaryMessageType.TIME.getValue())
@@ -302,7 +329,6 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         }
 
         if (gameInfo==null) return;
-        System.out.println(2);
         gameInfo.putSession(session);
         SessionRepository.inGameUser.put(session, gameInfo);
 
