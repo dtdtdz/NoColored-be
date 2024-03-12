@@ -28,6 +28,7 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
         binaryMessageService.binaryMessageProcessing(session, message);
     }
 
+    // 로그인용
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         textMessageService.textMessageProcessing(session, message);
