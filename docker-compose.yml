@@ -7,7 +7,7 @@ services:
     ports:
       - "18080:8080"
     networks:
-      - deploy # 컨테이너를 연결할 네트워크
+      - deploy # 컨테이너를 연결할 네트워크 
 
 networks:
   deploy: # 네트워크 정의
