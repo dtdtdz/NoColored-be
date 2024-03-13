@@ -50,34 +50,35 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public String signUp(String id, String password, String nickname) {
-        String userCode = getUserCode();
-        String token = null;
-        if (userCode == null) throw new RuntimeException("유저코드 생성 실패");
-        UserProfile userProfile = UserProfile.builder()
-                .userNickname(nickname)
-                .userCode(userCode)
-                .build();
+        try {
+            String userCode = getUserCode();
+            if (userCode == null) throw new RuntimeException("유저코드 생성 실패");
+            UserProfile userProfile = UserProfile.builder()
+                    .userNickname(nickname)
+                    .userCode(userCode)
+                    .build();
 
-        userProfileRepository.save(userProfile);
+            userProfileRepository.save(userProfile);
 
 //        System.out.println(userProfile.getId());
-        UserInfo userInfo = UserInfo.builder()
+            UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
-                .userId(id)
-                .userPwd(password)
-                .userProfile(userProfile)
-                .build();
+                    .userId(id)
+                    .userPwd(password)
+                    .userProfile(userProfile)
+                    .build();
 
-        Object result = userInfoRepository.save(userInfo);
+            userInfoRepository.save(userInfo);
+            return userCode;
 
-        token = jwtUtil.generateToken(userProfile.getUserCode());
-        redisTemplate.opsForValue().set("token:" + userCode, token, 3600, TimeUnit.SECONDS);
-
-
-        return token;
+        } catch (Exception e){
+            throw new RuntimeException("이미 있는 id");
+        }
     }
     @Override
     public String generateToken(String userCode){
-
+        String token = jwtUtil.generateToken(userCode);
+        redisTemplate.opsForValue().set("token:" + userCode, token, 3600, TimeUnit.SECONDS);
+        return token;
     }
 }

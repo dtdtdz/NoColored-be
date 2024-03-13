@@ -9,8 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @RequestMapping("/user")
 public class UserController {
 
@@ -22,7 +23,8 @@ public class UserController {
     }
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody UserLoginDto user){
-        String jwtToken = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
+        String userCode = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
+        String jwtToken = userService.generateToken(userCode);
         return ResponseEntity.ok(jwtToken);
     }
     @PostMapping("/login")
