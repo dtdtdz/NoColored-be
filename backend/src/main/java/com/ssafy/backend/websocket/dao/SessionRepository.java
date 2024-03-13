@@ -2,7 +2,7 @@ package com.ssafy.backend.websocket.dao;
 
 
 import com.ssafy.backend.websocket.domain.GameInfo;
-import com.ssafy.backend.user.entity.UserProfile;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
-public class SessionRepository {//redis 고려
+public class SessionRepository {
     //이것들 생성자 주입할까?
     //component가 static이라 얘네들 static아니어도 될듯..
     public final static CopyOnWriteArraySet<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
@@ -19,9 +19,9 @@ public class SessionRepository {//redis 고려
     public final static LinkedList<GameInfo> inGameList = new LinkedList<>();
 
     //세션으로 유저찾기
-    public final static HashMap<WebSocketSession, UserProfile> loginUserMap = new HashMap<>();
-
+    public final static HashMap<WebSocketSession, UserAccessInfo> userWebsocketMap = new HashMap<>();
     // 유저로 세션찾기
-    public final static HashMap<UserProfile, WebSocketSession> userSessionMap = new HashMap<>();
+    public final static HashMap<String, UserAccessInfo> userCodeMap = new HashMap<>();
+    public final static HashMap<String, UserAccessInfo> userTokenMap = new HashMap<>();
 
 }

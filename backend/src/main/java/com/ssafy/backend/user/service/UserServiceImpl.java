@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -49,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public String signUp(String id, String password, String nickname) {
+    public UserProfile signUp(String id, String password, String nickname) {
         try {
             String userCode = getUserCode();
             if (userCode == null) throw new RuntimeException("유저코드 생성 실패");
@@ -69,16 +70,24 @@ public class UserServiceImpl implements UserService {
                     .build();
 
             userInfoRepository.save(userInfo);
-            return userCode;
+            return userProfile;
 
         } catch (Exception e){
             throw new RuntimeException("이미 있는 id");
         }
     }
     @Override
-    public String generateToken(String userCode){
-        String token = jwtUtil.generateToken(userCode);
-        redisTemplate.opsForValue().set("token:" + userCode, token, 3600, TimeUnit.SECONDS);
+    public String generateToken(UserProfile userProfile){
+        String token = jwtUtil.generateToken(userProfile.getUserCode());
+        redisTemplate.opsForValue().set("token:" + token, userProfile.getId(), 3600, TimeUnit.SECONDS);
         return token;
+    }
+
+    @Override
+    public String login(String id, String password) {
+        UserProfile userProfile = userInfoRepository.findByUser(id, password);
+        if (userProfile==null) return null;
+
+        return generateToken(userProfile);
     }
 }
