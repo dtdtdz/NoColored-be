@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.user.entity.UserProfile;
-import com.ssafy.backend.user.dao.UserInfoRepository;
+import com.ssafy.backend.user.dao.UserProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
@@ -24,7 +24,7 @@ public class TextMessageServiceImpl implements TextMessageService{
     SessionRepository sessionRepository;
 
     @Autowired
-    UserInfoRepository userInfoRepository;
+    UserProfileRepository userInfoRepository;
     
     private final static ObjectMapper mapper = new ObjectMapper();
     
