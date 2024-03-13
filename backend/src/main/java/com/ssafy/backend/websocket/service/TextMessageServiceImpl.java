@@ -6,29 +6,43 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.dao.UserProfileRepository;
-import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
-import static com.ssafy.backend.websocket.dao.SessionRepository.userWebsocketMap;
-import static com.ssafy.backend.websocket.dao.SessionRepository.userCodeMap;
 import static com.ssafy.backend.user.util.RandomNickname.makeNickname;
 
 @Service
 public class TextMessageServiceImpl implements TextMessageService{
 
-    @Autowired
-    SessionRepository sessionRepository;
 
-    @Autowired
-    UserProfileRepository userInfoRepository;
-    
-    private final static ObjectMapper mapper = new ObjectMapper();
-    
+    private final SessionRepository sessionRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final ObjectMapper mapper;
+    private final Map<String, Consumer<JsonNode>> actionHandlers;
+
+    public TextMessageServiceImpl(SessionRepository sessionRepository,
+                                  UserProfileRepository userProfileRepository){
+        this.sessionRepository = sessionRepository;
+        this.userProfileRepository = userProfileRepository;
+        mapper = new ObjectMapper();
+        actionHandlers = new HashMap<>();
+        actionHandlers.put("token", this::handleToken);
+    }
+
+    static {
+
+    }
+
+    private void handleToken(JsonNode node){
+        System.out.println(node);
+    };
     // 로그인 처리하기
     @Override
     public String textMessageProcessing(WebSocketSession session, TextMessage message) throws IOException {
@@ -36,6 +50,10 @@ public class TextMessageServiceImpl implements TextMessageService{
         // message에서 action을 가져온다
         JsonNode jsonNode = mapper.readTree(message.getPayload());
         String action = jsonNode.get("action").asText();
+
+        switch (action){
+
+        }
 
         ObjectNode responseNode = mapper.createObjectNode();
         responseNode.put("action", action);
@@ -60,7 +78,7 @@ public class TextMessageServiceImpl implements TextMessageService{
                     .build();
 
             // UserInfo 객체를 데이터베이스에 저장
-            userInfoRepository.save(guestUser);
+//            userInfoRepository.save(guestUser);
 
             // 응답 노드에 게스트 사용자 정보 추가
             responseNode.put("status", "success");

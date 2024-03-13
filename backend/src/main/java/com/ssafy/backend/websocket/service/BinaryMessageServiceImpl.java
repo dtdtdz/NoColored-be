@@ -251,6 +251,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                         throw new RuntimeException(e);
                     } catch (Exception e){
                         System.out.println("can't find session");
+//                        SessionRepository.userWebsocketMap.get(entry.getKey()).setGameInfo(null);
                         SessionRepository.inGameUser.remove(entry.getKey());
                         SessionRepository.inGameList.remove(gameInfo);
                         e.printStackTrace();

@@ -11,10 +11,15 @@ import org.springframework.web.socket.WebSocketSession;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class UserAccessInfo {
     private WebSocketSession session;
     private String token;
     private UserProfile userProfile;
+    private GameInfo gameInfo;
+//    enum state 필요?
+    public UserAccessInfo(WebSocketSession session){
+        this.session = session;
+    }
+
 }

@@ -6,12 +6,15 @@ import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.dao.UserProfileRepository;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.user.util.RandomNickname;
+import com.ssafy.backend.websocket.dao.SessionRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -21,14 +24,19 @@ public class UserServiceImpl implements UserService {
     private final UserInfoRepository userInfoRepository;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
+
+    private final ScheduledExecutorService authScheduledExecutorService;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
-                           RedisTemplate<String,Object> redisTemplate) {
+                           RedisTemplate<String,Object> redisTemplate,
+                           @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService
+                           ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
         this.jwtUtil = jwtUtil;
         this.redisTemplate = redisTemplate;
+        this.authScheduledExecutorService = authScheduledExecutorService;
     }
 
 
@@ -79,7 +87,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public String generateToken(UserProfile userProfile){
         String token = jwtUtil.generateToken(userProfile.getUserCode());
-        redisTemplate.opsForValue().set("token:" + token, userProfile.getId(), 3600, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set("token:" + token, userProfile.getId(), 3600*8, TimeUnit.SECONDS);//8시간 살아있음
+        authScheduledExecutorService.schedule(()->{
+            if (!SessionRepository.userTokenMap.containsKey(token)){
+                redisTemplate.delete("token:" + token);
+            }
+//            redisTemplate.opsForValue().remo
+        },10, TimeUnit.SECONDS);
         return token;
     }
 
