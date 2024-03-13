@@ -5,7 +5,7 @@ services:
       context: "./backend"
       dockerfile: Dockerfile 
     ports:
-      - "18080:8080"
+      - "8080:8080"
     networks:
       - deploy # 컨테이너를 연결할 네트워크 
 
