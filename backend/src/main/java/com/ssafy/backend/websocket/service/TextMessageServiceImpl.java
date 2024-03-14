@@ -72,9 +72,10 @@ public class TextMessageServiceImpl implements TextMessageService {
 //        System.out.println("text");
         if (handler != null) {
             UserAccessInfo result = (UserAccessInfo)handler.apply(jsonNode.get("token"));
-            if (result!=null){
+            if (result!=null) {
                 result.setSession(session);
                 sessionRepository.userWebsocketMap.put(session, result);
+                System.out.println(result.getUserProfile().getId());
             }
         } else {
             System.out.println("Unknown action: " + action);

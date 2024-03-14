@@ -50,7 +50,7 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
                     throw new RuntimeException(e);
                 }
             }
-        },1000, TimeUnit.SECONDS);
+        },10, TimeUnit.SECONDS);
     }
 
     @Override

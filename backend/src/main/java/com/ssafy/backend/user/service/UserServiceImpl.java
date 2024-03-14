@@ -68,6 +68,10 @@ public class UserServiceImpl implements UserService {
             UserProfile userProfile = UserProfile.builder()
                     .userNickname(nickname)
                     .userCode(userCode)
+                    .userExp(0L)
+                    .userRating(0)
+                    .userSkin("")
+                    .userTitle("")
                     .build();
 
             userProfileRepository.save(userProfile);
@@ -78,6 +82,7 @@ public class UserServiceImpl implements UserService {
                     .userId(id)
                     .userPwd(password)
                     .userProfile(userProfile)
+                    .isDeleted(false)
                     .build();
 
             userInfoRepository.save(userInfo);

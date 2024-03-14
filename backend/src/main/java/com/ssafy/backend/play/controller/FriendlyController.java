@@ -1,11 +1,16 @@
 package com.ssafy.backend.play.controller;
 
+import com.ssafy.backend.play.service.FriendlyService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/play/Friendly")
 public class FriendlyController {
+    private final FriendlyService friendlyService;
+    public FriendlyController(FriendlyService friendlyService){
+        this.friendlyService = friendlyService;
+    }
     @GetMapping
     private ResponseEntity<?> getRoomList(){
         return ResponseEntity.ok("");
