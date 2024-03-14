@@ -60,6 +60,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserProfile guestSignUp(){
+        try {
+            String userCode = getUserCode();
+            if (userCode == null) throw new RuntimeException("유저코드 생성 실패");
+            UserProfile userProfile = UserProfile.builder()
+                    .userNickname(RandomNickname.makeNickname())
+                    .userCode(userCode)
+                    .build();
+            userProfileRepository.save(userProfile);
+            return userProfile;
+        } catch (Exception e){
+            throw new RuntimeException("게스트 생성 실패.");
+        }
+    }
+
+    @Override
     @Transactional
     public UserProfile signUp(String id, String password, String nickname) {
         try {
@@ -89,7 +105,7 @@ public class UserServiceImpl implements UserService {
             return userProfile;
 
         } catch (Exception e){
-            throw new RuntimeException("이미 있는 id");
+            throw new RuntimeException("이미 있는 id입니다.");
         }
     }
     @Override
