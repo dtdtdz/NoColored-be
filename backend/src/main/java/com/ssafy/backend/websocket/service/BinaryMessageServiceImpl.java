@@ -2,10 +2,9 @@ package com.ssafy.backend.websocket.service;
 
 import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.websocket.domain.*;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.BinaryMessage;
@@ -17,6 +16,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
@@ -29,6 +29,8 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     private final ByteBuffer[] buffer;
     private final PriorityQueue<CharacterInfo> characterQueue;
     private final List<byte[]> stepList;
+
+    private ScheduledFuture<?> future;
     BinaryMessageServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
                              SessionRepository sessionRepository){
         this.scheduledExecutorService = scheduledExecutorService;
@@ -41,6 +43,19 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
         stepList = new ArrayList<>();
     }
+    @EventListener(ApplicationReadyEvent.class)
+    public void scheduleTaskAfterStartup() {
+        long initialDelay = 0; // 시작 지연 없음
+        long period = 16_666; // 17ms
+
+        // 여기에 반복 실행할 태스크의 로직을 작성
+        //            System.out.println("태스크 실행: " + System.currentTimeMillis());
+        future = scheduledExecutorService.scheduleAtFixedRate(this::gameLogic, initialDelay, period, TimeUnit.MICROSECONDS);
+    }
+    @EventListener
+    public void onApplicationEvent(ContextClosedEvent event) {
+//        future.cancel(false);
+    }
 
     @Override
     public void setRoom(WebSocketSession session) {
@@ -51,214 +66,224 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     public void getRoomInfoList() {
 
     }
-    @EventListener(ApplicationReadyEvent.class)
-    public void scheduleTaskAfterStartup() {
-        long initialDelay = 0; // 시작 지연 없음
-        long period = 16_666; // 17ms
-
-        // 여기에 반복 실행할 태스크의 로직을 작성
-        //            System.out.println("태스크 실행: " + System.currentTimeMillis());
-        scheduledExecutorService.scheduleAtFixedRate(this::physics, initialDelay, period, TimeUnit.MICROSECONDS);
-    }
-
-    private void physics (){
-//        System.out.print(sessionRepository.inGameList.size());
-        for (GameInfo gameInfo : sessionRepository.inGameList){
-            if (Duration.between(gameInfo.getStartDate(), LocalDateTime.now()).getSeconds()>=100){
-                System.out.println("game close");
-                for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-                    sessionRepository.inGameUser.remove(entry.getKey());
-                }
-
-                sessionRepository.inGameList.remove(gameInfo);
-
-            } else {
-                long dt = gameInfo.tick();
-
-                MapInfo mapInfo = gameInfo.getMapInfo();
-                CharacterInfo[] characterInfoArr = gameInfo.getCharacterInfoArr();
-                boolean[][] floor = gameInfo.getFloor();
-
-                characterQueue.clear();
-                stepList.clear();
-
-                boolean checkSecond = gameInfo.checkSecond();
 
 
-                for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-                    int bufferNum = entry.getValue().getBufferNum();
-                    buffer[bufferNum].clear();
-                    if (checkSecond) putTime(buffer[bufferNum], gameInfo);
 
-                    buffer[bufferNum].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
-                            .put((byte) (16))
-                            .put((byte) characterInfoArr.length);
-                }
+
+    private void physics(GameInfo gameInfo){
+        long dt = gameInfo.tick();
+
+        MapInfo mapInfo = gameInfo.getMapInfo();
+        CharacterInfo[] characterInfoArr = gameInfo.getCharacterInfoArr();
+        boolean[][] floor = gameInfo.getFloor();
+
+        characterQueue.clear();
+        stepList.clear();
+
+        boolean checkSecond = gameInfo.checkSecond();
+
+
+        for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
+            int bufferNum = entry.getValue().getBufferNum();
+            buffer[bufferNum].clear();
+            if (checkSecond) putTime(buffer[bufferNum], gameInfo);
+
+            buffer[bufferNum].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
+                    .put((byte) (16))
+                    .put((byte) characterInfoArr.length);
+        }
 //                System.out.print(2);
 //phaser.js 에서 x좌표 이동 후 중력가속도 적용하는것처럼 작동함
-                for (int i=0; i<characterInfoArr.length; i++){
-                    CharacterInfo cInfo = characterInfoArr[i];
-                    float tarX = cInfo.getX()+(dt/1000f)*cInfo.getVelX();
-                    float halfSize = GameInfo.CHARACTER_SIZE/2f;
-                    if (tarX + halfSize > mapInfo.getRight()){
-                        gameInfo.toLeft(i);
-                        tarX = -tarX+2*(mapInfo.getRight()-halfSize);
-                    } else if (tarX - halfSize < mapInfo.getLeft()){
-                        gameInfo.toRight(i);
-                        tarX = 2*(mapInfo.getLeft()+halfSize)-tarX;
-                    }
+        for (int i=0; i<characterInfoArr.length; i++){
+            CharacterInfo cInfo = characterInfoArr[i];
+            float tarX = cInfo.getX()+(dt/1000f)*cInfo.getVelX();
+            float halfSize = GameInfo.CHARACTER_SIZE/2f;
+            if (tarX + halfSize > mapInfo.getRight()){
+                gameInfo.toLeft(i);
+                tarX = -tarX+2*(mapInfo.getRight()-halfSize);
+            } else if (tarX - halfSize < mapInfo.getLeft()){
+                gameInfo.toRight(i);
+                tarX = 2*(mapInfo.getLeft()+halfSize)-tarX;
+            }
 //                    System.out.print(3+":"+i+":1 ");
-                    float velY = cInfo.getVelY();
-                    float tarY = cInfo.getY();
+            float velY = cInfo.getVelY();
+            float tarY = cInfo.getY();
 //                    +(dt/1000f)*cInfo.getVelY()
-                    boolean isPlatForm = false;
+            boolean isPlatForm = false;
 //                    left = tarX-half, right = tarX+half, bottom = tarY+half
 //                    [bottom/18] (bottom%18)<=4
 //                    (left/18)
 //                    [(right/18)-1]
 //                    y축 이동 전 플랫폼 충돌
 
-                    int blockLeft = (int)((tarX-halfSize)/GameInfo.BLOCK_SIZE)-GameInfo.WALL_WIDTH;
-                    int blockRight =(int) Math.ceil((tarX+halfSize)/GameInfo.BLOCK_SIZE)-1-GameInfo.WALL_WIDTH;
-                    float bottom = tarY+halfSize;
-                    int blockY = (int)(bottom/GameInfo.BLOCK_SIZE);
-                    try {
-                        if (velY>=0&&bottom%GameInfo.BLOCK_SIZE<=4){
+            int blockLeft = (int)((tarX-halfSize)/GameInfo.BLOCK_SIZE)-GameInfo.WALL_WIDTH;
+            int blockRight =(int) Math.ceil((tarX+halfSize)/GameInfo.BLOCK_SIZE)-1-GameInfo.WALL_WIDTH;
+            float bottom = tarY+halfSize;
+            int blockY = (int)(bottom/GameInfo.BLOCK_SIZE);
+            try {
+                if (velY>=0&&bottom%GameInfo.BLOCK_SIZE<=4){
 
-                            if (indexCheck(blockY, floor[0].length)
-                                    && ((indexCheck(blockLeft, floor.length)
-                                    && floor[blockLeft][blockY])
-                                    || (indexCheck(blockRight, floor.length)
-                                    && floor[blockRight][blockY]))){
-                                tarY = blockY*GameInfo.BLOCK_SIZE-halfSize;
-                                isPlatForm = true;
-                            }
-                        }
-
-                        if (!isPlatForm){
-                            velY += (dt/1000f)*GameInfo.GRAVITY;
-                            tarY += (dt/1000f)*velY;
-                            if (tarY > (GameInfo.MAP_HEIGHT*GameInfo.BLOCK_SIZE+halfSize)){
-                                tarY %= (GameInfo.MAP_HEIGHT*GameInfo.BLOCK_SIZE+halfSize);
-                            }
-
-
-                            bottom = tarY+halfSize;
-                            int nextBlockY = (int)(bottom/GameInfo.BLOCK_SIZE);
-
-                            if (velY>=0 &&((bottom%GameInfo.BLOCK_SIZE<=4)||blockY<nextBlockY)){
-                                if (indexCheck(nextBlockY, floor[0].length)
-                                        && ((indexCheck(blockLeft, floor.length)
-                                        && floor[blockLeft][nextBlockY])
-                                        || (indexCheck(blockRight, floor.length)
-                                        && floor[blockRight][nextBlockY]))
-                                ){
-                                    tarY = nextBlockY*GameInfo.BLOCK_SIZE-halfSize;
-                                    isPlatForm = true;
-                                }
-                            }
-                        }
-                    } catch (Exception e){
-//                        System.out.println("err:"+tarX+" "+tarY);
-                        e.printStackTrace();
+                    if (indexCheck(blockY, floor[0].length)
+                            && ((indexCheck(blockLeft, floor.length)
+                            && floor[blockLeft][blockY])
+                            || (indexCheck(blockRight, floor.length)
+                            && floor[blockRight][blockY]))){
+                        tarY = blockY*GameInfo.BLOCK_SIZE-halfSize;
+                        isPlatForm = true;
                     }
+                }
+
+                if (!isPlatForm){
+                    velY += (dt/1000f)*GameInfo.GRAVITY;
+                    tarY += (dt/1000f)*velY;
+                    if (tarY > (GameInfo.MAP_HEIGHT*GameInfo.BLOCK_SIZE+halfSize)){
+                        tarY %= (GameInfo.MAP_HEIGHT*GameInfo.BLOCK_SIZE+halfSize);
+                    }
+
+
+                    bottom = tarY+halfSize;
+                    int nextBlockY = (int)(bottom/GameInfo.BLOCK_SIZE);
+
+                    if (velY>=0 &&((bottom%GameInfo.BLOCK_SIZE<=4)||blockY<nextBlockY)){
+                        if (indexCheck(nextBlockY, floor[0].length)
+                                && ((indexCheck(blockLeft, floor.length)
+                                && floor[blockLeft][nextBlockY])
+                                || (indexCheck(blockRight, floor.length)
+                                && floor[blockRight][nextBlockY]))
+                        ){
+                            tarY = nextBlockY*GameInfo.BLOCK_SIZE-halfSize;
+                            isPlatForm = true;
+                        }
+                    }
+                }
+            } catch (Exception e){
+//                        System.out.println("err:"+tarX+" "+tarY);
+                e.printStackTrace();
+            }
 
 //                    System.out.print(3+":"+i+":2 ");
-                    if (isPlatForm) {
-                        if (cInfo.isJump()){
-                            velY = -190;
-                            cInfo.setJump(false);
-                        } else {
-                            velY = 0;
-                        }
-                    } else {
-                        cInfo.setJump(false);
-                    }
-
-                    cInfo.setX(tarX);
-                    cInfo.setY(tarY);
-                    cInfo.setVelY(velY);
-
-                    characterQueue.offer(cInfo);
+            if (isPlatForm) {
+                if (cInfo.isJump()){
+                    velY = -190;
+                    cInfo.setJump(false);
+                } else {
+                    velY = 0;
                 }
+            } else {
+                cInfo.setJump(false);
+            }
 
-                LinkedList<CharacterInfo> validCharacter = new LinkedList<>();
-                Queue<CharacterInfo> removeCharacter = new ArrayDeque<>();
-                int cSize = GameInfo.CHARACTER_SIZE;
-                while (!characterQueue.isEmpty()){
-                    CharacterInfo curC = characterQueue.poll();
-                    boolean flag = false;
-                    for (CharacterInfo listC:validCharacter){
-                        if (listC.getY()+cSize<=curC.getY()){
-                            removeCharacter.offer(listC);
-                        } else if(listC.getY()+cSize/2f<curC.getY()
-                                && Math.abs(listC.getX()-curC.getX())<cSize
-                                && listC.getVelY()>curC.getVelY()
-                        ){
+            cInfo.setX(tarX);
+            cInfo.setY(tarY);
+            cInfo.setVelY(velY);
+
+            characterQueue.offer(cInfo);
+        }
+
+        LinkedList<CharacterInfo> validCharacter = new LinkedList<>();
+        Queue<CharacterInfo> removeCharacter = new ArrayDeque<>();
+        int cSize = GameInfo.CHARACTER_SIZE;
+        while (!characterQueue.isEmpty()){
+            CharacterInfo curC = characterQueue.poll();
+            boolean flag = false;
+            for (CharacterInfo listC:validCharacter){
+                if (listC.getY()+cSize<=curC.getY()){
+                    removeCharacter.offer(listC);
+                } else if(listC.getY()+cSize/2f<curC.getY()
+                        && Math.abs(listC.getX()-curC.getX())<cSize
+                        && listC.getVelY()>curC.getVelY()
+                ){
 //                            y좌표 캐릭터 크기에 대해 0.5<차이<1일때, 캐릭터 x축 겹치는가?
 //                            속도 위에있는게 아래 밟을 수 있나?
-                            listC.setVelY(-100);
-                            flag = true;
+                    listC.setVelY(-100);
+                    flag = true;
 
-                            if (curC.getUserGameInfo()!=null){
-                                UserGameInfo user = listC.getUserGameInfo();
-                                user.setScore((byte) (user.getScore()+1));
-                                stepList.add(new byte[]{ user.getPlayerNum(),
-                                        curC.getUserGameInfo().getPlayerNum(), user.getScore()});
-                            }
-
-                            break;//밟힌 캐릭터는 더 밟힐 수 없다.
-                        }
-                    }
-                    if (!flag && curC.getUserGameInfo()!=null){
-                        validCharacter.offer(curC);
+                    if (curC.getUserGameInfo()!=null){
+                        UserGameInfo user = listC.getUserGameInfo();
+                        user.setScore((byte) (user.getScore()+1));
+                        stepList.add(new byte[]{ user.getPlayerNum(),
+                                curC.getUserGameInfo().getPlayerNum(), user.getScore()});
                     }
 
-                    while (!removeCharacter.isEmpty()){
-                        CharacterInfo tmp = removeCharacter.poll();
-                        validCharacter.remove(tmp);
-                    }
+                    break;//밟힌 캐릭터는 더 밟힐 수 없다.
                 }
+            }
+            if (!flag && curC.getUserGameInfo()!=null){
+                validCharacter.offer(curC);
+            }
+
+            while (!removeCharacter.isEmpty()){
+                CharacterInfo tmp = removeCharacter.poll();
+                validCharacter.remove(tmp);
+            }
+        }
 //                System.out.println(4);
 //                System.out.println("game logic");
-                for (Map.Entry<WebSocketSession,UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-                    int bufferNum = entry.getValue().getBufferNum();
+        for (Map.Entry<WebSocketSession,UserGameInfo> entry: gameInfo.getUsers().entrySet()){
+            int bufferNum = entry.getValue().getBufferNum();
 
-                    for (CharacterInfo cInfo:characterInfoArr){
+            for (CharacterInfo cInfo:characterInfoArr){
 
-                        buffer[bufferNum].putFloat(cInfo.getX());
-                        buffer[bufferNum].putFloat(cInfo.getY());
-                        buffer[bufferNum].putFloat(cInfo.getVelX());
-                        buffer[bufferNum].putFloat(cInfo.getVelY());
-                    }
+                buffer[bufferNum].putFloat(cInfo.getX());
+                buffer[bufferNum].putFloat(cInfo.getY());
+                buffer[bufferNum].putFloat(cInfo.getVelX());
+                buffer[bufferNum].putFloat(cInfo.getVelY());
+            }
 
-                    if (!stepList.isEmpty()){
-                        putStep(buffer[bufferNum]);
+            if (!stepList.isEmpty()){
+                putStep(buffer[bufferNum]);
 //                        System.out.println(stepList.size());
-                    }
+            }
 
-                    try {
+            try {
 
-                        buffer[bufferNum].flip();
+                buffer[bufferNum].flip();
 
-                        synchronized (entry.getKey()){
-                            entry.getKey().sendMessage(new BinaryMessage(buffer[bufferNum]));
-                        }
-                    } catch (IOException e) {
+                synchronized (entry.getKey()){
+                    entry.getKey().sendMessage(new BinaryMessage(buffer[bufferNum]));
+                }
+            } catch (IOException e) {
 //                    e.printStackTrace();
 //                    roomInfo.getSessions().remove(session);
-                        e.printStackTrace();
-                        throw new RuntimeException(e);
-                    } catch (Exception e){
-                        System.out.println("can't find session");
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            } catch (Exception e){
+                System.out.println("can't find session");
 //                        SessionRepository.userWebsocketMap.get(entry.getKey()).setGameInfo(null);
+                sessionRepository.inGameUser.remove(entry.getKey());
+                sessionRepository.removeGame(gameInfo);
+                e.printStackTrace();
+            }
+        }
+    }
+    private void gameLogic(){
+        try {
+            sessionRepository.updateGameList();
+            Iterator<GameInfo> gameInfoIterator = sessionRepository.getGameInfoIterator();
+            while (gameInfoIterator.hasNext()){
+                GameInfo gameInfo = gameInfoIterator.next();
+                if (Duration.between(gameInfo.getStartDate(), LocalDateTime.now()).getSeconds()>=100){
+                    System.out.println("game close");
+                    for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
                         sessionRepository.inGameUser.remove(entry.getKey());
-                        sessionRepository.inGameList.remove(gameInfo);
+                    }
+
+                    sessionRepository.removeGame(gameInfo);
+
+                } else {
+                    try {
+                        physics(gameInfo);
+                    } catch (Exception e){
                         e.printStackTrace();
+                        throw e;
                     }
                 }
             }
+
+        } catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
     public boolean indexCheck(int idx, int size){
@@ -323,11 +348,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                 .put((byte) 1).put((byte)1).put((byte)gameInfo.getSecond());
     }
     private void testStart2(WebSocketSession session) {
-        GameInfo gameInfo = null;
-        for (GameInfo game:sessionRepository.inGameList){
-            gameInfo = game;
-            break;
-        }
+        GameInfo gameInfo = lastGame;
 
         if (gameInfo==null) return;
         gameInfo.putSession(session);
@@ -360,13 +381,13 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         }
 
     }
+    private GameInfo lastGame;
     private void testStart(WebSocketSession session){
 //        RoomInfo roomInfoEx = new RoomInfo(SessionRepository.loginUserMap(session));
         GameInfo gameInfo = new GameInfo();
         //수정 필요
         gameInfo.putSession(session);
-        sessionRepository.inGameList.add(gameInfo);
-        sessionRepository.inGameUser.put(session, gameInfo);
+        lastGame = gameInfo;
 
         ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
 
@@ -393,6 +414,8 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
             System.out.println("can't find session");
             e.printStackTrace();
         }
+        sessionRepository.addGame(gameInfo);
+        sessionRepository.inGameUser.put(session, gameInfo);
     }
 
     private void testLogin(WebSocketSession session){
