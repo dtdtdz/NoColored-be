@@ -29,13 +29,13 @@ public class UserProfile {
     @Column(columnDefinition = "LONGTEXT")//url, 변경될 수 있음
     private String userSkin;
 
-    private boolean isGuest = false; // 기본값 설정
+    private boolean isGuest;
 
-    private Long userExp = 0L; // 기본값 설정
+    private Long userExp;
 
     @Column(length = 30)
     private String userTitle;
 
-    private Integer userLevel = 0; // 기본값 설정
+    private Integer userRating;
 
 }
