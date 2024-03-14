@@ -4,7 +4,7 @@ package com.ssafy.backend.websocket.handler;
 import com.ssafy.backend.websocket.service.BinaryMessageService;
 import com.ssafy.backend.websocket.service.TextMessageService;
 import com.ssafy.backend.websocket.dao.SessionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
@@ -12,17 +12,18 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 @Component
+@RequiredArgsConstructor
 public class MyWebSocketHandler extends AbstractWebSocketHandler {
 
     private final BinaryMessageService binaryMessageService;
     private final TextMessageService textMessageService;
-
-    public MyWebSocketHandler(BinaryMessageService binaryMessageService,
-                       TextMessageService textMessageService){
-        this.binaryMessageService = binaryMessageService;
-        this.textMessageService = textMessageService;
-    }
+    private final SessionRepository sessionRepository;
+    private final ScheduledExecutorService authScheduledExecutorService;
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
@@ -40,16 +41,22 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("Connection established");
-//        session.get
-        SessionRepository.sessions.add(session);
+
+        authScheduledExecutorService.schedule(()->{
+            if (!sessionRepository.userWebsocketMap.containsKey(session)){
+                try {
+                    session.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        },1000, TimeUnit.SECONDS);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         System.out.println("Connection closed: " + status);
-        if (SessionRepository.sessions.remove(session)){
-//            System.out.println("close");
-        }
+//        close logic
     }
 
 

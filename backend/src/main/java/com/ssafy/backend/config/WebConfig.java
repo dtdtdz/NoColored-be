@@ -16,6 +16,6 @@ public class WebConfig implements WebMvcConfigurer {    @Override
 //                .allowedOrigins("http://nocolored.store")
 //                .allowedOrigins("http://nocolored.store:18080")
 //                .allowedOrigins("http://nocolored.store:8080");
-////                .allowedOrigins("https://i10a709.p.ssafy.io");
+//                .allowedOrigins("https://i10a709.p.ssafy.io");
     }
 }
