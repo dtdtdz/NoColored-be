@@ -1,9 +1,8 @@
 package com.ssafy.backend.config;
 
-import com.ssafy.backend.websocket.dao.SessionRepository;
+import com.ssafy.backend.websocket.service.MessageProcessService;
+import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.websocket.handler.MyWebSocketHandler;
-import com.ssafy.backend.websocket.service.BinaryMessageService;
-import com.ssafy.backend.websocket.service.TextMessageService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,23 +16,20 @@ import java.util.concurrent.ScheduledExecutorService;
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final BinaryMessageService binaryMessageService;
-    private final TextMessageService textMessageService;
-    private final SessionRepository sessionRepository;
+    private final MessageProcessService messageProcessService;
+    private final SessionCollection sessionRepository;
     private final ScheduledExecutorService authScheduledExecutorService;
     // 생성자를 통해 필요한 서비스들을 주입받음
-    public WebSocketConfig(BinaryMessageService binaryMessageService,
-                           TextMessageService textMessageService,
-                           SessionRepository sessionRepository,
+    public WebSocketConfig(MessageProcessService messageProcessService,
+                           SessionCollection sessionRepository,
                            @Qualifier("authScheduledExecutorService") ScheduledExecutorService authScheduledExecutorService) {
-        this.binaryMessageService = binaryMessageService;
-        this.textMessageService = textMessageService;
+        this.messageProcessService = messageProcessService;
         this.sessionRepository = sessionRepository;
         this.authScheduledExecutorService = authScheduledExecutorService;
     }
     @Bean
     public MyWebSocketHandler myWebSocketHandler(){
-        return new MyWebSocketHandler(binaryMessageService, textMessageService, sessionRepository, authScheduledExecutorService);
+        return new MyWebSocketHandler(messageProcessService, sessionRepository, authScheduledExecutorService);
     }
 
     // 요청경로: /game

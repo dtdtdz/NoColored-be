@@ -1,7 +1,8 @@
-package com.ssafy.backend.websocket.service;
+package com.ssafy.backend.game.service;
 
-import com.ssafy.backend.websocket.dao.SessionRepository;
-import com.ssafy.backend.websocket.domain.*;
+import com.ssafy.backend.game.util.InGameCollection;
+import com.ssafy.backend.websocket.util.SessionCollection;
+import com.ssafy.backend.game.domain.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.ContextClosedEvent;
@@ -21,27 +22,28 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 @Service
-public class BinaryMessageServiceImpl implements BinaryMessageService {
+public class GameServiceImpl implements GameService {
 
     private final ScheduledExecutorService scheduledExecutorService;
 //    private final ScheduledExecutorService
-    private final SessionRepository sessionRepository;
+    private final SessionCollection sessionCollection;
+    private final InGameCollection inGameCollection;
     private final ByteBuffer[] buffer;
     private final PriorityQueue<CharacterInfo> characterQueue;
-    private final List<byte[]> stepList;
+
 
     private ScheduledFuture<?> future;
-    BinaryMessageServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
-                             SessionRepository sessionRepository){
+    GameServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
+                    SessionCollection sessionRepository,
+                    InGameCollection inGameRepository){
         this.scheduledExecutorService = scheduledExecutorService;
-        this.sessionRepository = sessionRepository;
-
+        this.sessionCollection = sessionRepository;
+        this.inGameCollection = inGameRepository;
         buffer = new ByteBuffer[GameInfo.MAX_PLAYER];
         for (int i=0; i<buffer.length; i++){
             buffer[i] = ByteBuffer.allocate(1024);
         }
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
-        stepList = new ArrayList<>();
     }
     @EventListener(ApplicationReadyEvent.class)
     public void scheduleTaskAfterStartup() {
@@ -78,16 +80,15 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         boolean[][] floor = gameInfo.getFloor();
 
         characterQueue.clear();
-        stepList.clear();
+
 
         boolean checkSecond = gameInfo.checkSecond();
-
+        gameInfo.getStepList().clear();
 
         for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
             int bufferNum = entry.getValue().getBufferNum();
             buffer[bufferNum].clear();
-            if (checkSecond) putTime(buffer[bufferNum], gameInfo);
-
+            if (checkSecond) gameInfo.putTime(buffer[bufferNum]);
             buffer[bufferNum].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
                     .put((byte) (16))
                     .put((byte) characterInfoArr.length);
@@ -201,7 +202,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                     if (curC.getUserGameInfo()!=null){
                         UserGameInfo user = listC.getUserGameInfo();
                         user.setScore((byte) (user.getScore()+1));
-                        stepList.add(new byte[]{ user.getPlayerNum(),
+                        gameInfo.getStepList().add(new byte[]{ user.getPlayerNum(),
                                 curC.getUserGameInfo().getPlayerNum(), user.getScore()});
                     }
 
@@ -230,8 +231,9 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                 buffer[bufferNum].putFloat(cInfo.getVelY());
             }
 
-            if (!stepList.isEmpty()){
-                putStep(buffer[bufferNum]);
+
+            if (!gameInfo.getStepList().isEmpty()){
+                gameInfo.putStep(buffer[bufferNum]);
 //                        System.out.println(stepList.size());
             }
 
@@ -250,25 +252,25 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
             } catch (Exception e){
                 System.out.println("can't find session");
 //                        SessionRepository.userWebsocketMap.get(entry.getKey()).setGameInfo(null);
-                sessionRepository.inGameUser.remove(entry.getKey());
-                sessionRepository.removeGame(gameInfo);
+                inGameCollection.inGameUser.remove(entry.getKey());
+                inGameCollection.removeGame(gameInfo);
                 e.printStackTrace();
             }
         }
     }
     private void gameLogic(){
         try {
-            sessionRepository.updateGameList();
-            Iterator<GameInfo> gameInfoIterator = sessionRepository.getGameInfoIterator();
+            inGameCollection.updateGameList();
+            Iterator<GameInfo> gameInfoIterator = inGameCollection.getGameInfoIterator();
             while (gameInfoIterator.hasNext()){
                 GameInfo gameInfo = gameInfoIterator.next();
                 if (Duration.between(gameInfo.getStartDate(), LocalDateTime.now()).getSeconds()>=100){
                     System.out.println("game close");
                     for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-                        sessionRepository.inGameUser.remove(entry.getKey());
+                        inGameCollection.inGameUser.remove(entry.getKey());
                     }
 
-                    sessionRepository.removeGame(gameInfo);
+                    inGameCollection.removeGame(gameInfo);
 
                 } else {
                     try {
@@ -290,135 +292,6 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         return idx>=0 && idx<size;
     }
 
-    @Override
-    public void binaryMessageProcessing(WebSocketSession session, BinaryMessage message) {
-        ByteBuffer byteBuffer = message.getPayload();
 
-        // 여기에서 바이너리 데이터 처리
-        byte[] arr = byteBuffer.array();
-//        System.out.println("Received binary message of size: " + byteBuffer.remaining());
 
-        ReceiveBinaryMessageType binaryMessageType = ReceiveBinaryMessageType.valueOf(arr[0]);
-        if (binaryMessageType==null) return;
-//        System.out.println(binaryMessageType);
-        switch (binaryMessageType){
-            case LEFT -> applyLeft(session);
-            case RIGHT -> applyRight(session);
-            case JUMP -> applyJump(session);
-            case TEST_START2 -> testStart2(session);
-            case TEST_START -> testStart(session);
-            case TEST_LOGIN -> testLogin(session);
-        }
-    }
-    private void applyLeft(WebSocketSession session){
-        GameInfo gameInfo = sessionRepository.inGameUser.get(session);
-        int idx = gameInfo.getUsers().get(session).getCharacterNum();
-        gameInfo.toLeft(idx);
-//        System.out.println(0);
-    }
-    private void applyRight(WebSocketSession session){
-        GameInfo gameInfo = sessionRepository.inGameUser.get(session);
-        int idx = gameInfo.getUsers().get(session).getCharacterNum();
-        gameInfo.toRight(idx);
-//        System.out.println(1);
-    }
-
-    private void applyJump(WebSocketSession session){
-        //바닥에 있으면 점프
-        GameInfo gameInfo = sessionRepository.inGameUser.get(session);
-        int idx = gameInfo.getUsers().get(session).getCharacterNum();
-        gameInfo.jump(idx);
-//        System.out.println(1);
-//        try {
-//            session.sendMessage(new TextMessage("a"));
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-    }
-    private void putStep(ByteBuffer buffer){
-        buffer.put(SendBinaryMessageType.STEP.getValue())
-                .put((byte) 3).put((byte) stepList.size());
-        for (int i=0; i<stepList.size(); i++){
-            buffer.put(stepList.get(i)[0]).put(stepList.get(i)[1]).put(stepList.get(i)[2]);
-        }
-    }
-
-    private void putTime(ByteBuffer buffer, GameInfo gameInfo){
-        buffer.put(SendBinaryMessageType.TIME.getValue())
-                .put((byte) 1).put((byte)1).put((byte)gameInfo.getSecond());
-    }
-    private void testStart2(WebSocketSession session) {
-        GameInfo gameInfo = lastGame;
-
-        if (gameInfo==null) return;
-        gameInfo.putSession(session);
-        sessionRepository.inGameUser.put(session, gameInfo);
-
-        ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
-
-        putTime(tmpbuffer, gameInfo);
-
-        tmpbuffer.put(SendBinaryMessageType.TEST_MAP.getValue()).
-                put((byte) 3).put((byte) gameInfo.getMapInfo().getFloorList().size());
-        for (int[] arr:gameInfo.getMapInfo().getFloorList()){
-            tmpbuffer.put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
-        }
-
-        try {
-            tmpbuffer.flip();
-            synchronized (session){
-                session.sendMessage(new BinaryMessage(tmpbuffer));
-            }
-
-        } catch (IOException e) {
-//                    e.printStackTrace();
-//                    roomInfo.getSessions().remove(session);
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } catch (Exception e){
-            System.out.println("can't find session");
-            e.printStackTrace();
-        }
-
-    }
-    private GameInfo lastGame;
-    private void testStart(WebSocketSession session){
-//        RoomInfo roomInfoEx = new RoomInfo(SessionRepository.loginUserMap(session));
-        GameInfo gameInfo = new GameInfo();
-        //수정 필요
-        gameInfo.putSession(session);
-        lastGame = gameInfo;
-
-        ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
-
-        putTime(tmpbuffer, gameInfo);
-
-        tmpbuffer.put(SendBinaryMessageType.TEST_MAP.getValue()).
-                put((byte) 3).put((byte) gameInfo.getMapInfo().getFloorList().size());
-        for (int[] arr:gameInfo.getMapInfo().getFloorList()){
-            tmpbuffer.put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
-        }
-
-        try {
-            tmpbuffer.flip();
-            synchronized (session){
-                session.sendMessage(new BinaryMessage(tmpbuffer));
-            }
-
-        } catch (IOException e) {
-//                    e.printStackTrace();
-//                    roomInfo.getSessions().remove(session);
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } catch (Exception e){
-            System.out.println("can't find session");
-            e.printStackTrace();
-        }
-        sessionRepository.addGame(gameInfo);
-        sessionRepository.inGameUser.put(session, gameInfo);
-    }
-
-    private void testLogin(WebSocketSession session){
-
-    }
 }

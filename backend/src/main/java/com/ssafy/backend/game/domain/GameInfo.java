@@ -1,10 +1,12 @@
-package com.ssafy.backend.websocket.domain;
+package com.ssafy.backend.game.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,7 @@ public class GameInfo {
     private CharacterInfo[] characterInfoArr;
     private boolean[][] floor;
     private int second;
-
+    private List<byte[]> stepList;
     //이것들 위치 바꿔야하나?
     public static final int CHARACTER_SIZE = 36;
     public static final float DEFAULT_SPEED = 160;
@@ -55,6 +57,7 @@ public class GameInfo {
                 floor[arr[0]+i-WALL_WIDTH][arr[1]] = true;
             }
         }
+        stepList = new ArrayList<>();
     }
 
     private GameInfo(int num){
@@ -101,6 +104,19 @@ public class GameInfo {
             return true;
         }
         return false;
+    }
+
+    public void putStep(ByteBuffer buffer){
+        buffer.put(SendBinaryMessageType.STEP.getValue())
+                .put((byte) 3).put((byte) stepList.size());
+        for (int i=0; i<stepList.size(); i++){
+            buffer.put(stepList.get(i)[0]).put(stepList.get(i)[1]).put(stepList.get(i)[2]);
+        }
+    }
+
+    public void putTime(ByteBuffer buffer){
+        buffer.put(SendBinaryMessageType.TIME.getValue())
+                .put((byte) 1).put((byte)1).put((byte)second);
     }
 
     //세션과 캐릭터를 매핑한다.

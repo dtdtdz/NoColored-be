@@ -1,4 +1,4 @@
-package com.ssafy.backend.websocket.domain;
+package com.ssafy.backend.game.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
