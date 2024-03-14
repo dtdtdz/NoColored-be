@@ -4,6 +4,7 @@ import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.websocket.domain.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.BinaryMessage;
@@ -15,6 +16,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
@@ -27,6 +29,8 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     private final ByteBuffer[] buffer;
     private final PriorityQueue<CharacterInfo> characterQueue;
     private final List<byte[]> stepList;
+
+    private ScheduledFuture<?> future;
     BinaryMessageServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
                              SessionRepository sessionRepository){
         this.scheduledExecutorService = scheduledExecutorService;
@@ -39,6 +43,19 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
         stepList = new ArrayList<>();
     }
+    @EventListener(ApplicationReadyEvent.class)
+    public void scheduleTaskAfterStartup() {
+        long initialDelay = 0; // 시작 지연 없음
+        long period = 16_666; // 17ms
+
+        // 여기에 반복 실행할 태스크의 로직을 작성
+        //            System.out.println("태스크 실행: " + System.currentTimeMillis());
+        future = scheduledExecutorService.scheduleAtFixedRate(this::gameLogic, initialDelay, period, TimeUnit.MICROSECONDS);
+    }
+    @EventListener
+    public void onApplicationEvent(ContextClosedEvent event) {
+//        future.cancel(false);
+    }
 
     @Override
     public void setRoom(WebSocketSession session) {
@@ -49,15 +66,9 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     public void getRoomInfoList() {
 
     }
-    @EventListener(ApplicationReadyEvent.class)
-    public void scheduleTaskAfterStartup() {
-        long initialDelay = 0; // 시작 지연 없음
-        long period = 16_666; // 17ms
 
-        // 여기에 반복 실행할 태스크의 로직을 작성
-        //            System.out.println("태스크 실행: " + System.currentTimeMillis());
-        scheduledExecutorService.scheduleAtFixedRate(this::gameLogic, initialDelay, period, TimeUnit.MICROSECONDS);
-    }
+
+
 
     private void physics(GameInfo gameInfo){
         long dt = gameInfo.tick();
@@ -240,31 +251,39 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                 System.out.println("can't find session");
 //                        SessionRepository.userWebsocketMap.get(entry.getKey()).setGameInfo(null);
                 sessionRepository.inGameUser.remove(entry.getKey());
-                sessionRepository.inGameList.remove(gameInfo);
+                sessionRepository.removeGame(gameInfo);
                 e.printStackTrace();
             }
         }
     }
     private void gameLogic(){
-//        System.out.print(sessionRepository.inGameList.size());
-        for (GameInfo gameInfo : sessionRepository.inGameList){
-            if (Duration.between(gameInfo.getStartDate(), LocalDateTime.now()).getSeconds()>=100){
-                System.out.println("game close");
-                for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-                    sessionRepository.inGameUser.remove(entry.getKey());
-                }
+        try {
+            sessionRepository.updateGameList();
+            Iterator<GameInfo> gameInfoIterator = sessionRepository.getGameInfoIterator();
+            while (gameInfoIterator.hasNext()){
+                GameInfo gameInfo = gameInfoIterator.next();
+                if (Duration.between(gameInfo.getStartDate(), LocalDateTime.now()).getSeconds()>=100){
+                    System.out.println("game close");
+                    for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
+                        sessionRepository.inGameUser.remove(entry.getKey());
+                    }
 
-                sessionRepository.inGameList.remove(gameInfo);
+                    sessionRepository.removeGame(gameInfo);
 
-            } else {
-                try {
-                    physics(gameInfo);
-                } catch (Exception e){
-                    e.printStackTrace();
-                    throw e;
+                } else {
+                    try {
+                        physics(gameInfo);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                        throw e;
+                    }
                 }
             }
+
+        } catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
     public boolean indexCheck(int idx, int size){
@@ -329,11 +348,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                 .put((byte) 1).put((byte)1).put((byte)gameInfo.getSecond());
     }
     private void testStart2(WebSocketSession session) {
-        GameInfo gameInfo = null;
-        for (GameInfo game:sessionRepository.inGameList){
-            gameInfo = game;
-            break;
-        }
+        GameInfo gameInfo = lastGame;
 
         if (gameInfo==null) return;
         gameInfo.putSession(session);
@@ -366,13 +381,13 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         }
 
     }
+    private GameInfo lastGame;
     private void testStart(WebSocketSession session){
 //        RoomInfo roomInfoEx = new RoomInfo(SessionRepository.loginUserMap(session));
         GameInfo gameInfo = new GameInfo();
         //수정 필요
         gameInfo.putSession(session);
-        sessionRepository.inGameList.add(gameInfo);
-        sessionRepository.inGameUser.put(session, gameInfo);
+        lastGame = gameInfo;
 
         ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
 
@@ -399,6 +414,8 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
             System.out.println("can't find session");
             e.printStackTrace();
         }
+        sessionRepository.addGame(gameInfo);
+        sessionRepository.inGameUser.put(session, gameInfo);
     }
 
     private void testLogin(WebSocketSession session){
