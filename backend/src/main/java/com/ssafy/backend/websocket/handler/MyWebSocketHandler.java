@@ -1,8 +1,8 @@
 package com.ssafy.backend.websocket.handler;
 
 
-import com.ssafy.backend.websocket.application.BinaryMessageService;
-import com.ssafy.backend.websocket.application.TextMessageService;
+import com.ssafy.backend.websocket.service.BinaryMessageService;
+import com.ssafy.backend.websocket.service.TextMessageService;
 import com.ssafy.backend.websocket.dao.SessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,10 +15,14 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 @Component
 public class MyWebSocketHandler extends AbstractWebSocketHandler {
 
-    @Autowired
-    private BinaryMessageService binaryMessageService;
-    @Autowired
-    private TextMessageService textMessageService;
+    private final BinaryMessageService binaryMessageService;
+    private final TextMessageService textMessageService;
+
+    public MyWebSocketHandler(BinaryMessageService binaryMessageService,
+                       TextMessageService textMessageService){
+        this.binaryMessageService = binaryMessageService;
+        this.textMessageService = textMessageService;
+    }
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
@@ -28,6 +32,7 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
         binaryMessageService.binaryMessageProcessing(session, message);
     }
 
+    // 로그인용
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         textMessageService.textMessageProcessing(session, message);
@@ -35,6 +40,7 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("Connection established");
+//        session.get
         SessionRepository.sessions.add(session);
     }
 
