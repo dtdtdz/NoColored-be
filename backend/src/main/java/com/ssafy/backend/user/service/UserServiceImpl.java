@@ -7,6 +7,7 @@ import com.ssafy.backend.user.dao.UserProfileRepository;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.user.util.RandomNickname;
 import com.ssafy.backend.websocket.dao.SessionRepository;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -24,19 +25,21 @@ public class UserServiceImpl implements UserService {
     private final UserInfoRepository userInfoRepository;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
-
     private final ScheduledExecutorService authScheduledExecutorService;
+    private final SessionRepository sessionRepository;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
                            RedisTemplate<String,Object> redisTemplate,
-                           @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService
+                           @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
+                           SessionRepository sessionRepository
                            ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
         this.jwtUtil = jwtUtil;
         this.redisTemplate = redisTemplate;
         this.authScheduledExecutorService = authScheduledExecutorService;
+        this.sessionRepository = sessionRepository;
     }
 
 
@@ -51,7 +54,7 @@ public class UserServiceImpl implements UserService {
             cnt++;
             testCode = RandomNickname.generateRandomString();
 //            System.out.println(testCode);
-        } while (cnt<10 && !findUserInfoByUserCode(testCode).isEmpty());
+        } while (cnt<10 && findUserInfoByUserCode(testCode).isPresent());
         if (cnt==10) return null;
         return testCode;
     }
@@ -88,11 +91,15 @@ public class UserServiceImpl implements UserService {
     public String generateToken(UserProfile userProfile){
         String token = jwtUtil.generateToken(userProfile.getUserCode());
         redisTemplate.opsForValue().set("token:" + token, userProfile.getId(), 3600*8, TimeUnit.SECONDS);//8시간 살아있음
+        sessionRepository.userIdMap.put(userProfile.getId(), new UserAccessInfo(userProfile));
+
         authScheduledExecutorService.schedule(()->{
-            if (!SessionRepository.userTokenMap.containsKey(token)){
+            if (!sessionRepository.userIdMap.containsKey(userProfile.getId())){
                 redisTemplate.delete("token:" + token);
+            } else if (sessionRepository.userIdMap.get(userProfile.getId()).getSession()==null){
+                redisTemplate.delete("token:" + token);
+                sessionRepository.userIdMap.remove(userProfile.getId());
             }
-//            redisTemplate.opsForValue().remo
         },10, TimeUnit.SECONDS);
         return token;
     }

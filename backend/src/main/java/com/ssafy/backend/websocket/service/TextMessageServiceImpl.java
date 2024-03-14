@@ -6,7 +6,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssafy.backend.websocket.dao.SessionRepository;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.dao.UserProfileRepository;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -14,84 +17,108 @@ import org.springframework.web.socket.WebSocketSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.ssafy.backend.user.util.RandomNickname.makeNickname;
 
 @Service
-public class TextMessageServiceImpl implements TextMessageService{
+public class TextMessageServiceImpl implements TextMessageService {
 
 
     private final SessionRepository sessionRepository;
     private final UserProfileRepository userProfileRepository;
     private final ObjectMapper mapper;
-    private final Map<String, Consumer<JsonNode>> actionHandlers;
-
+    private final Map<String, Function<JsonNode, Object>> actionHandlers;
+    private final RedisTemplate<String,Object> redisTemplate;
     public TextMessageServiceImpl(SessionRepository sessionRepository,
-                                  UserProfileRepository userProfileRepository){
+                                  UserProfileRepository userProfileRepository,
+                                  RedisTemplate<String,Object> redisTemplate) {
         this.sessionRepository = sessionRepository;
         this.userProfileRepository = userProfileRepository;
         mapper = new ObjectMapper();
         actionHandlers = new HashMap<>();
         actionHandlers.put("token", this::handleToken);
+        this.redisTemplate = redisTemplate;
     }
 
-    static {
+    private UserAccessInfo handleToken(JsonNode node) {
+//        System.out.println(node.asText());
+        Object value = redisTemplate.opsForValue().get("token:"+node.asText());
 
+        if (value==null) return null;
+        UUID id = UUID.fromString((String) value);
+        if (sessionRepository.userIdMap.containsKey(id)){
+            UserAccessInfo accessInfo = sessionRepository.userIdMap.get(id);
+            return accessInfo;
+        }
+        return null;
     }
 
-    private void handleToken(JsonNode node){
-        System.out.println(node);
-    };
+    ;
+
     // 로그인 처리하기
     @Override
-    public String textMessageProcessing(WebSocketSession session, TextMessage message) throws IOException {
+    public void textMessageProcessing(WebSocketSession session, TextMessage message) throws IOException {
 
         // message에서 action을 가져온다
         JsonNode jsonNode = mapper.readTree(message.getPayload());
         String action = jsonNode.get("action").asText();
 
-        switch (action){
-
+        Function<JsonNode, Object> handler = actionHandlers.get(action);
+//        System.out.println("text");
+        if (handler != null) {
+            UserAccessInfo result = (UserAccessInfo)handler.apply(jsonNode.get("token"));
+            if (result!=null){
+                result.setSession(session);
+                sessionRepository.userWebsocketMap.put(session, result);
+            }
+        } else {
+            System.out.println("Unknown action: " + action);
         }
+    }
+}
 
-        ObjectNode responseNode = mapper.createObjectNode();
-        responseNode.put("action", action);
+//        ObjectNode responseNode = mapper.createObjectNode();
+//        responseNode.put("action", action);
 
         // 로그인인 경우
-        if ("UserLogin".equals(action)) {
-            // 사용자 ID와 비밀번호 추출
-            String userId = jsonNode.get("data").get("userId").asText();
-            String userPwd = jsonNode.get("data").get("userPwd").asText();
-
-            responseNode.put("status", "success");
-
-        } else if ("GuestLogin".equals(action)) { // 게스트 로그인+회원가입 처리 로직
-            // UserInfo 객체 생성
-            UserProfile guestUser = UserProfile.builder()
-                    .userNickname(makeNickname())
-                    .userSkin("") // 기본 스킨 설정
-                    .isGuest(true) // 게스트 사용자로 설정
-                    .userExp(0L) // 경험치 초기값 설정
-                    .userTitle("") // 타이틀 설정
-                    .userLevel(0) // 레벨 설정
-                    .build();
+//        if ("UserLogin".equals(action)) {
+//            // 사용자 ID와 비밀번호 추출
+//            String userId = jsonNode.get("data").get("userId").asText();
+//            String userPwd = jsonNode.get("data").get("userPwd").asText();
+//
+//            responseNode.put("status", "success");
+//
+//        } else if ("GuestLogin".equals(action)) { // 게스트 로그인+회원가입 처리 로직
+//            // UserInfo 객체 생성
+//            UserProfile guestUser = UserProfile.builder()
+//                    .userNickname(makeNickname())
+//                    .userSkin("") // 기본 스킨 설정
+//                    .isGuest(true) // 게스트 사용자로 설정
+//                    .userExp(0L) // 경험치 초기값 설정
+//                    .userTitle("") // 타이틀 설정
+//                    .userLevel(0) // 레벨 설정
+//                    .build();
 
             // UserInfo 객체를 데이터베이스에 저장
 //            userInfoRepository.save(guestUser);
 
             // 응답 노드에 게스트 사용자 정보 추가
-            responseNode.put("status", "success");
-            responseNode.put("userId", guestUser.getId().toString());
-            responseNode.put("userNickname", guestUser.getUserNickname());
-            responseNode.put("userSkin", guestUser.getUserSkin());
-            responseNode.put("isGuest", guestUser.isGuest());
-            responseNode.put("userExp", guestUser.getUserExp());
-            responseNode.put("userTitle", guestUser.getUserTitle());
-            responseNode.put("userLevel", guestUser.getUserLevel());
-
-            // 웹소켓 세션에 사용자 정보 저장
-            session.getAttributes().put("usrInfo", guestUser);
+//            responseNode.put("status", "success");
+//            responseNode.put("userId", guestUser.getId().toString());
+//            responseNode.put("userNickname", guestUser.getUserNickname());
+//            responseNode.put("userSkin", guestUser.getUserSkin());
+//            responseNode.put("isGuest", guestUser.isGuest());
+//            responseNode.put("userExp", guestUser.getUserExp());
+//            responseNode.put("userTitle", guestUser.getUserTitle());
+//            responseNode.put("userLevel", guestUser.getUserLevel());
+//
+//            // 웹소켓 세션에 사용자 정보 저장
+//            session.getAttributes().put("usrInfo", guestUser);
 
 //            UserAccessInfo userAccessInfo = new UserAccessInfo(session, guestUser);
 //            // 맵에 매핑
@@ -114,21 +141,21 @@ public class TextMessageServiceImpl implements TextMessageService{
 
 
 
-        } else {
-            // 지원되지 않는 액션 처리
-            responseNode.put("action", "Error");
-            responseNode.put("message", "Action not supported");
-        }
+//        } else {
+//            // 지원되지 않는 액션 처리
+//            responseNode.put("action", "Error");
+//            responseNode.put("message", "Action not supported");
+//        }
 
 
 
 
         // 메시지 처리 결과를 송신자(클라이언트)에게 반환
-        session.sendMessage(new TextMessage(responseNode.toString()));
-        return responseNode.toString();
+//        session.sendMessage(new TextMessage(responseNode.toString()));
+//        return responseNode.toString();
 
-    }
-}
+//    }
+//}
 
 
 /*
