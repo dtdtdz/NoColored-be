@@ -26,9 +26,9 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     private final ScheduledExecutorService scheduledExecutorService;
 //    private final ScheduledExecutorService
     private final SessionRepository sessionRepository;
-    private ByteBuffer[] buffer;
-    PriorityQueue<CharacterInfo> characterQueue;
-    List<byte[]> stepList;
+    private final ByteBuffer[] buffer;
+    private final PriorityQueue<CharacterInfo> characterQueue;
+    private final List<byte[]> stepList;
     BinaryMessageServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
                              SessionRepository sessionRepository){
         this.scheduledExecutorService = scheduledExecutorService;
@@ -62,15 +62,15 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     }
 
     private void physics (){
-//        System.out.print("1");
-        for (GameInfo gameInfo : SessionRepository.inGameList){
+//        System.out.print(sessionRepository.inGameList.size());
+        for (GameInfo gameInfo : sessionRepository.inGameList){
             if (Duration.between(gameInfo.getStartDate(), LocalDateTime.now()).getSeconds()>=100){
                 System.out.println("game close");
                 for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-                    SessionRepository.inGameUser.remove(entry.getKey());
+                    sessionRepository.inGameUser.remove(entry.getKey());
                 }
 
-                SessionRepository.inGameList.remove(gameInfo);
+                sessionRepository.inGameList.remove(gameInfo);
 
             } else {
                 long dt = gameInfo.tick();
@@ -251,8 +251,9 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
                         throw new RuntimeException(e);
                     } catch (Exception e){
                         System.out.println("can't find session");
-                        SessionRepository.inGameUser.remove(entry.getKey());
-                        SessionRepository.inGameList.remove(gameInfo);
+//                        SessionRepository.userWebsocketMap.get(entry.getKey()).setGameInfo(null);
+                        sessionRepository.inGameUser.remove(entry.getKey());
+                        sessionRepository.inGameList.remove(gameInfo);
                         e.printStackTrace();
                     }
                 }
@@ -285,13 +286,13 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         }
     }
     private void applyLeft(WebSocketSession session){
-        GameInfo gameInfo = SessionRepository.inGameUser.get(session);
+        GameInfo gameInfo = sessionRepository.inGameUser.get(session);
         int idx = gameInfo.getUsers().get(session).getCharacterNum();
         gameInfo.toLeft(idx);
 //        System.out.println(0);
     }
     private void applyRight(WebSocketSession session){
-        GameInfo gameInfo = SessionRepository.inGameUser.get(session);
+        GameInfo gameInfo = sessionRepository.inGameUser.get(session);
         int idx = gameInfo.getUsers().get(session).getCharacterNum();
         gameInfo.toRight(idx);
 //        System.out.println(1);
@@ -299,7 +300,7 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
 
     private void applyJump(WebSocketSession session){
         //바닥에 있으면 점프
-        GameInfo gameInfo = SessionRepository.inGameUser.get(session);
+        GameInfo gameInfo = sessionRepository.inGameUser.get(session);
         int idx = gameInfo.getUsers().get(session).getCharacterNum();
         gameInfo.jump(idx);
 //        System.out.println(1);
@@ -323,14 +324,14 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
     }
     private void testStart2(WebSocketSession session) {
         GameInfo gameInfo = null;
-        for (GameInfo game:SessionRepository.inGameList){
+        for (GameInfo game:sessionRepository.inGameList){
             gameInfo = game;
             break;
         }
 
         if (gameInfo==null) return;
         gameInfo.putSession(session);
-        SessionRepository.inGameUser.put(session, gameInfo);
+        sessionRepository.inGameUser.put(session, gameInfo);
 
         ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
 
@@ -364,8 +365,8 @@ public class BinaryMessageServiceImpl implements BinaryMessageService {
         GameInfo gameInfo = new GameInfo();
         //수정 필요
         gameInfo.putSession(session);
-        SessionRepository.inGameList.add(gameInfo);
-        SessionRepository.inGameUser.put(session, gameInfo);
+        sessionRepository.inGameList.add(gameInfo);
+        sessionRepository.inGameUser.put(session, gameInfo);
 
         ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
 
