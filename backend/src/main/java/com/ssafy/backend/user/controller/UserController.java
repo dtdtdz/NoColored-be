@@ -1,17 +1,11 @@
 package com.ssafy.backend.user.controller;
 
-import com.ssafy.backend.user.dto.UserLoginDto;
+import com.ssafy.backend.user.dto.UserSignDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.service.UserService;
 import com.ssafy.backend.user.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -21,15 +15,24 @@ public class UserController {
         this.userService = userService;
 
     }
+    @GetMapping("/guest")
+    public ResponseEntity<String> guestSignUp(){
+        UserProfile userProfile = userService.guestSignUp();
+        String jwtToken = userService.generateToken(userProfile);
+        return ResponseEntity.ok(jwtToken);
+    }
+
     @PostMapping("/signup")
-    private ResponseEntity<String> signup(@RequestBody UserLoginDto user){
+
+    public ResponseEntity<String> signUp(@RequestBody UserSignDto user){
         UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
         String jwtToken = userService.generateToken(userProfile);
         return ResponseEntity.ok(jwtToken);
     }
     @PostMapping("/login")
-    private ResponseEntity<String> login(@RequestBody UserLoginDto user){
+    private ResponseEntity<String> login(@RequestBody UserSignDto user){
         return ResponseEntity.ok(userService.login(user.getId(),user.getPassword()));
     }
+
 
 }

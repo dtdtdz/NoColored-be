@@ -6,15 +6,14 @@ import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.dao.UserProfileRepository;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.user.util.RandomNickname;
-import com.ssafy.backend.websocket.dao.SessionRepository;
-import com.ssafy.backend.websocket.domain.UserAccessInfo;
+import com.ssafy.backend.websocket.util.SessionCollection;
+import com.ssafy.backend.game.domain.UserAccessInfo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -26,20 +25,20 @@ public class UserServiceImpl implements UserService {
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ScheduledExecutorService authScheduledExecutorService;
-    private final SessionRepository sessionRepository;
+    private final SessionCollection sessionCollection;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
                            RedisTemplate<String,Object> redisTemplate,
                            @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
-                           SessionRepository sessionRepository
+                           SessionCollection sessionCollection
                            ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
         this.jwtUtil = jwtUtil;
         this.redisTemplate = redisTemplate;
         this.authScheduledExecutorService = authScheduledExecutorService;
-        this.sessionRepository = sessionRepository;
+        this.sessionCollection = sessionCollection;
     }
 
 
@@ -57,6 +56,22 @@ public class UserServiceImpl implements UserService {
         } while (cnt<10 && findUserInfoByUserCode(testCode).isPresent());
         if (cnt==10) return null;
         return testCode;
+    }
+
+    @Override
+    public UserProfile guestSignUp(){
+        try {
+            String userCode = getUserCode();
+            if (userCode == null) throw new RuntimeException("유저코드 생성 실패");
+            UserProfile userProfile = UserProfile.builder()
+                    .userNickname(RandomNickname.makeNickname())
+                    .userCode(userCode)
+                    .build();
+            userProfileRepository.save(userProfile);
+            return userProfile;
+        } catch (Exception e){
+            throw new RuntimeException("게스트 생성 실패.");
+        }
     }
 
     @Override
@@ -89,21 +104,21 @@ public class UserServiceImpl implements UserService {
             return userProfile;
 
         } catch (Exception e){
-            throw new RuntimeException("이미 있는 id");
+            throw new RuntimeException("이미 있는 id입니다.");
         }
     }
     @Override
     public String generateToken(UserProfile userProfile){
         String token = jwtUtil.generateToken(userProfile.getUserCode());
         redisTemplate.opsForValue().set("token:" + token, userProfile.getId(), 3600*8, TimeUnit.SECONDS);//8시간 살아있음
-        sessionRepository.userIdMap.put(userProfile.getId(), new UserAccessInfo(userProfile));
+        sessionCollection.userIdMap.put(userProfile.getId(), new UserAccessInfo(userProfile));
 
         authScheduledExecutorService.schedule(()->{
-            if (!sessionRepository.userIdMap.containsKey(userProfile.getId())){
+            if (!sessionCollection.userIdMap.containsKey(userProfile.getId())){
                 redisTemplate.delete("token:" + token);
-            } else if (sessionRepository.userIdMap.get(userProfile.getId()).getSession()==null){
+            } else if (sessionCollection.userIdMap.get(userProfile.getId()).getSession()==null){
                 redisTemplate.delete("token:" + token);
-                sessionRepository.userIdMap.remove(userProfile.getId());
+                sessionCollection.userIdMap.remove(userProfile.getId());
             }
         },10, TimeUnit.SECONDS);
         return token;

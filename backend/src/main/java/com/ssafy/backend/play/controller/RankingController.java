@@ -18,7 +18,6 @@ public class RankingController {
     private ResponseEntity<?> addMatchingList(){
         return ResponseEntity.ok("");
     }
-
     @DeleteMapping
     private ResponseEntity<?> delMatchingList(){
         return ResponseEntity.ok("");

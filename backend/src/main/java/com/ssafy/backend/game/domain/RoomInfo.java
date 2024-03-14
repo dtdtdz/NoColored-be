@@ -1,11 +1,9 @@
-package com.ssafy.backend.websocket.domain;
+package com.ssafy.backend.game.domain;
 
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
