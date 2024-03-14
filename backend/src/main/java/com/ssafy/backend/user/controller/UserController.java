@@ -22,13 +22,13 @@ public class UserController {
 
     }
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody UserLoginDto user){
+    private ResponseEntity<String> signup(@RequestBody UserLoginDto user){
         UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
         String jwtToken = userService.generateToken(userProfile);
         return ResponseEntity.ok(jwtToken);
     }
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserLoginDto user){
+    private ResponseEntity<String> login(@RequestBody UserLoginDto user){
         return ResponseEntity.ok(userService.login(user.getId(),user.getPassword()));
     }
 
