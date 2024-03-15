@@ -11,14 +11,14 @@ public class RankingController {
     public RankingController(RankingService rankingService){
         this.rankingService = rankingService;
     }
-    @PostMapping
+    @GetMapping
     private ResponseEntity<?> addMatchingList(@RequestHeader("Authorization") String token){
-//        rankingService.addMatchingList(token)
-        return ResponseEntity.ok("");
+        rankingService.addMatchingList(token);
+        return ResponseEntity.ok("매칭 시작");
     }
     @DeleteMapping
     private ResponseEntity<?> delMatchingList(){
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok("매칭 취소");
     }
 
 }

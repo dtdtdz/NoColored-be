@@ -23,12 +23,13 @@ public class MatchingCollection {
             matchingQueue[i] =new LinkedList<>();
         }
     }
-    public synchronized void setMatching(UserAccessInfo userAccessInfo){
+    public synchronized void setAddMatching(UserAccessInfo userAccessInfo){
+        System.out.println("set!");
         MatchingInfo matchingInfo = new MatchingInfo(userAccessInfo);
         matchingInfoMap.put(userAccessInfo, matchingInfo);
         addQueue.offer(userAccessInfo);
     }
-    public synchronized void removeMatching(UserAccessInfo userAccessInfo){
+    public synchronized void setDelMatching(UserAccessInfo userAccessInfo){
         delQueue.offer(userAccessInfo);
     }
     private void delMatchingList(){
@@ -38,12 +39,13 @@ public class MatchingCollection {
         }
     }
 
-    public void delMatching(UserAccessInfo userAccessInfo) {
+    private void delMatching(UserAccessInfo userAccessInfo) {
         if (!matchingInfoMap.containsKey(userAccessInfo)) return;
         MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
-        int high = Math.min(matchingQueue.length, matchingInfo.getRatingLevel() + matchingInfo.getExpandLevel());
+        int high = Math.min(matchingQueue.length-1, matchingInfo.getRatingLevel() + matchingInfo.getExpandLevel());
         int low = Math.max(0, matchingInfo.getRatingLevel()-matchingInfo.getExpandLevel());
-        for (int i=low; i<high; i++){
+//        System.out.println(high+" "+low);
+        for (int i=low; i<=high; i++){
             matchingQueue[i].remove(userAccessInfo);
         }
         matchingInfoMap.remove(userAccessInfo);
@@ -64,8 +66,9 @@ public class MatchingCollection {
         long now = System.currentTimeMillis();
         //접속중인 유저를 매칭 리스트에 추가한다.
         for (MatchingInfo matchingInfo: matchingInfoMap.values()){
+
             if (!matchingInfo.getUserAccessInfo().getSession().isOpen()) {
-                removeMatching(matchingInfo.getUserAccessInfo());
+                setDelMatching(matchingInfo.getUserAccessInfo());
                 continue;
             }
             int expandLevel = matchingInfo.getExpandLevel();
@@ -86,14 +89,15 @@ public class MatchingCollection {
 
         //높은 점수대부터 매칭 시도
         for (int i=matchingQueue.length-1; i>=0; i--){
-            while (matchingQueue[i].size()> GameInfo.MAX_PLAYER){
+            while (matchingQueue[i].size() >= GameInfo.MAX_PLAYER){
                 //세션 접속 확인 한번했으니 매칭 성공했다치자
                 for (int j=0; j<GameInfo.MAX_PLAYER; j++){
 //                    게임 생성 후 이동
 //                    matchingQueue[i].get(j).getSession()
-                    System.out.println(1);
-                    delMatching(matchingQueue[i].get(j));
+//                    System.out.println(matchingQueue[i].get(j).getUserProfile().getUserNickname());
+                    delMatching(matchingQueue[i].get(0));
                 }
+                System.out.println("matching success");
             }
         }
 

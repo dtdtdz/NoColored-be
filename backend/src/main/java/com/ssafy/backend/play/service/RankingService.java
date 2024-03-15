@@ -1,6 +1,6 @@
 package com.ssafy.backend.play.service;
 
 public interface RankingService {
-    boolean addMatchingList(String token);
-    boolean delMatchingList(String token);
+    void addMatchingList(String token);
+    void delMatchingList(String token);
 }

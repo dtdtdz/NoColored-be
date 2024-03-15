@@ -52,7 +52,6 @@ public class JwtUtil {
     }
 
     public UserAccessInfo getUserAccessInfoRedis(String token){
-        //        System.out.println(node.asText());
         Object value = redisTemplate.opsForValue().get(tokenKey(token));
 
         if (value==null) return null;

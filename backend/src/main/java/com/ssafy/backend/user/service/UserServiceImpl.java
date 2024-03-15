@@ -62,6 +62,10 @@ public class UserServiceImpl implements UserService {
             UserProfile userProfile = UserProfile.builder()
                     .userNickname(RandomNickname.makeNickname())
                     .userCode(userCode)
+                    .userExp(0L)
+                    .userRating(0)
+                    .userSkin("")
+                    .userTitle("")
                     .build();
             userProfileRepository.save(userProfile);
             return userProfile;
