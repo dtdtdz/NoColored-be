@@ -16,8 +16,4 @@ public class RankingServiceImpl implements RankingService{
         return false;
     }
 
-    @Scheduled(fixedRate = 1000)
-    private void matching(){
-
-    }
 }

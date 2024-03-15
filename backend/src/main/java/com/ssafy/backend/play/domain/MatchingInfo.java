@@ -9,10 +9,12 @@ import lombok.Setter;
 public class MatchingInfo {
     private UserAccessInfo userAccessInfo;
     private long startTime;
+    private int ratingLevel;
     private int expandLevel;
     public MatchingInfo(UserAccessInfo userAccessInfo){
         this.userAccessInfo = userAccessInfo;
         startTime = System.currentTimeMillis();
+        ratingLevel = userAccessInfo.getUserProfile().getUserRating()/100;
         expandLevel = -1;
     }
 }

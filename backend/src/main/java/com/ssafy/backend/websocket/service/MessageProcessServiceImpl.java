@@ -7,6 +7,7 @@ import com.ssafy.backend.game.domain.ReceiveBinaryMessageType;
 import com.ssafy.backend.game.domain.SendBinaryMessageType;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.util.InGameCollection;
+import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -29,7 +30,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
 
     private final SessionCollection sessionCollection;
     private final InGameCollection inGameCollection;
-    private final RedisTemplate<String,Object> redisTemplate;
+    private final JwtUtil jwtUtil;
     private final ScheduledExecutorService authScheduledExecutorService;
     private final ObjectMapper mapper;
     private final Map<String, Function<JsonNode, Object>> actionHandlers;
@@ -37,11 +38,11 @@ public class MessageProcessServiceImpl implements MessageProcessService{
 
     public MessageProcessServiceImpl(SessionCollection sessionCollection,
                                      InGameCollection inGameCollection,
-                                     RedisTemplate<String, Object> redisTemplate,
+                                     JwtUtil jwtUtil,
                                      @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService){
         this.sessionCollection = sessionCollection;
         this.inGameCollection = inGameCollection;
-        this.redisTemplate = redisTemplate;
+        this.jwtUtil = jwtUtil;
         this.authScheduledExecutorService = authScheduledExecutorService;
         mapper = new ObjectMapper();
         actionHandlers = new HashMap<>();
@@ -107,16 +108,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
     }
 
     private UserAccessInfo handleToken(JsonNode node) {
-//        System.out.println(node.asText());
-        Object value = redisTemplate.opsForValue().get("token:"+node.asText());
-
-        if (value==null) return null;
-        UUID id = UUID.fromString((String) value);
-        if (sessionCollection.userIdMap.containsKey(id)){
-            UserAccessInfo accessInfo = sessionCollection.userIdMap.get(id);
-            return accessInfo;
-        }
-        return null;
+        return jwtUtil.getUserAccessInfoRedis(node.asText());
     }
 
     private void applyLeft(WebSocketSession session){

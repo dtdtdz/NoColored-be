@@ -23,7 +23,6 @@ public class UserController {
     }
 
     @PostMapping("/signup")
-
     public ResponseEntity<String> signUp(@RequestBody UserSignDto user){
         UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
         String jwtToken = userService.generateToken(userProfile);

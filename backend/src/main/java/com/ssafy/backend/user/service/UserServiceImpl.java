@@ -10,7 +10,6 @@ import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,20 +22,17 @@ public class UserServiceImpl implements UserService {
     private final UserProfileRepository userProfileRepository;
     private final UserInfoRepository userInfoRepository;
     private final JwtUtil jwtUtil;
-    private final RedisTemplate<String, Object> redisTemplate;
     private final ScheduledExecutorService authScheduledExecutorService;
     private final SessionCollection sessionCollection;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
-                           RedisTemplate<String,Object> redisTemplate,
                            @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
                            SessionCollection sessionCollection
                            ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
         this.jwtUtil = jwtUtil;
-        this.redisTemplate = redisTemplate;
         this.authScheduledExecutorService = authScheduledExecutorService;
         this.sessionCollection = sessionCollection;
     }
@@ -110,17 +106,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public String generateToken(UserProfile userProfile){
         String token = jwtUtil.generateToken(userProfile.getUserCode());
-        redisTemplate.opsForValue().set("token:" + token, userProfile.getId(), 3600*8, TimeUnit.SECONDS);//8시간 살아있음
+        jwtUtil.setTokenRedis(token, userProfile.getId());
         sessionCollection.userIdMap.put(userProfile.getId(), new UserAccessInfo(userProfile));
-
         authScheduledExecutorService.schedule(()->{
             if (!sessionCollection.userIdMap.containsKey(userProfile.getId())){
-                redisTemplate.delete("token:" + token);
+                jwtUtil.deleteTokenRedis(token);
             } else if (sessionCollection.userIdMap.get(userProfile.getId()).getSession()==null){
-                redisTemplate.delete("token:" + token);
+                jwtUtil.deleteTokenRedis(token);
                 sessionCollection.userIdMap.remove(userProfile.getId());
             }
         },10, TimeUnit.SECONDS);
+
         return token;
     }
 
