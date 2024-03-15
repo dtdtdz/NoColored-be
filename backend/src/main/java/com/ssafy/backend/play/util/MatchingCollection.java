@@ -22,15 +22,16 @@ public class MatchingCollection {
             matchingQueue[i] =new LinkedList<>();
         }
     }
-    public synchronized void setMatching(MatchingInfo matchingInfo){
+    public synchronized void setMatching(UserAccessInfo userAccessInfo){
+        MatchingInfo matchingInfo = new MatchingInfo(userAccessInfo);
+        matchingInfoMap.put(userAccessInfo, matchingInfo);
         addQueue.offer(matchingInfo);
     }
-
     public synchronized void removeMatching(MatchingInfo matchingInfo){
         delQueue.offer(matchingInfo);
     }
-
     public void matching(){
-
+        
     }
+
 }

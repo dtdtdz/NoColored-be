@@ -20,8 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class MyWebSocketHandler extends AbstractWebSocketHandler {
 
     private final MessageProcessService messageProcessService;
-    private final SessionCollection sessionCollection;
-    private final ScheduledExecutorService authScheduledExecutorService;
+
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
@@ -39,16 +38,7 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         System.out.println("Connection established");
-
-        authScheduledExecutorService.schedule(()->{
-            if (!sessionCollection.userWebsocketMap.containsKey(session)){
-                try {
-                    session.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        },100, TimeUnit.SECONDS);
+        messageProcessService.setAuthSessionTimeOut(session);
     }
 
     @Override
