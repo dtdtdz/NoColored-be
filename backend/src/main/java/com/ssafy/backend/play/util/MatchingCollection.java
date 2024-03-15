@@ -24,7 +24,7 @@ public class MatchingCollection {
         }
     }
     public synchronized void setAddMatching(UserAccessInfo userAccessInfo){
-        System.out.println("set!");
+//        System.out.println("set!");
         MatchingInfo matchingInfo = new MatchingInfo(userAccessInfo);
         matchingInfoMap.put(userAccessInfo, matchingInfo);
         addQueue.offer(userAccessInfo);
@@ -51,7 +51,7 @@ public class MatchingCollection {
         matchingInfoMap.remove(userAccessInfo);
     }
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 500)
     private void matching(){
         delMatchingList();
         while (!addQueue.isEmpty()){
@@ -73,7 +73,7 @@ public class MatchingCollection {
             }
             int expandLevel = matchingInfo.getExpandLevel();
             int ratingLevel = matchingInfo.getRatingLevel();
-            int timeDiff = (int)((now - matchingInfo.getStartTime())/1000);
+            int timeDiff = (int)((now - matchingInfo.getStartTime())/500);
             //매칭 리스트에 추가
             while (timeDiff < expandLevel&&expandLevel<matchingQueue.length){
                 expandLevel++;
@@ -90,16 +90,12 @@ public class MatchingCollection {
         //높은 점수대부터 매칭 시도
         for (int i=matchingQueue.length-1; i>=0; i--){
             while (matchingQueue[i].size() >= GameInfo.MAX_PLAYER){
-                //세션 접속 확인 한번했으니 매칭 성공했다치자
+
                 for (int j=0; j<GameInfo.MAX_PLAYER; j++){
-//                    게임 생성 후 이동
-//                    matchingQueue[i].get(j).getSession()
-//                    System.out.println(matchingQueue[i].get(j).getUserProfile().getUserNickname());
                     delMatching(matchingQueue[i].get(0));
                 }
                 System.out.println("matching success");
             }
         }
-
     }
 }

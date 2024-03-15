@@ -18,11 +18,11 @@ public class GameInfo {
     private LocalDateTime startDate;
     private long startTime;
     private long time;
+    private int second;
     private Map<WebSocketSession, UserGameInfo> users = new LinkedHashMap<>();
     private MapInfo mapInfo;
     private CharacterInfo[] characterInfoArr;
     private boolean[][] floor;
-    private int second;
     private List<byte[]> stepList;
     //이것들 위치 바꿔야하나?
     public static final int CHARACTER_SIZE = 27;

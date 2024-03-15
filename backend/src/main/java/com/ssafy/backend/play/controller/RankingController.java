@@ -17,7 +17,8 @@ public class RankingController {
         return ResponseEntity.ok("매칭 시작");
     }
     @DeleteMapping
-    private ResponseEntity<?> delMatchingList(){
+    private ResponseEntity<?> delMatchingList(@RequestHeader("Authorization") String token){
+        rankingService.delMatchingList(token);
         return ResponseEntity.ok("매칭 취소");
     }
 
