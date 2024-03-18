@@ -1,15 +1,26 @@
 package com.ssafy.backend.play.controller;
 
+import com.ssafy.backend.game.domain.GameInfo;
+import com.ssafy.backend.game.domain.RoomInfo;
+import com.ssafy.backend.game.domain.UserAccessInfo;
+import com.ssafy.backend.game.dto.RoomDto;
 import com.ssafy.backend.play.service.FriendlyService;
+import com.ssafy.backend.user.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
-@RequestMapping("/play/Friendly")
+@RequestMapping("/play/friendly")
 public class FriendlyController {
     private final FriendlyService friendlyService;
-    public FriendlyController(FriendlyService friendlyService){
+
+    private final JwtUtil jwtUtil;
+
+    public FriendlyController(FriendlyService friendlyService, JwtUtil jwtUtil){
         this.friendlyService = friendlyService;
+        this.jwtUtil = jwtUtil;
     }
     @GetMapping
     private ResponseEntity<?> getRoomList(){
@@ -19,9 +30,23 @@ public class FriendlyController {
     private ResponseEntity<?> enterRoom(){
         return ResponseEntity.ok("");
     }
-    @PostMapping
-    private ResponseEntity<?> createRoom(){
-        return ResponseEntity.ok("");
+    @PostMapping("")
+    private ResponseEntity<?> createRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody){
+
+        String roomTitle = (String) requestBody.get("roomTitle");
+        String roomPassword = (String) requestBody.get("roomPassword");
+        int mapId = (int) requestBody.get("mapId");
+
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+
+        RoomDto roomDto = new RoomDto(userAccessInfo, mapId, roomTitle, roomPassword);
+
+        RoomInfo roomInfo = friendlyService.createRoom(roomDto);
+        
+        // useraccesssinfo 따로 처리
+        roomInfo.setUserArr(new UserAccessInfo[]{userAccessInfo, null, null, null});
+
+        return ResponseEntity.ok(roomInfo);
     }
     @DeleteMapping
     private ResponseEntity<?> quitRoom(){

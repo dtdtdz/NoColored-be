@@ -17,24 +17,26 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class RoomDto {
-    private UUID gameId;//seq로 바꾸는거 생각해보셈
+    private UUID gameId;//seq로 바꾸는거 생각해보셈 sequential UUID를 쓸까?
     private String title;
     private String password;
     private int code;
-    private int master;//ranking에서는 null
-    //1p가 방장?
+    private int master;//방장의 위치.ranking에서는 null
+    //1p(0번째)가 방장
     private UserInfoDto[] userArr;
     private MapInfo mapInfo;
+
     public RoomDto(UserAccessInfo user, int mapId, String title, String password){//친선전
         userArr = new UserInfoDto[GameInfo.MAX_PLAYER];
         userArr[0] = new UserInfoDto(user.getUserProfile());
         gameId = UUID.randomUUID();
         master = 0;
-//        mapInfo = new MapInfo(mapId);
+        //mapInfo = new MapInfo(mapId);
         mapInfo = new MapInfo();
         this.title = title;
         this.password = password;
     }
+
     public RoomDto(List<UserAccessInfo> userList){//랭킹전
         userArr = new UserInfoDto[GameInfo.MAX_PLAYER];
         for (int i=0; i<userList.size(); i++){
