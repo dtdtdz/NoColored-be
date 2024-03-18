@@ -9,28 +9,30 @@ import com.ssafy.backend.user.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/play/friendly")
 public class FriendlyController {
     private final FriendlyService friendlyService;
-
     private final JwtUtil jwtUtil;
 
     public FriendlyController(FriendlyService friendlyService, JwtUtil jwtUtil){
         this.friendlyService = friendlyService;
         this.jwtUtil = jwtUtil;
     }
-    @GetMapping
-    private ResponseEntity<?> getRoomList(){
-        return ResponseEntity.ok("");
+    @GetMapping("/{offset}")
+    private ResponseEntity<?> getRoomList(@PathVariable int offset){
+
+        List<RoomDto> roomDtoList=friendlyService.getPaginatedRoomList(offset);
+        return ResponseEntity.ok(roomDtoList);
     }
     @PatchMapping
     private ResponseEntity<?> enterRoom(){
         return ResponseEntity.ok("");
     }
-    @PostMapping("")
+    @PostMapping()
     private ResponseEntity<?> createRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody){
 
         String roomTitle = (String) requestBody.get("roomTitle");
@@ -46,7 +48,7 @@ public class FriendlyController {
         // useraccesssinfo 따로 처리
         roomInfo.setUserArr(new UserAccessInfo[]{userAccessInfo, null, null, null});
 
-        return ResponseEntity.ok(roomInfo);
+        return ResponseEntity.ok(roomDto);
     }
     @DeleteMapping
     private ResponseEntity<?> quitRoom(){

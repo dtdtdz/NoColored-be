@@ -14,8 +14,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RoomInfo {
 
-    @Id
-    private UUID gameId;
+//    @Id
+//    private UUID gameId;
     private String title;
     private String password;
     private int code;
