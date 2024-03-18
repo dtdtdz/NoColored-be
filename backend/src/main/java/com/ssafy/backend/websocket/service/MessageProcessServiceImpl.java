@@ -3,14 +3,12 @@ package com.ssafy.backend.websocket.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.backend.game.domain.GameInfo;
-import com.ssafy.backend.game.domain.ReceiveBinaryMessageType;
-import com.ssafy.backend.game.domain.SendBinaryMessageType;
+import com.ssafy.backend.websocket.domain.ReceiveBinaryMessageType;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
@@ -63,7 +61,8 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             if (result!=null) {
                 result.setSession(session);
                 sessionCollection.userWebsocketMap.put(session, result);
-                System.out.println(result.getUserProfile().getId());
+                System.out.println(result.getUserProfile().getUserNickname());
+//                System.out.println(result.getUserProfile().getId());
             }
         } else {
             System.out.println("Unknown action: " + action);
@@ -102,7 +101,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
                     throw new RuntimeException(e);
                 }
             }
-        },100, TimeUnit.SECONDS);
+        },10, TimeUnit.SECONDS);
     }
 
     private UserAccessInfo handleToken(JsonNode node) {
@@ -133,9 +132,11 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         inGameCollection.insertUser(session);
     }
     private void testStart(WebSocketSession session){
-        List<WebSocketSession> sessions = new ArrayList<>();
-        sessions.add(session);
-        inGameCollection.addGame(sessions);
+        List<UserAccessInfo> users = new ArrayList<>();
+        UserAccessInfo user = new UserAccessInfo();
+        user.setSession(session);
+        users.add(user);
+        inGameCollection.addGame(users);
 //        inGameCollection.inGameUser.put(session, gameInfo);
     }
 
