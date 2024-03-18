@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Component
 public class InGameCollection {
@@ -16,10 +17,10 @@ public class InGameCollection {
         return inGameList.iterator();
     }
 
-    public synchronized void removeGame(GameInfo gameInfo){
+    public void removeGame(GameInfo gameInfo){
         delQueue.offer(gameInfo);
     }
-    public synchronized void addGame(GameInfo gameInfo){
+    public void addGame(GameInfo gameInfo){
         addQueue.offer(gameInfo);
     }
     public void updateGameList() throws Exception{
@@ -33,8 +34,8 @@ public class InGameCollection {
 
     public InGameCollection(){
         inGameList = new LinkedList<>();
-        addQueue = new ArrayDeque<>();
-        delQueue = new ArrayDeque<>();
+        addQueue = new ConcurrentLinkedQueue<>();
+        delQueue = new ConcurrentLinkedQueue<>();
         inGameUser = new HashMap<>();
     }
 }

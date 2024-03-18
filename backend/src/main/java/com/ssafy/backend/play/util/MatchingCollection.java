@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Component
 public class MatchingCollection {
@@ -17,19 +18,19 @@ public class MatchingCollection {
     public MatchingCollection(){
         matchingQueue = new List[100];
         matchingInfoMap = new LinkedHashMap<>();
-        addQueue = new ArrayDeque<>();
-        delQueue = new ArrayDeque<>();
+        addQueue = new ConcurrentLinkedQueue<>();
+        delQueue = new ConcurrentLinkedQueue<>();
         for (int i=0; i<100; i++){
             matchingQueue[i] =new LinkedList<>();
         }
     }
-    public synchronized void setAddMatching(UserAccessInfo userAccessInfo){
+    public void setAddMatching(UserAccessInfo userAccessInfo){
 //        System.out.println("set!");
         MatchingInfo matchingInfo = new MatchingInfo(userAccessInfo);
         matchingInfoMap.put(userAccessInfo, matchingInfo);
         addQueue.offer(userAccessInfo);
     }
-    public synchronized void setDelMatching(UserAccessInfo userAccessInfo){
+    public void setDelMatching(UserAccessInfo userAccessInfo){
         delQueue.offer(userAccessInfo);
     }
     private void delMatchingList(){
