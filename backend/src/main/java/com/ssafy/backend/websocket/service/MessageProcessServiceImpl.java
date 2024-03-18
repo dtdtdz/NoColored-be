@@ -18,9 +18,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -132,74 +130,13 @@ public class MessageProcessServiceImpl implements MessageProcessService{
     }
 
     private void testStart2(WebSocketSession session) {
-        GameInfo gameInfo = lastGame;
-
-        if (gameInfo==null) return;
-        gameInfo.putSession(session);
-        inGameCollection.inGameUser.put(session, gameInfo);
-
-        ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
-
-        gameInfo.putTime(tmpbuffer);
-
-        tmpbuffer.put(SendBinaryMessageType.TEST_MAP.getValue()).
-                put((byte) 3).put((byte) gameInfo.getMapInfo().getFloorList().size());
-        for (int[] arr:gameInfo.getMapInfo().getFloorList()){
-            tmpbuffer.put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
-        }
-
-        try {
-            tmpbuffer.flip();
-            synchronized (session){
-                session.sendMessage(new BinaryMessage(tmpbuffer));
-            }
-
-        } catch (IOException e) {
-//                    e.printStackTrace();
-//                    roomInfo.getSessions().remove(session);
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } catch (Exception e){
-            System.out.println("can't find session");
-            e.printStackTrace();
-        }
-
+        inGameCollection.insertUser(session);
     }
-    private GameInfo lastGame;
     private void testStart(WebSocketSession session){
-//        RoomInfo roomInfoEx = new RoomInfo(SessionRepository.loginUserMap(session));
-        GameInfo gameInfo = new GameInfo();
-        //수정 필요
-        gameInfo.putSession(session);
-        lastGame = gameInfo;
-
-        ByteBuffer tmpbuffer = ByteBuffer.allocate(1024);
-
-        gameInfo.putTime(tmpbuffer);
-
-        tmpbuffer.put(SendBinaryMessageType.TEST_MAP.getValue()).
-                put((byte) 3).put((byte) gameInfo.getMapInfo().getFloorList().size());
-        for (int[] arr:gameInfo.getMapInfo().getFloorList()){
-            tmpbuffer.put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
-        }
-
-        try {
-            tmpbuffer.flip();
-            synchronized (session){
-                session.sendMessage(new BinaryMessage(tmpbuffer));
-            }
-
-        } catch (IOException e) {
-//                    e.printStackTrace();
-//                    roomInfo.getSessions().remove(session);
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } catch (Exception e){
-            System.out.println("can't find session");
-            e.printStackTrace();
-        }
-        inGameCollection.addGame(gameInfo);
-        inGameCollection.inGameUser.put(session, gameInfo);
+        List<WebSocketSession> sessions = new ArrayList<>();
+        sessions.add(session);
+        inGameCollection.addGame(sessions);
+//        inGameCollection.inGameUser.put(session, gameInfo);
     }
 
     private void testLogin(WebSocketSession session){
