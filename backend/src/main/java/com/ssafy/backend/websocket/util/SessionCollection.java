@@ -20,7 +20,5 @@ public class SessionCollection {
     public SessionCollection(){
         userWebsocketMap = new HashMap<>();
         userIdMap = new HashMap<>();
-
-
     }
 }

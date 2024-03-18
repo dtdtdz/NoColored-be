@@ -17,19 +17,13 @@ import java.util.concurrent.ScheduledExecutorService;
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final MessageProcessService messageProcessService;
-    private final SessionCollection sessionRepository;
-    private final ScheduledExecutorService authScheduledExecutorService;
     // 생성자를 통해 필요한 서비스들을 주입받음
-    public WebSocketConfig(MessageProcessService messageProcessService,
-                           SessionCollection sessionRepository,
-                           @Qualifier("authScheduledExecutorService") ScheduledExecutorService authScheduledExecutorService) {
+    public WebSocketConfig(MessageProcessService messageProcessService){
         this.messageProcessService = messageProcessService;
-        this.sessionRepository = sessionRepository;
-        this.authScheduledExecutorService = authScheduledExecutorService;
     }
     @Bean
     public MyWebSocketHandler myWebSocketHandler(){
-        return new MyWebSocketHandler(messageProcessService, sessionRepository, authScheduledExecutorService);
+        return new MyWebSocketHandler(messageProcessService);
     }
 
     // 요청경로: /game

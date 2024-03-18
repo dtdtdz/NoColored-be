@@ -18,14 +18,14 @@ public class GameInfo {
     private LocalDateTime startDate;
     private long startTime;
     private long time;
+    private int second;
     private Map<WebSocketSession, UserGameInfo> users = new LinkedHashMap<>();
     private MapInfo mapInfo;
     private CharacterInfo[] characterInfoArr;
     private boolean[][] floor;
-    private int second;
     private List<byte[]> stepList;
     //이것들 위치 바꿔야하나?
-    public static final int CHARACTER_SIZE = 36;
+    public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_SPEED = 160;
     public static final int MAX_PLAYER = 4;
     public static final float GRAVITY = 200;
@@ -34,6 +34,7 @@ public class GameInfo {
     public static final int MAP_WIDTH = 27;
     public static final int WALL_WIDTH = 3;
     public static final int DEFAULT_TIME = 120;
+    public static final int CHARACTER_NUM = 10;
 
     int roomId;
     public GameInfo(){
@@ -41,7 +42,7 @@ public class GameInfo {
         startTime = System.currentTimeMillis();
         time = startTime;
         second = DEFAULT_TIME;
-        characterInfoArr = new CharacterInfo[3];
+        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
         for (int i=0; i<characterInfoArr.length; i++){
             characterInfoArr[i] = new CharacterInfo();
             characterInfoArr[i].setX((1+i)*100);

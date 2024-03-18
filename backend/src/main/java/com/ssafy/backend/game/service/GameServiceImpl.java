@@ -292,6 +292,4 @@ public class GameServiceImpl implements GameService {
         return idx>=0 && idx<size;
     }
 
-
-
 }
