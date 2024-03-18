@@ -1,6 +1,8 @@
 package com.ssafy.backend.user.service;
 
 import com.ssafy.backend.user.dao.UserInfoRepository;
+import com.ssafy.backend.user.dto.UserInfoDto;
+import com.ssafy.backend.user.dto.UserSignDto;
 import com.ssafy.backend.user.entity.UserInfo;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.dao.UserProfileRepository;
@@ -73,6 +75,28 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("게스트 생성 실패.");
         }
     }
+    @Override
+    @Transactional
+    public UserInfoDto guestConvert(String token, UserSignDto userSignDto) {
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        UserProfile userProfile = userAccessInfo.getUserProfile();
+        //userProfile 을 managed 상태로 만들어준다.
+        userProfile = userProfileRepository.findById(userProfile.getId()).orElse(null);
+        if (userProfile==null) return null;
+        userProfile.setGuest(false);
+        userProfile.setUserNickname(userSignDto.getNickname());
+
+        userProfileRepository.save(userProfile);
+        UserInfo userInfo = UserInfo.builder()
+//                .id(userProfile.getId()) 넣으면 안된다.
+                .userId(userSignDto.getId())
+                .userPwd(userSignDto.getPassword())
+                .userProfile(userProfile)
+                .isDeleted(false)
+                .build();
+        userInfoRepository.save(userInfo);
+        return new UserInfoDto(userProfile, token);
+    }
 
     @Override
     @Transactional
@@ -108,7 +132,7 @@ public class UserServiceImpl implements UserService {
         }
     }
     @Override
-    public String generateToken(UserProfile userProfile){
+    public UserInfoDto generateUserInfoDtoWithToken(UserProfile userProfile){
         String token = jwtUtil.generateToken(userProfile.getUserCode());
         jwtUtil.setTokenRedis(token, userProfile.getId());
         sessionCollection.userIdMap.put(userProfile.getId(), new UserAccessInfo(userProfile));
@@ -121,14 +145,14 @@ public class UserServiceImpl implements UserService {
             }
         },10, TimeUnit.SECONDS);
 
-        return token;
+        return new UserInfoDto(userProfile, token);
     }
 
     @Override
-    public String login(String id, String password) {
+    public UserInfoDto login(String id, String password) {
         UserProfile userProfile = userInfoRepository.findByUser(id, password);
         if (userProfile==null) return null;
 
-        return generateToken(userProfile);
+        return generateUserInfoDtoWithToken(userProfile);
     }
 }

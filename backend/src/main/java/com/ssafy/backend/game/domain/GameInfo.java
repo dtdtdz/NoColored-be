@@ -1,5 +1,6 @@
 package com.ssafy.backend.game.domain;
 
+import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.socket.WebSocketSession;

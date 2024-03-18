@@ -14,7 +14,7 @@ public class MatchingInfo {
     public MatchingInfo(UserAccessInfo userAccessInfo){
         this.userAccessInfo = userAccessInfo;
         startTime = System.currentTimeMillis();
-        ratingLevel = userAccessInfo.getUserProfile().getUserRating()/100;
+        ratingLevel = Math.min(99, userAccessInfo.getUserProfile().getUserRating()/100);
         expandLevel = -1;
     }
 }
