@@ -1,5 +1,6 @@
 package com.ssafy.backend.user.controller;
 
+import com.ssafy.backend.user.dto.UserInfoDto;
 import com.ssafy.backend.user.dto.UserSignDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.service.UserService;
@@ -15,20 +16,24 @@ public class UserController {
 
     }
     @GetMapping("/guest")
-    public ResponseEntity<String> guestSignUp(){
+    public ResponseEntity<UserInfoDto> guestSignUp(){
         UserProfile userProfile = userService.guestSignUp();
-        String jwtToken = userService.generateToken(userProfile);
-        return ResponseEntity.ok(jwtToken);
+        return ResponseEntity.ok(userService.generateUserInfoDtoWithToken(userProfile));
+    }
+    @PostMapping("/guest")
+    public ResponseEntity<UserInfoDto> guestConvert(@RequestHeader("Authorization") String token,
+                                                    @RequestBody UserSignDto user){
+        return ResponseEntity.ok(userService.guestConvert(token, user));
     }
 
+
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody UserSignDto user){
+    public ResponseEntity<UserInfoDto> signUp(@RequestBody UserSignDto user){
         UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
-        String jwtToken = userService.generateToken(userProfile);
-        return ResponseEntity.ok(jwtToken);
+        return ResponseEntity.ok(userService.generateUserInfoDtoWithToken(userProfile));
     }
     @PostMapping("/login")
-    private ResponseEntity<String> login(@RequestBody UserSignDto user){
+    private ResponseEntity<UserInfoDto> login(@RequestBody UserSignDto user){
         return ResponseEntity.ok(userService.login(user.getId(),user.getPassword()));
     }
 

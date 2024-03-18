@@ -1,7 +1,9 @@
 package com.ssafy.backend.play.util;
 
+import com.ssafy.backend.assets.SendTextMessageWrapper;
 import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.game.domain.UserAccessInfo;
+import com.ssafy.backend.game.dto.RoomDto;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.play.domain.MatchingInfo;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -96,17 +99,31 @@ public class MatchingCollection {
         //높은 점수대부터 매칭 시도
         for (int i=matchingQueue.length-1; i>=0; i--){
             while (matchingQueue[i].size() >= GameInfo.MAX_PLAYER){
-                List<WebSocketSession> list = new ArrayList<>();
+                List<UserAccessInfo> list = new ArrayList<>();
                 for (int j=0; j<GameInfo.MAX_PLAYER; j++){
                     try {
-                        list.add(matchingQueue[i].get(0).getSession());
+                        list.add(matchingQueue[i].get(0));
+
                         //매칭 정보 추가:맵, 인원
-                        list.get(i).sendMessage(new TextMessage("matching success"));
+//                        list.get(i).getSession().sendMessage(new TextMessage("matching success"));
 
                     } catch (Exception e){
                         e.printStackTrace();
                     }
                     delMatching(matchingQueue[i].get(0));
+                }
+
+                RoomDto roomDto = new RoomDto(list);
+                for (UserAccessInfo userAccessInfo:list){
+                    synchronized (userAccessInfo.getSession()){
+                        try {
+                            userAccessInfo.getSession().sendMessage(
+                                    new TextMessage(SendTextMessageWrapper.wrapAndConvertToJson(roomDto)));
+                        } catch (IOException e) {
+//                            throw new RuntimeException(e);
+                            e.printStackTrace();
+                        }
+                    }
                 }
                 inGameCollection.addGame(list);
                 System.out.println("matching success");

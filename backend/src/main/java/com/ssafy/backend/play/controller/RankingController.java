@@ -1,5 +1,8 @@
 package com.ssafy.backend.play.controller;
 
+import com.ssafy.backend.assets.SendTextMessageWrapper;
+import com.ssafy.backend.game.domain.MapInfo;
+import com.ssafy.backend.game.dto.RoomDto;
 import com.ssafy.backend.play.service.RankingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,4 +25,8 @@ public class RankingController {
         return ResponseEntity.ok("매칭 취소");
     }
 
+    @GetMapping("/test")
+    private ResponseEntity<String> test() throws Exception{
+        return ResponseEntity.ok(SendTextMessageWrapper.wrapAndConvertToJson(new MapInfo()));
+    }
 }

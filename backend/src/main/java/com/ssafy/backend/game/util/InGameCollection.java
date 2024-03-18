@@ -1,6 +1,8 @@
 package com.ssafy.backend.game.util;
 
 import com.ssafy.backend.game.domain.*;
+import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -22,11 +24,15 @@ public class InGameCollection {
         return inGameList.iterator();
     }
 
-    public void addGame(List<WebSocketSession> sessions){
+//    public void addGame(RoomDto roomDto){
+//        GameInfo gameInfo = new GameInfo();
+//        for (UserAccessInfo user:roomDto.getUserArr())
+//    }
+    public void addGame(List<UserAccessInfo> users){
         GameInfo gameInfo = new GameInfo();
-        for (WebSocketSession session:sessions){
-            gameInfo.putSession(session);
-            inGameUser.put(session, gameInfo);
+        for (UserAccessInfo user:users){
+            gameInfo.putSession(user.getSession());
+            inGameUser.put(user.getSession(), gameInfo);
         }
 
         for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()) {
