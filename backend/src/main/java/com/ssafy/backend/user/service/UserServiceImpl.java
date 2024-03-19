@@ -1,7 +1,7 @@
 package com.ssafy.backend.user.service;
 
 import com.ssafy.backend.user.dao.UserInfoRepository;
-import com.ssafy.backend.user.dto.UserInfoDto;
+import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.dto.UserSignDto;
 import com.ssafy.backend.user.entity.UserInfo;
 import com.ssafy.backend.user.entity.UserProfile;
@@ -14,7 +14,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -39,11 +38,6 @@ public class UserServiceImpl implements UserService {
         this.sessionCollection = sessionCollection;
     }
 
-
-    private Optional<UserProfile> findUserInfoByUserCode(String userCode){
-        return userProfileRepository.findByUserCode(userCode);
-    }
-
     private String getUserCode() {
         String testCode = null;
         int cnt = 0;
@@ -51,7 +45,7 @@ public class UserServiceImpl implements UserService {
             cnt++;
             testCode = RandomNickname.generateRandomString();
 //            System.out.println(testCode);
-        } while (cnt<10 && findUserInfoByUserCode(testCode).isPresent());
+        } while (cnt<10 && userProfileRepository.existsByUserCode(testCode));
         if (cnt==10) return null;
         return testCode;
     }
@@ -77,7 +71,7 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     @Transactional
-    public UserInfoDto guestConvert(String token, UserSignDto userSignDto) {
+    public UserProfileDto guestConvert(String token, UserSignDto userSignDto) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         UserProfile userProfile = userAccessInfo.getUserProfile();
         //userProfile 을 managed 상태로 만들어준다.
@@ -95,7 +89,7 @@ public class UserServiceImpl implements UserService {
                 .isDeleted(false)
                 .build();
         userInfoRepository.save(userInfo);
-        return new UserInfoDto(userProfile, token);
+        return new UserProfileDto(userProfile, token);
     }
 
     @Override
@@ -132,7 +126,7 @@ public class UserServiceImpl implements UserService {
         }
     }
     @Override
-    public UserInfoDto generateUserInfoDtoWithToken(UserProfile userProfile){
+    public UserProfileDto generateUserInfoDtoWithToken(UserProfile userProfile){
         String token = jwtUtil.generateToken(userProfile.getUserCode());
         jwtUtil.setTokenRedis(token, userProfile.getId());
         sessionCollection.userIdMap.put(userProfile.getId(), new UserAccessInfo(userProfile));
@@ -145,11 +139,11 @@ public class UserServiceImpl implements UserService {
             }
         },10, TimeUnit.SECONDS);
 
-        return new UserInfoDto(userProfile, token);
+        return new UserProfileDto(userProfile, token);
     }
 
     @Override
-    public UserInfoDto login(String id, String password) {
+    public UserProfileDto login(String id, String password) {
         UserProfile userProfile = userInfoRepository.findByUser(id, password);
         if (userProfile==null) return null;
 
@@ -168,7 +162,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateNickname(String token, String nickname) {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
-        userInfoRepository.updateNickname(user.getUserProfile().getId(), nickname);
+        userProfileRepository.updateNickname(user.getUserProfile().getId(), nickname);
     }
 
     @Override
@@ -177,5 +171,17 @@ public class UserServiceImpl implements UserService {
         if (!prePwd.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId())))
             throw new RuntimeException("잘못된 패스워드 입력입니다");
         userInfoRepository.deleteUser(user.getUserProfile().getId());
+    }
+
+    @Override
+    public boolean existsUserId(String userId) {
+        return userInfoRepository.existsByUserId(userId);
+    }
+
+    @Override
+    public UserProfileDto findUserInfo(String userCode) {
+        UserProfile userProfile = userProfileRepository.findByUserCode(userCode).orElse(null);
+        if (userProfile==null) return null;
+        return new UserProfileDto(userProfile);
     }
 }
