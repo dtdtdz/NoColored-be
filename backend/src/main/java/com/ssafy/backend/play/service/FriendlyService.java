@@ -12,4 +12,6 @@ public interface FriendlyService {
 
     List<FriendlyRoomDto> getPaginatedRoomList(int offset);
 
+    void findRoom();
+
 }

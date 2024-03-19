@@ -1,6 +1,6 @@
 package com.ssafy.backend.play.controller;
 
-import com.ssafy.backend.game.domain.GameInfo;
+
 import com.ssafy.backend.game.domain.RoomInfo;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.dto.FriendlyRoomDto;
@@ -34,6 +34,8 @@ public class FriendlyController {
 
         String code=(String) requestBody.get("roomCode");
         String password=(String) requestBody.get("roomPassword");
+
+
 
 
         return ResponseEntity.ok("");
