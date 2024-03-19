@@ -31,6 +31,8 @@ public class FriendlyController {
     }
     @PatchMapping
     private ResponseEntity<?> enterRoom(){
+
+
         return ResponseEntity.ok("");
     }
     @PostMapping()

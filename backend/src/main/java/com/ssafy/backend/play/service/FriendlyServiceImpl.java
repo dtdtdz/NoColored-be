@@ -70,7 +70,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         final int maxRooms = roomsPerPage * maxPages;
 
         // 가져올 방 번호
-        int startIndex = (offset - 1) * roomsPerPage;
+        int startIndex = (offset - 1) * maxRooms;
         int endIndex;
 
         List<FriendlyRoomDto> paginatedFriendlyRooms = new ArrayList<>();
@@ -81,7 +81,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                 return Collections.emptyList();
             }
 
-            endIndex = Math.min(startIndex + roomsPerPage, roomInfoList.size());
+            endIndex = Math.min(startIndex + maxRooms, roomInfoList.size());
 
             for (int i = startIndex; i < endIndex; i++) {
                 RoomInfo roomInfo = roomInfoList.get(i);
