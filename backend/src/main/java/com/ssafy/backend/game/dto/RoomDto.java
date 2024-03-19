@@ -22,26 +22,18 @@ public class RoomDto {
     private String password;
     private int code;
     private int master;//방장의 위치.ranking에서는 null
-    //1p(0번째)가 방장
+    private int[] readyState;
     private UserInfoDto[] userArr;
     private MapInfo mapInfo;
 
-
-//    private synchronized int getNextCode() {
-//        if (roomCode >= 9999) {
-//            roomCode = 1000;
-//        } else {
-//            roomCode++;
-//        }
-//        return roomCode;
-//    }
-
-    public RoomDto(UserAccessInfo user, int mapId, String title, String password){//친선전
+    public RoomDto(UserAccessInfo user, int mapId, String title, String password){//친선전 생성
         userArr = new UserInfoDto[GameInfo.MAX_PLAYER];
         userArr[0] = new UserInfoDto(user.getUserProfile());
 //        gameId = UUID.randomUUID();
         master = 0;
         //mapInfo = new MapInfo(mapId);
+        readyState=new int[] {0,0,0,0};
+//        userArr= new UserInfoDto[]{null, null, null, null};
         mapInfo = new MapInfo();
         this.title = title;
         this.password = password;

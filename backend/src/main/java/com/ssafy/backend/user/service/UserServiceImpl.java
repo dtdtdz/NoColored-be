@@ -66,8 +66,8 @@ public class UserServiceImpl implements UserService {
                     .userCode(userCode)
                     .userExp(0L)
                     .userRating(0)
-                    .userSkin("")
-                    .userTitle("")
+                    .userSkin(0)
+                    .userTitle(0)
                     .build();
             userProfileRepository.save(userProfile);
             return userProfile;
@@ -109,8 +109,8 @@ public class UserServiceImpl implements UserService {
                     .userCode(userCode)
                     .userExp(0L)
                     .userRating(0)
-                    .userSkin("")
-                    .userTitle("")
+                    .userSkin(0)
+                    .userTitle(0)
                     .build();
 
             userProfileRepository.save(userProfile);

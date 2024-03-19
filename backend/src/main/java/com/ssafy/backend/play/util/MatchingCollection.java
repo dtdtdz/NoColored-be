@@ -124,7 +124,7 @@ public class MatchingCollection {
 
                 RoomDto roomDto = new RoomDto(list);
                 for (UserAccessInfo userAccessInfo:list){
-                    SynchronizedSend.textSend(userAccessInfo.getSession(),"matching", roomDto);
+                    SynchronizedSend.textSend(userAccessInfo.getSession(), "matching", roomDto);
                 }
                 inGameCollection.addGame(list);
                 System.out.println("matching success");
