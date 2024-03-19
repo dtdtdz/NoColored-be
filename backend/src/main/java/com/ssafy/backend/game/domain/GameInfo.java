@@ -110,7 +110,7 @@ public class GameInfo {
 
     public void putStep(ByteBuffer buffer){
         buffer.put(SendBinaryMessageType.STEP.getValue())
-                .put((byte) 3).put((byte) stepList.size());
+                .put((byte) stepList.size());
         for (int i=0; i<stepList.size(); i++){
             buffer.put(stepList.get(i)[0]).put(stepList.get(i)[1]).put(stepList.get(i)[2]);
         }
@@ -118,7 +118,7 @@ public class GameInfo {
 
     public void putTime(ByteBuffer buffer){
         buffer.put(SendBinaryMessageType.TIME.getValue())
-                .put((byte) 1).put((byte)1).put((byte)second);
+                .put((byte)1).put((byte)second);
     }
 
     //세션과 캐릭터를 매핑한다.

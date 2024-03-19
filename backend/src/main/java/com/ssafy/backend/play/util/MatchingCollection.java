@@ -1,6 +1,7 @@
 package com.ssafy.backend.play.util;
 
 import com.ssafy.backend.assets.SendTextMessageWrapper;
+import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.dto.RoomDto;
@@ -15,60 +16,71 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+
 @Component
 public class MatchingCollection {
-    private final List<UserAccessInfo>[] matchingQueue;
+    private final List<List<UserAccessInfo>> matchingQueue;
     private final Map<UserAccessInfo, MatchingInfo> matchingInfoMap;
     private final Queue<UserAccessInfo> addQueue;
     private final Queue<UserAccessInfo> delQueue;
     private final InGameCollection inGameCollection;
     public MatchingCollection(InGameCollection inGameCollection){
         this.inGameCollection = inGameCollection;
-        matchingQueue = new List[100];
+        matchingQueue = new ArrayList<>();
         matchingInfoMap = new LinkedHashMap<>();
         addQueue = new ConcurrentLinkedQueue<>();
         delQueue = new ConcurrentLinkedQueue<>();
         for (int i=0; i<100; i++){
-            matchingQueue[i] =new LinkedList<>();
+            matchingQueue.add(new LinkedList<>());
         }
     }
     public void setAddMatching(UserAccessInfo userAccessInfo){
 //        System.out.println("set!");
         MatchingInfo matchingInfo = new MatchingInfo(userAccessInfo);
         matchingInfoMap.put(userAccessInfo, matchingInfo);
-        addQueue.offer(userAccessInfo);
+        synchronized (addQueue){
+            addQueue.offer(userAccessInfo);
+        }
     }
     public void setDelMatching(UserAccessInfo userAccessInfo){
-        delQueue.offer(userAccessInfo);
+        synchronized (delQueue){
+            delQueue.offer(userAccessInfo);
+        }
     }
     private void delMatchingList(){
-        while (!delQueue.isEmpty()){
-            UserAccessInfo userAccessInfo = delQueue.poll();
-            delMatching(userAccessInfo);
+        synchronized (delQueue) {
+            while (!delQueue.isEmpty()) {
+                UserAccessInfo userAccessInfo = delQueue.poll();
+                delMatching(userAccessInfo);
+            }
         }
     }
 
     private void delMatching(UserAccessInfo userAccessInfo) {
         if (!matchingInfoMap.containsKey(userAccessInfo)) return;
         MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
-        int high = Math.min(matchingQueue.length-1, matchingInfo.getRatingLevel() + matchingInfo.getExpandLevel());
+        int high = Math.min(matchingQueue.size()-1, matchingInfo.getRatingLevel() + matchingInfo.getExpandLevel());
         int low = Math.max(0, matchingInfo.getRatingLevel()-matchingInfo.getExpandLevel());
 //        System.out.println(high+" "+low);
         for (int i=low; i<=high; i++){
-            matchingQueue[i].remove(userAccessInfo);
+            matchingQueue.get(i).remove(userAccessInfo);
         }
         matchingInfoMap.remove(userAccessInfo);
+        WebSocketSession session = userAccessInfo.getSession();
+        SynchronizedSend.send(session, "matchingCancel");
     }
 
     @Scheduled(fixedRate = 500)
     private void matching(){
         delMatchingList();
-        while (!addQueue.isEmpty()){
-            UserAccessInfo userAccessInfo = addQueue.poll();
-            if (matchingInfoMap.containsKey(userAccessInfo)){
-                MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
-                matchingQueue[matchingInfo.getRatingLevel()].add(userAccessInfo);
-                matchingInfo.setExpandLevel(0);
+        synchronized (addQueue) {
+            while (!addQueue.isEmpty()) {
+                UserAccessInfo userAccessInfo = addQueue.poll();
+                if (matchingInfoMap.containsKey(userAccessInfo)) {
+                    MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
+                    matchingQueue.get(matchingInfo.getRatingLevel()).add(userAccessInfo);
+                    matchingInfo.setExpandLevel(0);
+                }
             }
         }
 
@@ -84,25 +96,25 @@ public class MatchingCollection {
             int ratingLevel = matchingInfo.getRatingLevel();
             int timeDiff = (int)((now - matchingInfo.getStartTime())/500);
             //매칭 리스트에 추가
-            while (timeDiff < expandLevel&&expandLevel<matchingQueue.length){
+            while (timeDiff < expandLevel&&expandLevel<matchingQueue.size()){
                 expandLevel++;
                 if (ratingLevel-expandLevel>=0){
-                    matchingQueue[ratingLevel-expandLevel].add(matchingInfo.getUserAccessInfo());
+                    matchingQueue.get(ratingLevel-expandLevel).add(matchingInfo.getUserAccessInfo());
                 }
-                if (ratingLevel+expandLevel<matchingQueue.length){
-                    matchingQueue[ratingLevel+expandLevel].add(matchingInfo.getUserAccessInfo());
+                if (ratingLevel+expandLevel<matchingQueue.size()){
+                    matchingQueue.get(ratingLevel+expandLevel).add(matchingInfo.getUserAccessInfo());
                 }
             }
         }
         delMatchingList();
 
         //높은 점수대부터 매칭 시도
-        for (int i=matchingQueue.length-1; i>=0; i--){
-            while (matchingQueue[i].size() >= GameInfo.MAX_PLAYER){
+        for (int i=matchingQueue.size()-1; i>=0; i--){
+            while (matchingQueue.get(i).size() >= GameInfo.MAX_PLAYER){
                 List<UserAccessInfo> list = new ArrayList<>();
                 for (int j=0; j<GameInfo.MAX_PLAYER; j++){
                     try {
-                        list.add(matchingQueue[i].get(0));
+                        list.add(matchingQueue.get(i).get(0));
 
                         //매칭 정보 추가:맵, 인원
 //                        list.get(i).getSession().sendMessage(new TextMessage("matching success"));
@@ -110,20 +122,12 @@ public class MatchingCollection {
                     } catch (Exception e){
                         e.printStackTrace();
                     }
-                    delMatching(matchingQueue[i].get(0));
+                    delMatching(matchingQueue.get(i).get(0));
                 }
 
                 RoomDto roomDto = new RoomDto(list);
                 for (UserAccessInfo userAccessInfo:list){
-                    synchronized (userAccessInfo.getSession()){
-                        try {
-                            userAccessInfo.getSession().sendMessage(
-                                    new TextMessage(SendTextMessageWrapper.wrapAndConvertToJson(roomDto)));
-                        } catch (IOException e) {
-//                            throw new RuntimeException(e);
-                            e.printStackTrace();
-                        }
-                    }
+                    SynchronizedSend.send(userAccessInfo.getSession(), roomDto);
                 }
                 inGameCollection.addGame(list);
                 System.out.println("matching success");

@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class MyWebSocketHandler extends AbstractWebSocketHandler {
 
     private final MessageProcessService messageProcessService;
-
-
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
         // 필요에 따라 응답 보내기

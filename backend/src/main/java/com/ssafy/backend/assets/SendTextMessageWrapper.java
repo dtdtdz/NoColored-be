@@ -15,13 +15,18 @@ public class SendTextMessageWrapper {
     private static final Wrapper wrapper = new Wrapper();
 
     public static String wrapAndConvertToJson(Object dto) throws JsonProcessingException {
-        // DTO 클래스 이름을 소문자로 시작하게 변환 (예: MyDto -> myDto)
-        String typeName = dto.getClass().getSimpleName();
-//        typeName = Character.toLowerCase(typeName.charAt(0)) + typeName.substring(1);
 
         // "type"과 "data"를 가진 객체 생성
-        wrapper.setType(typeName);
-        wrapper.setData(dto);
+        if (dto instanceof String str){
+            wrapper.setType(str);
+        } else {
+            // DTO 클래스 이름을 소문자로 시작하게 변환 (예: MyDto -> myDto)
+            String typeName = dto.getClass().getSimpleName();
+//        typeName = Character.toLowerCase(typeName.charAt(0)) + typeName.substring(1);
+
+            wrapper.setType(typeName);
+            wrapper.setData(dto);
+        }
 
         // 객체를 JSON 문자열로 변환
         return objectMapper.writeValueAsString(wrapper);
