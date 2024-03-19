@@ -26,6 +26,17 @@ public class RoomDto {
     private UserInfoDto[] userArr;
     private MapInfo mapInfo;
 
+    // 방 번호
+    public static int roomCode=1000;
+//    private synchronized int getNextCode() {
+//        if (roomCode >= 9999) {
+//            roomCode = 1000;
+//        } else {
+//            roomCode++;
+//        }
+//        return roomCode;
+//    }
+
     public RoomDto(UserAccessInfo user, int mapId, String title, String password){//친선전
         userArr = new UserInfoDto[GameInfo.MAX_PLAYER];
         userArr[0] = new UserInfoDto(user.getUserProfile());

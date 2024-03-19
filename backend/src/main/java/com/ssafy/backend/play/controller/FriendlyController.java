@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+import static com.ssafy.backend.play.service.FriendlyServiceImpl.roomDtoList;
+
 @RestController
 @RequestMapping("/play/friendly")
 public class FriendlyController {
@@ -23,7 +25,7 @@ public class FriendlyController {
         this.jwtUtil = jwtUtil;
     }
     @GetMapping("/{offset}")
-    private ResponseEntity<?> getRoomList(@PathVariable int offset){
+    private ResponseEntity<?> getRoomList(@PathVariable("offset") int offset){
 
         List<RoomDto> roomDtoList=friendlyService.getPaginatedRoomList(offset);
         return ResponseEntity.ok(roomDtoList);
@@ -38,16 +40,13 @@ public class FriendlyController {
         String roomTitle = (String) requestBody.get("roomTitle");
         String roomPassword = (String) requestBody.get("roomPassword");
         int mapId = (int) requestBody.get("mapId");
-
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
 
         RoomDto roomDto = new RoomDto(userAccessInfo, mapId, roomTitle, roomPassword);
-
         RoomInfo roomInfo = friendlyService.createRoom(roomDto);
         
         // useraccesssinfo 따로 처리
         roomInfo.setUserArr(new UserAccessInfo[]{userAccessInfo, null, null, null});
-
         return ResponseEntity.ok(roomDto);
     }
     @DeleteMapping
