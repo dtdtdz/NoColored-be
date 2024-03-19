@@ -155,4 +155,27 @@ public class UserServiceImpl implements UserService {
 
         return generateUserInfoDtoWithToken(userProfile);
     }
+
+    @Override
+    public void updatePassword(String token, String pwd, String prePwd) {
+        UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
+        if (!prePwd.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId())))
+            throw new RuntimeException("잘못된 패스워드 입력입니다");
+
+        userInfoRepository.updatePassword(user.getUserProfile().getId(), pwd);
+    }
+
+    @Override
+    public void updateNickname(String token, String nickname) {
+        UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
+        userInfoRepository.updateNickname(user.getUserProfile().getId(), nickname);
+    }
+
+    @Override
+    public void deleteUser(String token, String prePwd) {
+        UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
+        if (!prePwd.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId())))
+            throw new RuntimeException("잘못된 패스워드 입력입니다");
+        userInfoRepository.deleteUser(user.getUserProfile().getId());
+    }
 }

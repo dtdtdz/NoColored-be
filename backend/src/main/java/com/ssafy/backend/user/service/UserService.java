@@ -10,5 +10,8 @@ public interface UserService {
     UserProfile signUp(String id, String password, String nickname);
     UserInfoDto generateUserInfoDtoWithToken(UserProfile userProfile);
     UserInfoDto login(String id, String password);
+    void updatePassword(String token, String pwd, String prePwd);
+    void updateNickname(String token, String nickname);
+    void deleteUser(String token, String prePwd);
 
 }

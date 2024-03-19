@@ -10,10 +10,10 @@ public enum SendBinaryMessageType {
 
     START((byte) 0),
     SET_CHARACTER((byte) 1),
-    PHYSICS_STATE((byte) 2),
     TIME((byte) 3),
     STEP((byte) 4),
     GAME_END((byte) 10),
+    PHYSICS_STATE((byte) 100),
     TEST_MAP((byte) 200);
 
     private final byte value;
