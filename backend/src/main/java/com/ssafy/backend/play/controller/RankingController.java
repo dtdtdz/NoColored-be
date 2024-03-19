@@ -3,6 +3,7 @@ package com.ssafy.backend.play.controller;
 import com.ssafy.backend.assets.SendTextMessageWrapper;
 import com.ssafy.backend.game.domain.MapInfo;
 import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.play.service.FriendlyServiceImpl;
 import com.ssafy.backend.play.service.RankingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,6 @@ public class RankingController {
 
     @GetMapping("/test")
     private ResponseEntity<String> test() throws Exception{
-        return ResponseEntity.ok(SendTextMessageWrapper.wrapAndConvertToJson("yes"));
+        return ResponseEntity.ok(SendTextMessageWrapper.wrapAndConvertToJson(FriendlyServiceImpl.roomDtoList.size()));
     }
 }

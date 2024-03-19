@@ -44,6 +44,7 @@ public class JwtUtil {
     }
 
     public void setTokenRedis(String token, UUID id){
+//        if (redisTemplate.opsForValue().get(tokenKey(token)) !=null) System.out.println("dup");
         redisTemplate.opsForValue().set(tokenKey(token), id, 3600*8, TimeUnit.SECONDS);//8시간 살아있음
     }
 

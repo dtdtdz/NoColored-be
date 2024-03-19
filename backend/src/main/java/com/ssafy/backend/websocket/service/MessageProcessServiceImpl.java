@@ -57,11 +57,11 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         Function<JsonNode, Object> handler = actionHandlers.get(action);
 //        System.out.println("text");
         if (handler != null) {
-            UserAccessInfo result = (UserAccessInfo)handler.apply(jsonNode.get("token"));
+            UserAccessInfo result = (UserAccessInfo)handler.apply(jsonNode.get("data"));
             if (result!=null) {
                 result.setSession(session);
                 sessionCollection.userWebsocketMap.put(session, result);
-                System.out.println(result.getUserProfile().getUserNickname());
+//                System.out.println(result.getUserProfile().getUserNickname());
 //                System.out.println(result.getUserProfile().getId());
             }
         } else {
@@ -137,7 +137,6 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         user.setSession(session);
         users.add(user);
         inGameCollection.addGame(users);
-//        inGameCollection.inGameUser.put(session, gameInfo);
     }
 
     private void testLogin(WebSocketSession session){
