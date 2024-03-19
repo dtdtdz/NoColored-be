@@ -1,5 +1,6 @@
 package com.ssafy.backend.game.util;
 
+import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.*;
 import com.ssafy.backend.game.dto.RoomDto;
 import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
@@ -38,15 +39,13 @@ public class InGameCollection {
         for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()) {
             int bufferNum = entry.getValue().getBufferNum();
             gameInfo.putTime(buffer[bufferNum]);
-            buffer[bufferNum].flip();
-            synchronized (entry.getKey()){
-                try {
-                    entry.getKey().sendMessage(new BinaryMessage(buffer[bufferNum]));
-                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-                    e.printStackTrace();
-                }
+            buffer[bufferNum].put(SendBinaryMessageType.TEST_MAP.getValue())
+                    .put((byte) gameInfo.getMapInfo().getFloorList().size());
+            for (int[] arr:gameInfo.getMapInfo().getFloorList()){
+                buffer[bufferNum].put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
             }
+
+            SynchronizedSend.send(entry.getKey(), buffer[bufferNum]);
         }
         addQueue.offer(gameInfo);
     }
@@ -100,7 +99,6 @@ public class InGameCollection {
             buffer[bufferNum].clear();
             if (checkSecond) gameInfo.putTime(buffer[bufferNum]);
             buffer[bufferNum].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
-                    .put((byte) (16))
                     .put((byte) characterInfoArr.length);
         }
 //                System.out.print(2);
@@ -247,25 +245,7 @@ public class InGameCollection {
 //                        System.out.println(stepList.size());
             }
 
-            try {
-
-                buffer[bufferNum].flip();
-
-                synchronized (entry.getKey()){
-                    entry.getKey().sendMessage(new BinaryMessage(buffer[bufferNum]));
-                }
-            } catch (IOException e) {
-//                    e.printStackTrace();
-//                    roomInfo.getSessions().remove(session);
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            } catch (Exception e){
-                System.out.println("can't find session");
-//                        SessionRepository.userWebsocketMap.get(entry.getKey()).setGameInfo(null);
-                inGameUser.remove(entry.getKey());
-                removeGame(gameInfo);
-                e.printStackTrace();
-            }
+            SynchronizedSend.send(entry.getKey(), buffer[bufferNum]);
         }
     }
 

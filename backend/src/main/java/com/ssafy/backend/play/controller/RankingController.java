@@ -27,6 +27,6 @@ public class RankingController {
 
     @GetMapping("/test")
     private ResponseEntity<String> test() throws Exception{
-        return ResponseEntity.ok(SendTextMessageWrapper.wrapAndConvertToJson(new MapInfo()));
+        return ResponseEntity.ok(SendTextMessageWrapper.wrapAndConvertToJson("yes"));
     }
 }
