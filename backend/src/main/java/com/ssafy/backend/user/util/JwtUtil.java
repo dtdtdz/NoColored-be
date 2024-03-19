@@ -45,15 +45,22 @@ public class JwtUtil {
 
     public void setTokenRedis(String token, UUID id){
 //        if (redisTemplate.opsForValue().get(tokenKey(token)) !=null) System.out.println("dup");
-        redisTemplate.opsForValue().set(tokenKey(token), id, 3600*8, TimeUnit.SECONDS);//8시간 살아있음
+        synchronized (redisTemplate){
+            redisTemplate.opsForValue().set(tokenKey(token), id, 3600*8, TimeUnit.SECONDS);//8시간 살아있음
+        }
     }
 
     public void deleteTokenRedis(String token){
-        redisTemplate.delete(tokenKey(token));
+        synchronized (redisTemplate){
+            redisTemplate.delete(tokenKey(token));
+        }
     }
 
     public UserAccessInfo getUserAccessInfoRedis(String token){
-        Object value = redisTemplate.opsForValue().get(tokenKey(token));
+        Object value = null;
+        synchronized (redisTemplate){
+            value = redisTemplate.opsForValue().get(tokenKey(token));
+        }
 
         if (value==null) return null;
         UUID id = UUID.fromString((String) value);

@@ -11,17 +11,14 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class SchedulerConfig {
-
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {
         return Executors.newScheduledThreadPool(1); // 예: 스레드 풀 크기를 1로 설정
     }
-
     @Bean
     ScheduledExecutorService authScheduledExecutorService(){
         return Executors.newScheduledThreadPool(1);
     }
-
     // 스프링 컨텍스트가 종료될 때 이벤트 리스너
     @EventListener
     public void onApplicationEvent(ContextClosedEvent event) {
@@ -32,7 +29,6 @@ public class SchedulerConfig {
                 .getBean("authScheduledExecutorService", ScheduledExecutorService.class);
         shutdownAndAwaitTermination(authExecutorService);
     }
-
     // 스레드 풀 종료를 위한 메서드
     void shutdownAndAwaitTermination(ScheduledExecutorService pool) {
         System.out.println("shut");
