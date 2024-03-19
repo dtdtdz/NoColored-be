@@ -66,7 +66,7 @@ public class FriendlyServiceImpl implements FriendlyService {
     @Override
     public List<FriendlyRoomDto> getPaginatedRoomList(int offset) {
         final int roomsPerPage = 6;
-        final int maxPages = 1;
+        final int maxPages = 5;
         final int maxRooms = roomsPerPage * maxPages;
 
         // 가져올 방 번호
