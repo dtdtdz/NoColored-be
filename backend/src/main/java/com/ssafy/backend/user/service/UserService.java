@@ -1,11 +1,14 @@
 package com.ssafy.backend.user.service;
 
+import com.ssafy.backend.user.dto.UserInfoDto;
+import com.ssafy.backend.user.dto.UserSignDto;
 import com.ssafy.backend.user.entity.UserProfile;
 
-import java.util.UUID;
-
 public interface UserService {
+    UserProfile guestSignUp();
+    UserInfoDto guestConvert(String token, UserSignDto userSignDto);
     UserProfile signUp(String id, String password, String nickname);
-    public String generateToken(UserProfile userProfile);
-    public String login(String id, String password);
+    UserInfoDto generateUserInfoDtoWithToken(UserProfile userProfile);
+    UserInfoDto login(String id, String password);
+
 }

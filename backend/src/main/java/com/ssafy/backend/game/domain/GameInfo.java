@@ -1,10 +1,13 @@
-package com.ssafy.backend.websocket.domain;
+package com.ssafy.backend.game.domain;
 
+import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,14 +19,14 @@ public class GameInfo {
     private LocalDateTime startDate;
     private long startTime;
     private long time;
+    private int second;
     private Map<WebSocketSession, UserGameInfo> users = new LinkedHashMap<>();
     private MapInfo mapInfo;
     private CharacterInfo[] characterInfoArr;
     private boolean[][] floor;
-    private int second;
-
+    private List<byte[]> stepList;
     //이것들 위치 바꿔야하나?
-    public static final int CHARACTER_SIZE = 36;
+    public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_SPEED = 160;
     public static final int MAX_PLAYER = 4;
     public static final float GRAVITY = 200;
@@ -32,6 +35,7 @@ public class GameInfo {
     public static final int MAP_WIDTH = 27;
     public static final int WALL_WIDTH = 3;
     public static final int DEFAULT_TIME = 120;
+    public static final int CHARACTER_NUM = 10;
 
     int roomId;
     public GameInfo(){
@@ -39,7 +43,7 @@ public class GameInfo {
         startTime = System.currentTimeMillis();
         time = startTime;
         second = DEFAULT_TIME;
-        characterInfoArr = new CharacterInfo[3];
+        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
         for (int i=0; i<characterInfoArr.length; i++){
             characterInfoArr[i] = new CharacterInfo();
             characterInfoArr[i].setX((1+i)*100);
@@ -55,6 +59,7 @@ public class GameInfo {
                 floor[arr[0]+i-WALL_WIDTH][arr[1]] = true;
             }
         }
+        stepList = new ArrayList<>();
     }
 
     private GameInfo(int num){
@@ -101,6 +106,19 @@ public class GameInfo {
             return true;
         }
         return false;
+    }
+
+    public void putStep(ByteBuffer buffer){
+        buffer.put(SendBinaryMessageType.STEP.getValue())
+                .put((byte) stepList.size());
+        for (int i=0; i<stepList.size(); i++){
+            buffer.put(stepList.get(i)[0]).put(stepList.get(i)[1]).put(stepList.get(i)[2]);
+        }
+    }
+
+    public void putTime(ByteBuffer buffer){
+        buffer.put(SendBinaryMessageType.TIME.getValue())
+                .put((byte)1).put((byte)second);
     }
 
     //세션과 캐릭터를 매핑한다.

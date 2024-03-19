@@ -1,8 +1,6 @@
-package com.ssafy.backend.websocket.domain;
+package com.ssafy.backend.game.domain;
 
-import com.ssafy.backend.user.entity.UserInfo;
 import com.ssafy.backend.user.entity.UserProfile;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

@@ -1,10 +1,10 @@
-package com.ssafy.backend.websocket.domain;
+package com.ssafy.backend.game.domain;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 public class MapInfo {

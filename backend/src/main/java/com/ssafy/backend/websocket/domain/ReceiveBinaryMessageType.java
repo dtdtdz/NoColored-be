@@ -31,7 +31,7 @@ public enum ReceiveBinaryMessageType {
     public static ReceiveBinaryMessageType valueOf(byte value) {
         ReceiveBinaryMessageType result = map.get(value);
         if (result == null) {
-//            throw new IllegalArgumentException("No enum constant for value: " + value);
+            throw new IllegalArgumentException("No enum constant for value: " + value);
         }
         return result;
     }

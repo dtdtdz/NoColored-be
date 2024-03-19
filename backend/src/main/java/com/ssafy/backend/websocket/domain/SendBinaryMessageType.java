@@ -14,7 +14,7 @@ public enum SendBinaryMessageType {
     TIME((byte) 3),
     STEP((byte) 4),
     GAME_END((byte) 10),
-    TEST_MAP((byte) 100);
+    TEST_MAP((byte) 200);
 
     private final byte value;
     private static final Map<Byte, SendBinaryMessageType> map = new HashMap<>();
@@ -34,5 +34,4 @@ public enum SendBinaryMessageType {
         }
         return result;
     }
-
 }
