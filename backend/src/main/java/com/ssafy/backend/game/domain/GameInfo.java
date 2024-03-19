@@ -118,7 +118,7 @@ public class GameInfo {
 
     public void putTime(ByteBuffer buffer){
         buffer.put(SendBinaryMessageType.TIME.getValue())
-                .put((byte)1).put((byte)second);
+                .put((byte)second);
     }
 
     //세션과 캐릭터를 매핑한다.

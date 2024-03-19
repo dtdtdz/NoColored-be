@@ -1,6 +1,7 @@
 package com.ssafy.backend.game.service;
 
 import com.ssafy.backend.game.util.InGameCollection;
+import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.game.domain.*;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,11 +25,14 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class GameServiceImpl implements GameService {
 
+
+
+
     private final ScheduledExecutorService scheduledExecutorService;
 //    private final ScheduledExecutorService
     private final SessionCollection sessionCollection;
     private final InGameCollection inGameCollection;
-
+    JwtUtil jwtUtil;
     private ScheduledFuture<?> future;
     GameServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
                     SessionCollection sessionRepository,
@@ -38,6 +42,12 @@ public class GameServiceImpl implements GameService {
         this.inGameCollection = inGameRepository;
 
     }
+
+    @Override
+    public synchronized void ready(String token) {
+
+    }
+
     @EventListener(ApplicationReadyEvent.class)
     public void scheduleTaskAfterStartup() {
         long initialDelay = 0; // 시작 지연 없음
@@ -53,15 +63,6 @@ public class GameServiceImpl implements GameService {
 //        future.cancel(false);
 //    }
 
-    @Override
-    public void setRoom(WebSocketSession session) {
-
-    }
-
-    @Override
-    public void getRoomInfoList() {
-
-    }
     private void gameLogic(){
         try {
             inGameCollection.updateGameList();
