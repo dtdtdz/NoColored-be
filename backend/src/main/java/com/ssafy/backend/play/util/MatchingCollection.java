@@ -1,6 +1,5 @@
 package com.ssafy.backend.play.util;
 
-import com.ssafy.backend.assets.SendTextMessageWrapper;
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.game.domain.UserAccessInfo;
@@ -9,10 +8,8 @@ import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.play.domain.MatchingInfo;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -67,7 +64,7 @@ public class MatchingCollection {
         }
         matchingInfoMap.remove(userAccessInfo);
         WebSocketSession session = userAccessInfo.getSession();
-        SynchronizedSend.send(session, "matchingCancel");
+        SynchronizedSend.textSend(session, "matchingCancel",null);
     }
 
     @Scheduled(fixedRate = 500)
@@ -127,7 +124,7 @@ public class MatchingCollection {
 
                 RoomDto roomDto = new RoomDto(list);
                 for (UserAccessInfo userAccessInfo:list){
-                    SynchronizedSend.send(userAccessInfo.getSession(), roomDto);
+                    SynchronizedSend.textSend(userAccessInfo.getSession(), "matching", roomDto);
                 }
                 inGameCollection.addGame(list);
                 System.out.println("matching success");

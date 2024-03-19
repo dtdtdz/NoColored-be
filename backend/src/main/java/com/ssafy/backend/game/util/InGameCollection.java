@@ -45,7 +45,7 @@ public class InGameCollection {
                 buffer[bufferNum].put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
             }
 
-            SynchronizedSend.send(entry.getKey(), buffer[bufferNum]);
+            SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
         }
         addQueue.offer(gameInfo);
     }
@@ -245,7 +245,7 @@ public class InGameCollection {
 //                        System.out.println(stepList.size());
             }
 
-            SynchronizedSend.send(entry.getKey(), buffer[bufferNum]);
+            SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
         }
     }
 

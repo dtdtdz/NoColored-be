@@ -21,17 +21,6 @@ public class FriendlyServiceImpl implements FriendlyService {
     // mapinfo리스트로 가지고있다가 return시 dto로 바꿔주기
     public static List<RoomInfo> roomInfoList= Collections.synchronizedList(new ArrayList<>());
 
-//    public static int roomCode=1000;
-//
-//    private synchronized int getNextCode() {
-//        if (roomCode >= 9999) {
-//            roomCode = 1000;
-//        } else {
-//            roomCode++;
-//        }
-//        return roomCode;
-//    }
-
     // 대기실 생성
     @Override
     public synchronized RoomInfo createRoom(RoomDto roomDto) {
@@ -45,9 +34,6 @@ public class FriendlyServiceImpl implements FriendlyService {
             }
             roomDto.setCode(roomCode); // 할당
         }
-
-        // 리스트에 추가
-        // roomDtoList.add(roomDto);
 
         RoomInfo roomInfo = new RoomInfo();
 //        roomInfo.setGameId(roomDto.getGameId());

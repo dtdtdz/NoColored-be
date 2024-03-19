@@ -30,7 +30,12 @@ public class FriendlyController {
         return ResponseEntity.ok(roomInfoList);
     }
     @PatchMapping
-    private ResponseEntity<?> enterRoom(){
+    private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody ){
+
+        String code=(String) requestBody.get("roomCode");
+        String password=(String) requestBody.get("roomPassword");
+
+
         return ResponseEntity.ok("");
     }
     @PostMapping()
