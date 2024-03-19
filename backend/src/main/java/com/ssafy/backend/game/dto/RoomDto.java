@@ -26,8 +26,7 @@ public class RoomDto {
     private UserInfoDto[] userArr;
     private MapInfo mapInfo;
 
-    // 방 번호
-    public static int roomCode=1000;
+
 //    private synchronized int getNextCode() {
 //        if (roomCode >= 9999) {
 //            roomCode = 1000;
