@@ -1,6 +1,6 @@
 package com.ssafy.backend.play.controller;
 
-import com.ssafy.backend.game.domain.GameInfo;
+
 import com.ssafy.backend.game.domain.RoomInfo;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.dto.FriendlyRoomDto;
@@ -30,7 +30,12 @@ public class FriendlyController {
         return ResponseEntity.ok(roomInfoList);
     }
     @PatchMapping
-    private ResponseEntity<?> enterRoom(){
+    private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody ){
+
+        String code=(String) requestBody.get("roomCode");
+        String password=(String) requestBody.get("roomPassword");
+
+
 
 
         return ResponseEntity.ok("");

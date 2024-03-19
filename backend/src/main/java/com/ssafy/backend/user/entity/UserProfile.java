@@ -26,15 +26,13 @@ public class UserProfile {
     @Column(nullable = false, length = 9)
     private String userNickname;
 
-    @Column(columnDefinition = "LONGTEXT")//url, 변경될 수 있음
-    private String userSkin;
+    private Integer userSkin;
 
     private boolean isGuest;
 
     private Long userExp;
 
-    @Column(length = 30)
-    private String userTitle;
+    private Integer userTitle;
 
     private Integer userRating;
 

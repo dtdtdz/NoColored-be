@@ -21,17 +21,6 @@ public class FriendlyServiceImpl implements FriendlyService {
     // mapinfo리스트로 가지고있다가 return시 dto로 바꿔주기
     public static List<RoomInfo> roomInfoList= Collections.synchronizedList(new ArrayList<>());
 
-//    public static int roomCode=1000;
-//
-//    private synchronized int getNextCode() {
-//        if (roomCode >= 9999) {
-//            roomCode = 1000;
-//        } else {
-//            roomCode++;
-//        }
-//        return roomCode;
-//    }
-
     // 대기실 생성
     @Override
     public synchronized RoomInfo createRoom(RoomDto roomDto) {
@@ -46,15 +35,13 @@ public class FriendlyServiceImpl implements FriendlyService {
             roomDto.setCode(roomCode); // 할당
         }
 
-        // 리스트에 추가
-        // roomDtoList.add(roomDto);
-
         RoomInfo roomInfo = new RoomInfo();
 //        roomInfo.setGameId(roomDto.getGameId());
         roomInfo.setTitle(roomDto.getTitle());
         roomInfo.setPassword(roomDto.getPassword());
         roomInfo.setCode(roomDto.getCode());
         roomInfo.setMaster(roomDto.getMaster());
+        roomInfo.setReadyState(roomDto.getReadyState());
         roomInfo.setMapInfo(roomDto.getMapInfo());
 
         // 리스트에 추가
@@ -89,12 +76,24 @@ public class FriendlyServiceImpl implements FriendlyService {
                 friendlyRoomDto.setRoomTitle(roomInfo.getTitle()); // roomTitle 설정
                 friendlyRoomDto.setRoomCode(roomInfo.getCode());   // roomCode 설정
                 friendlyRoomDto.setMapId(roomInfo.getMapInfo().getMapId());         // mapId 설정
-                friendlyRoomDto.setUserNumber(roomInfo.getUserArr().length);// userNumber 설정
+
+                // for문으로 유저 수 세기
+                int userNumber=0;
+                for(int j=0;j<4;j++){
+                    if(roomInfo.getUserArr()[j]!=null){
+                        userNumber++;
+                    }
+                }
+                friendlyRoomDto.setUserNumber(userNumber);// userNumber 설정
                 paginatedFriendlyRooms.add(friendlyRoomDto);
             }
         }
-
         return paginatedFriendlyRooms;
+    }
+
+    @Override
+    public void findRoom(){
+
     }
 
 

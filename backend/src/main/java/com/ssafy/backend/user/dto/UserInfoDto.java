@@ -15,8 +15,8 @@ public class UserInfoDto {
     long exp; //누적 경험치? 남은 경험치? 둘다?
     int level;
     String tier;
-    String skinId;
-    String titleId;
+    Integer skinId;
+    Integer titleId;
     public UserInfoDto(UserProfile userProfile){
         this.userCode = userProfile.getUserCode();
         this.nickName = userProfile.getUserNickname();
