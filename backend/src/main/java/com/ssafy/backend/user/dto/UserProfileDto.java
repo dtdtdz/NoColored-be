@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserInfoDto {
+public class UserProfileDto {
     String token;//이건 로그인 후 자기정보일때만 not null
     String userCode;
     String nickName;
@@ -17,7 +17,7 @@ public class UserInfoDto {
     String tier;
     Integer skinId;
     Integer titleId;
-    public UserInfoDto(UserProfile userProfile){
+    public UserProfileDto(UserProfile userProfile){
         this.userCode = userProfile.getUserCode();
         this.nickName = userProfile.getUserNickname();
         this.exp = userProfile.getUserExp();
@@ -25,7 +25,7 @@ public class UserInfoDto {
         this.skinId = userProfile.getUserSkin();
         this.titleId = userProfile.getUserTitle();
     }
-    public UserInfoDto(UserProfile userProfile, String token){
+    public UserProfileDto(UserProfile userProfile, String token){
         this.token = token;
         this.userCode = userProfile.getUserCode();
         this.nickName = userProfile.getUserNickname();

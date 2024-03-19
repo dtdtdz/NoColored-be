@@ -11,13 +11,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.UUID;
 
 public interface UserInfoRepository extends JpaRepository<UserInfo, UUID> {
-    @Query("select u.userProfile from UserInfo u where userId = :userId and userPwd = :userPwd")
-    UserProfile findByUser(@Param("userId")String userId, @Param("userPwd")String userPwd);
 
-    @Transactional
-    @Modifying
-    @Query("update UserInfo set userProfile.userNickname = :userNickname where id = :id")
-    void updateNickname(@Param("id")UUID id, @Param("userNickname") String userNickname);
+    boolean existsByUserId(String userId);
+    @Query("select u.userProfile from UserInfo u where userId = :userId and userPwd = :userPwd and isDeleted = false")
+    UserProfile findByUser(@Param("userId")String userId, @Param("userPwd")String userPwd);
 
     @Transactional
     @Modifying
@@ -29,5 +26,6 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, UUID> {
     @Query("update UserInfo set isDeleted = true where id = :id")
     void deleteUser(@Param("id")UUID id);
 
+    @Query("SELECT u.userPwd FROM UserInfo u WHERE u.id = ?1")
     String findUserPwdById(UUID id);
 }
