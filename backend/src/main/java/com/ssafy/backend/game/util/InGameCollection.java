@@ -91,7 +91,6 @@ public class InGameCollection {
         characterQueue.clear();
 
         boolean checkSecond = gameInfo.checkSecond();
-        gameInfo.getStepList().clear();
 
         for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
             int bufferNum = entry.getValue().getBufferNum();
@@ -210,7 +209,10 @@ public class InGameCollection {
                         UserGameInfo user = listC.getUserGameInfo();
                         user.setScore((byte) (user.getScore()+1));
                         gameInfo.getStepList().add(new byte[]{ user.getPlayerNum(),
-                                curC.getUserGameInfo().getPlayerNum(), user.getScore()});
+                                curC.getUserGameInfo().getPlayerNum(),
+                                user.getCharacterNum(),
+                                curC.getUserGameInfo().getCharacterNum(),
+                                user.getScore()});
                     }
 
                     break;//밟힌 캐릭터는 더 밟힐 수 없다.

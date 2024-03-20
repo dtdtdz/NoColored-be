@@ -139,6 +139,7 @@ public class GameInfo {
         for (int i=0; i<stepList.size(); i++){
             buffer.put(stepList.get(i)[0]).put(stepList.get(i)[1]).put(stepList.get(i)[2]);
         }
+        stepList.clear();
     }
 
     public void putTime(ByteBuffer buffer){
