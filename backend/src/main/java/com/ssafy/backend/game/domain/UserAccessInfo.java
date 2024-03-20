@@ -13,10 +13,6 @@ import org.springframework.web.socket.WebSocketSession;
 public class UserAccessInfo {
     private WebSocketSession session;
     private UserProfile userProfile;
-    enum UserState {
-        MAIN, ROOM, GAME
-    }
-
     private Object position;//사용할때 상태 확인해야함
 
     public UserAccessInfo(UserProfile userProfile){

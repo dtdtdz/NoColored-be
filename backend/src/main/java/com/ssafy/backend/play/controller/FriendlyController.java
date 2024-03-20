@@ -1,6 +1,7 @@
 package com.ssafy.backend.play.controller;
 
 
+
 import com.ssafy.backend.game.domain.RoomInfo;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.dto.FriendlyRoomDto;
@@ -24,6 +25,11 @@ public class FriendlyController {
         this.friendlyService = friendlyService;
         this.jwtUtil = jwtUtil;
     }
+
+    RoomInfo dummyRoom = new RoomInfo("dummy",1111,1111,0,new int[] {0,0,0,0}, null, null);
+
+
+
     @GetMapping("/{offset}")
     private ResponseEntity<?> getRoomList(@PathVariable("offset") int offset){
         List<FriendlyRoomDto> roomInfoList=friendlyService.getPaginatedRoomList(offset);
@@ -41,6 +47,7 @@ public class FriendlyController {
     @PostMapping()
     private ResponseEntity<?> createRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody){
 
+        // requestbody를 service로 보내서 한번에 처리 가능한거 아님??? 나중에 고쳐라
         String roomTitle = (String) requestBody.get("roomTitle");
         int roomPassword = Integer.parseInt(requestBody.get("roomPassword").toString());
         int mapId = (int) requestBody.get("mapId");
@@ -50,6 +57,8 @@ public class FriendlyController {
         RoomInfo roomInfo = friendlyService.createRoom(roomDto);
         
         // useraccesssinfo 따로 처리
+        // position 처리해주기
+        userAccessInfo.setRoomInfo(roomInfo);
         roomInfo.setUserArr(new UserAccessInfo[]{userAccessInfo, null, null, null});
         return ResponseEntity.ok(roomDto);
     }
