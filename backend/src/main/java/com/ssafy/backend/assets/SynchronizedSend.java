@@ -17,6 +17,7 @@ public class SynchronizedSend {
             System.out.println("세션 없음");
             return;
         }
+        if (!session.isOpen()) throw new RuntimeException("세션없음");
         synchronized (session){
             try {
                 buffer.flip();
@@ -24,8 +25,7 @@ public class SynchronizedSend {
                 buffer.clear();
             } catch (IOException e) {
                 buffer.clear();
-                e.printStackTrace();
-//                throw new RuntimeException(e);
+//                throw new RuntimeException("");
             }
 
         }

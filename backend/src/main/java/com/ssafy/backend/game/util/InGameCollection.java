@@ -244,7 +244,11 @@ public class InGameCollection {
 //                        System.out.println(stepList.size());
             }
 
-            SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
+            try {
+                SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
+            } catch (Exception e){
+//                error
+            }
         }
     }
 

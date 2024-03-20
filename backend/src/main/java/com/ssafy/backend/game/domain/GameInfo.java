@@ -38,6 +38,31 @@ public class GameInfo {
     public static final int CHARACTER_NUM = 10;
 
     int roomId;
+
+    public GameInfo(List<UserAccessInfo> users){
+        startDate = LocalDateTime.now();
+        startTime = System.currentTimeMillis();
+        time = startTime;
+        second = DEFAULT_TIME;
+        mapInfo = new MapInfo();
+
+        for (int[] arr:mapInfo.getFloorList()){
+            for (int i=0; i<arr[2]; i++){
+                floor[arr[0]+i-WALL_WIDTH][arr[1]] = true;
+            }
+        }
+
+        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
+        floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
+        //캐릭터 위치 랜덤배치
+
+
+        //유저 캐릭터 번호 랜덤 매핑
+        for (int i=0; i<users.size(); i++){
+//            characterInfoArr[i].setUserGameInfo();
+        }
+    }
+
     public GameInfo(){
         startDate = LocalDateTime.now();
         startTime = System.currentTimeMillis();
