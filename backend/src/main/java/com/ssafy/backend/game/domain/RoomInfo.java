@@ -13,7 +13,7 @@ import java.util.UUID;
 public class RoomInfo {
 
     private String title;
-    private String password;
+    private int password;
     private int code;
     private int master;
     private int[] readyState;

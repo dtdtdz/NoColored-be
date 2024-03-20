@@ -32,19 +32,17 @@ public class FriendlyController {
     @PatchMapping
     private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody ){
 
-        String code=(String) requestBody.get("roomCode");
-        String password=(String) requestBody.get("roomPassword");
+        int code=(int) requestBody.get("roomCode");
+        int password=Integer.parseInt(requestBody.get("roomPassword").toString());
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
 
-
-
-
-        return ResponseEntity.ok("");
+        return friendlyService.enterRoom(code, password, userAccessInfo);
     }
     @PostMapping()
     private ResponseEntity<?> createRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody){
 
         String roomTitle = (String) requestBody.get("roomTitle");
-        String roomPassword = (String) requestBody.get("roomPassword");
+        int roomPassword = Integer.parseInt(requestBody.get("roomPassword").toString());
         int mapId = (int) requestBody.get("mapId");
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
 
