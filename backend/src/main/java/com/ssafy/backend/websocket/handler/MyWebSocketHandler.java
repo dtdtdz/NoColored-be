@@ -16,10 +16,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@RequiredArgsConstructor
 public class MyWebSocketHandler extends AbstractWebSocketHandler {
 
     private final MessageProcessService messageProcessService;
+
+    public MyWebSocketHandler(MessageProcessService messageProcessService){
+        this.messageProcessService = messageProcessService;
+    }
+
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
         // 필요에 따라 응답 보내기

@@ -45,7 +45,7 @@ public class InGameCollection {
                 buffer[bufferNum].put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
             }
 
-            SynchronizedSend.send(entry.getKey(), buffer[bufferNum]);
+            SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
         }
         addQueue.offer(gameInfo);
     }
@@ -89,7 +89,6 @@ public class InGameCollection {
         boolean[][] floor = gameInfo.getFloor();
 
         characterQueue.clear();
-
 
         boolean checkSecond = gameInfo.checkSecond();
         gameInfo.getStepList().clear();
@@ -245,7 +244,7 @@ public class InGameCollection {
 //                        System.out.println(stepList.size());
             }
 
-            SynchronizedSend.send(entry.getKey(), buffer[bufferNum]);
+            SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
         }
     }
 

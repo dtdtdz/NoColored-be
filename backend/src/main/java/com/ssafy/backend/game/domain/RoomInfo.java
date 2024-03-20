@@ -1,9 +1,7 @@
 package com.ssafy.backend.game.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.ssafy.backend.game.dto.RoomDto;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import java.util.UUID;
@@ -14,15 +12,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RoomInfo {
 
-//    @Id
-//    private UUID gameId;
     private String title;
     private String password;
     private int code;
     private int master;
+    private int[] readyState;
     private UserAccessInfo[] userArr;
     private MapInfo mapInfo;
 
-    // generateRandomString
 
 }

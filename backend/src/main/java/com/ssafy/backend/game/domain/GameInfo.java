@@ -25,7 +25,7 @@ public class GameInfo {
     private CharacterInfo[] characterInfoArr;
     private boolean[][] floor;
     private List<byte[]> stepList;
-    //이것들 위치 바꿔야하나?
+    //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_SPEED = 160;
     public static final int MAX_PLAYER = 4;
@@ -62,12 +62,12 @@ public class GameInfo {
         stepList = new ArrayList<>();
     }
 
-    private GameInfo(int num){
+    private GameInfo(int num){ //리팩토링 필요
         startDate = LocalDateTime.now();
         startTime = System.currentTimeMillis();
         time = startTime;
         second = DEFAULT_TIME;
-        characterInfoArr = new CharacterInfo[3];
+        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
         for (int i=0; i<characterInfoArr.length; i++){
             characterInfoArr[i] = new CharacterInfo();
             characterInfoArr[i].setX((1+i)*100);
@@ -118,7 +118,7 @@ public class GameInfo {
 
     public void putTime(ByteBuffer buffer){
         buffer.put(SendBinaryMessageType.TIME.getValue())
-                .put((byte)1).put((byte)second);
+                .put((byte)second);
     }
 
     //세션과 캐릭터를 매핑한다.
