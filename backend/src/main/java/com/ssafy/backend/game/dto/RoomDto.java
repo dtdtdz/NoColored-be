@@ -17,14 +17,14 @@ import java.util.List;
 public class RoomDto {
 //    private UUID gameId;//seq로 바꾸는거 생각해보셈 sequential UUID를 쓸까?
     private String title;
-    private String password;
+    private int password;
     private int code;
     private int master;//방장의 위치.ranking에서는 null
     private int[] readyState;
     private UserProfileDto[] userArr;
     private MapInfo mapInfo;
 
-    public RoomDto(UserAccessInfo user, int mapId, String title, String password){//친선전 생성
+    public RoomDto(UserAccessInfo user, int mapId, String title, int password){//친선전 생성
         userArr = new UserProfileDto[GameInfo.MAX_PLAYER];
         userArr[0] = new UserProfileDto(user.getUserProfile());
 //        gameId = UUID.randomUUID();

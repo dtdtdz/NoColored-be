@@ -173,6 +173,7 @@ public class GameInfo {
             buffer[i].put(SendBinaryMessageType.TIME.getValue())
                     .put((byte) second);
         }
+        stepList.clear();
     }
 
     public void putPhysicsState() {
