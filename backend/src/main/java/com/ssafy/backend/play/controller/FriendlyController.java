@@ -35,7 +35,7 @@ public class FriendlyController {
     @PatchMapping("/test")
     private ResponseEntity<?> enterRoomTest(){
 
-        return friendlyService.enterRoomTest(1111, 1111, null);
+        return ResponseEntity.ok(dummyRoomDto);
     }
 
     @GetMapping("/{offset}")
