@@ -1,13 +1,16 @@
 package com.ssafy.backend.play.service;
 
+import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.RoomInfo;
+import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.dto.FriendlyRoomDto;
 import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.user.dto.UserProfileDto;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -16,10 +19,7 @@ public class FriendlyServiceImpl implements FriendlyService {
     // 방 번호
     public static int roomCode=1000;
 
-    public static List<RoomDto> roomDtoList= Collections.synchronizedList(new ArrayList<>());
-
-    // mapinfo리스트로 가지고있다가 return시 dto로 바꿔주기
-    public static List<RoomInfo> roomInfoList= Collections.synchronizedList(new ArrayList<>());
+    private Map<Integer, RoomInfo> roomInfoMap =Collections.synchronizedMap(new HashMap<>());
 
     // 대기실 생성
     @Override
@@ -44,8 +44,8 @@ public class FriendlyServiceImpl implements FriendlyService {
         roomInfo.setReadyState(roomDto.getReadyState());
         roomInfo.setMapInfo(roomDto.getMapInfo());
 
-        // 리스트에 추가
-        roomInfoList.add(roomInfo);
+        // 맵에 추가
+        roomInfoMap.put(roomDto.getCode(), roomInfo);
         return roomInfo;
     }
 
@@ -56,35 +56,33 @@ public class FriendlyServiceImpl implements FriendlyService {
         final int maxPages = 5;
         final int maxRooms = roomsPerPage * maxPages;
 
-        // 가져올 방 번호
-        int startIndex = (offset - 1) * maxRooms;
-        int endIndex;
-
         List<FriendlyRoomDto> paginatedFriendlyRooms = new ArrayList<>();
 
-        synchronized (roomInfoList){
-            // 시작 인덱스가 전체 리스트 크기를 넘어가는 경우 빈 리스트 반환
-            if (startIndex >= roomInfoList.size()) {
-                return Collections.emptyList();
+        synchronized (roomInfoMap){
+            // roomInfoMap에서 RoomInfo 객체들을 방 코드 순서로 정렬
+            List<RoomInfo> sortedRooms = new ArrayList<>(roomInfoMap.values());
+            sortedRooms.sort(Comparator.comparingInt(RoomInfo::getCode));
+
+            // 페이징을 위한 계산
+            int totalRooms = sortedRooms.size();
+            int startIndex = (offset - 1) * maxRooms;
+            if (startIndex >= totalRooms) {
+                return Collections.emptyList(); // 시작 인덱스가 범위를 벗어나면 빈 리스트 반환
             }
+            int endIndex = Math.min(startIndex + maxRooms, totalRooms);
 
-            endIndex = Math.min(startIndex + maxRooms, roomInfoList.size());
-
+            // 페이징된 목록 생성
             for (int i = startIndex; i < endIndex; i++) {
-                RoomInfo roomInfo = roomInfoList.get(i);
+                RoomInfo roomInfo = sortedRooms.get(i);
                 FriendlyRoomDto friendlyRoomDto = new FriendlyRoomDto();
-                friendlyRoomDto.setRoomTitle(roomInfo.getTitle()); // roomTitle 설정
-                friendlyRoomDto.setRoomCode(roomInfo.getCode());   // roomCode 설정
-                friendlyRoomDto.setMapId(roomInfo.getMapInfo().getMapId());         // mapId 설정
+                friendlyRoomDto.setRoomTitle(roomInfo.getTitle());
+                friendlyRoomDto.setRoomCode(roomInfo.getCode());
+                friendlyRoomDto.setMapId(roomInfo.getMapInfo().getMapId());
 
-                // for문으로 유저 수 세기
-                int userNumber=0;
-                for(int j=0;j<4;j++){
-                    if(roomInfo.getUserArr()[j]!=null){
-                        userNumber++;
-                    }
-                }
-                friendlyRoomDto.setUserNumber(userNumber);// userNumber 설정
+                // 유저 수 계산
+                int userNumber = (int) Arrays.stream(roomInfo.getUserArr()).filter(Objects::nonNull).count();
+                friendlyRoomDto.setUserNumber(userNumber);
+
                 paginatedFriendlyRooms.add(friendlyRoomDto);
             }
         }
@@ -92,8 +90,57 @@ public class FriendlyServiceImpl implements FriendlyService {
     }
 
     @Override
-    public void findRoom(){
+    public synchronized ResponseEntity<?> enterRoom(int code, int password, UserAccessInfo userAccessInfo) {
 
+        RoomInfo roomInfo = roomInfoMap.get(code);
+
+        // 방이 존재하지 않음
+        if (roomInfo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("방이 존재하지 않습니다.");
+        }
+
+        // 비밀번호 불일치
+        if (roomInfo.getPassword()!= password) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("틀린 비밀번호입니다.");
+        }
+
+        // 들어갈 곳 찾기
+        for (int i = 0; i < 4; i++) {
+            if (roomInfo.getUserArr()[i] == null) {
+                roomInfo.getUserArr()[i] = userAccessInfo;
+
+                // RoomInfo를 RoomDto로 변환
+                RoomDto roomDto = new RoomDto();
+                roomDto.setTitle(roomInfo.getTitle());
+                roomDto.setPassword(roomInfo.getPassword());
+                roomDto.setCode(roomInfo.getCode());
+                roomDto.setMaster(roomInfo.getMaster());
+                roomDto.setReadyState(roomInfo.getReadyState());
+
+                // 세션에 뿌릴 map
+                Map<Integer, UserProfileDto> dataMap = new HashMap<>();
+                dataMap.put(i,new UserProfileDto(userAccessInfo.getUserProfile()));
+
+                UserProfileDto[] userProfileDtos = new UserProfileDto[4];
+                for (int j = 0; j < 4; j++) {
+                    UserAccessInfo tempUserAccessInfo = roomInfo.getUserArr()[j];
+                    if (tempUserAccessInfo != null) { // 널 체크 추가
+
+                        // 방에 다른 사람들에게 세션 뿌려주기
+                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),"newUser",dataMap);
+
+                        userProfileDtos[j] = new UserProfileDto(tempUserAccessInfo.getUserProfile());
+                    }
+                }
+
+                roomDto.setUserArr(userProfileDtos);
+                roomDto.setMapInfo(roomInfo.getMapInfo());
+
+                return ResponseEntity.ok(roomDto);
+            }
+        }
+        // 풀방
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("방에 들어갈 공간이 없습니다.");
     }
 
 
