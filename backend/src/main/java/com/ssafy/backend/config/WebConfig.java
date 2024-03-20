@@ -5,12 +5,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {    @Override
+public class WebConfig implements WebMvcConfigurer {
+    @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 .allowedOrigins("*")
-                .allowedMethods("GET","PUT", "POST", "DELETE", "PATCH")
-                .allowCredentials(true)
+                .allowedMethods("GET", "PUT", "POST", "DELETE", "PATCH")
                 .maxAge(3000);
 
 
