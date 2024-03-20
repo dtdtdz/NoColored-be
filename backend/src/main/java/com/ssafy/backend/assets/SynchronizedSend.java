@@ -17,15 +17,14 @@ public class SynchronizedSend {
             System.out.println("세션 없음");
             return;
         }
-        if (!session.isOpen()) throw new RuntimeException("세션없음");
         synchronized (session){
             try {
                 buffer.flip();
                 session.sendMessage(new BinaryMessage(buffer));
                 buffer.clear();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 buffer.clear();
-//                throw new RuntimeException("");
+                throw new RuntimeException("전송 실패");
             }
 
         }

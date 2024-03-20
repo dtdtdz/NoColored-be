@@ -14,6 +14,7 @@ public class CharacterInfo {
     private float y;
     private float velX;
     private float velY;
+    private int direction;
     private UserGameInfo userGameInfo;
     private boolean jump;
 
