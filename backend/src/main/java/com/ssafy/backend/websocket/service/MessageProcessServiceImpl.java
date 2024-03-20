@@ -2,11 +2,13 @@ package com.ssafy.backend.websocket.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.websocket.domain.ReceiveBinaryMessageType;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.user.util.JwtUtil;
+import com.ssafy.backend.websocket.domain.SendTextMessageType;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -96,6 +98,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         authScheduledExecutorService.schedule(()->{
             if (!sessionCollection.userWebsocketMap.containsKey(session)){
                 try {
+                    SynchronizedSend.textSend(session,"로그인 실패",null);
                     session.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
