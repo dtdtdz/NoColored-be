@@ -177,7 +177,8 @@ public class FriendlyServiceImpl implements FriendlyService {
     public synchronized ResponseEntity<?> enterRoomTest(int code, int password, UserAccessInfo userAccessInfo) {
 
 
-        return ResponseEntity.ok("success");
+
+        return ResponseEntity.ok("");
     }
 
 
