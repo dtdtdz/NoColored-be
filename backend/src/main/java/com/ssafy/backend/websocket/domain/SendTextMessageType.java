@@ -1,8 +1,10 @@
 package com.ssafy.backend.websocket.domain;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
-
+@Getter
 public enum SendTextMessageType {
     // sendbinarymessagetype처럼 만들고
     // synchronizedsend 참고해서 보내면 된다

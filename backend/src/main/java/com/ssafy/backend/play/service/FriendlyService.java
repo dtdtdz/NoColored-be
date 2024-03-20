@@ -10,10 +10,14 @@ import java.util.List;
 
 public interface FriendlyService {
 
-    RoomInfo createRoom(RoomDto roomDto);
+//    RoomInfo createRoom(RoomDto roomDto);
+    ResponseEntity<?> createRoom(String roomTitle, int roomPassword, int mapId, UserAccessInfo userAccessInfo);
 
-    List<FriendlyRoomDto> getPaginatedRoomList(int offset);
+//    List<FriendlyRoomDto> getPaginatedRoomList(int offset);
+    ResponseEntity<?> getRoomList(int offset);
 
     ResponseEntity<?> enterRoom(int code, int password, UserAccessInfo userAccessInfo);
+
+    ResponseEntity<?> enterRoomTest(int code, int password, UserAccessInfo userAccessInfo);
 
 }

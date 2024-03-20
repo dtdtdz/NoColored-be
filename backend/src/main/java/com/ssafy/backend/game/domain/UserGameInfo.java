@@ -14,7 +14,6 @@ import org.springframework.web.socket.WebSocketSession;
 public class UserGameInfo {
     private WebSocketSession webSocketSession;
     private byte characterNum;
-    private byte bufferNum;
     private byte playerNum;
     private byte score;
 }

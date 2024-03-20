@@ -1,10 +1,13 @@
 package com.ssafy.backend.play.controller;
 
 
+
+import com.ssafy.backend.game.domain.MapInfo;
 import com.ssafy.backend.game.domain.RoomInfo;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.dto.FriendlyRoomDto;
 import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.game.dto.UserRoomDto;
 import com.ssafy.backend.play.service.FriendlyService;
 import com.ssafy.backend.user.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
@@ -24,35 +27,47 @@ public class FriendlyController {
         this.friendlyService = friendlyService;
         this.jwtUtil = jwtUtil;
     }
+
+    RoomDto dummyRoomDto=new RoomDto("dummy",1111,0,new UserRoomDto[]{null,null,null,null},null);
+
+    RoomInfo dummyRoomInfo = new RoomInfo(1111,new UserAccessInfo[]{null,null,null,null},dummyRoomDto,false);
+
+    @PatchMapping("/test")
+    private ResponseEntity<?> enterRoomTest(){
+
+        return friendlyService.enterRoomTest(1111, 1111, null);
+    }
+
     @GetMapping("/{offset}")
     private ResponseEntity<?> getRoomList(@PathVariable("offset") int offset){
-        List<FriendlyRoomDto> roomInfoList=friendlyService.getPaginatedRoomList(offset);
-        return ResponseEntity.ok(roomInfoList);
+
+//        List<FriendlyRoomDto> roomInfoList=friendlyService.getPaginatedRoomList(offset);
+//        return ResponseEntity.ok(roomInfoList);
+
+        return friendlyService.getRoomList(offset);
     }
     @PatchMapping
     private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody ){
 
-        int code=(int) requestBody.get("roomCode");
+        int code=(Integer) requestBody.get("roomCode");
         int password=Integer.parseInt(requestBody.get("roomPassword").toString());
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
 
         return friendlyService.enterRoom(code, password, userAccessInfo);
     }
+
     @PostMapping()
     private ResponseEntity<?> createRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody){
 
+        // requestbody를 service로 보내서 한번에 처리 가능한거 아님??? 나중에 고쳐라
         String roomTitle = (String) requestBody.get("roomTitle");
         int roomPassword = Integer.parseInt(requestBody.get("roomPassword").toString());
-        int mapId = (int) requestBody.get("mapId");
+        int mapId = Integer.parseInt(requestBody.get("mapId").toString());
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
 
-        RoomDto roomDto = new RoomDto(userAccessInfo, mapId, roomTitle, roomPassword);
-        RoomInfo roomInfo = friendlyService.createRoom(roomDto);
-        
-        // useraccesssinfo 따로 처리
-        roomInfo.setUserArr(new UserAccessInfo[]{userAccessInfo, null, null, null});
-        return ResponseEntity.ok(roomDto);
+        return friendlyService.createRoom(roomTitle,roomPassword,mapId,userAccessInfo);
     }
+
     @DeleteMapping
     private ResponseEntity<?> quitRoom(){
         return ResponseEntity.ok("");

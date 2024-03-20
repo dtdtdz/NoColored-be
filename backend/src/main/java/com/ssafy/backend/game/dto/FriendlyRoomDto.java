@@ -9,8 +9,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class FriendlyRoomDto {
 
-    private String roomTitle;
-    private int roomCode;
+    private String title;
+    private int code;
     private int mapId;
     private int userNumber;
 
