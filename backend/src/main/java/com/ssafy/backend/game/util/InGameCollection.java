@@ -90,7 +90,6 @@ public class InGameCollection {
 
         characterQueue.clear();
 
-
         boolean checkSecond = gameInfo.checkSecond();
         gameInfo.getStepList().clear();
 
