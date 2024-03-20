@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/ready")
-public class GameController {
+public class ReadyController {
     @GetMapping
     private ResponseEntity<String> ready(){
         return ResponseEntity.ok("확인");
