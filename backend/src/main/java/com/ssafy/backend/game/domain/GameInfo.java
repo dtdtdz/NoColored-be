@@ -1,5 +1,6 @@
 package com.ssafy.backend.game.domain;
 
+import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,10 +8,7 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Getter
@@ -25,6 +23,7 @@ public class GameInfo {
     private CharacterInfo[] characterInfoArr;
     private boolean[][] floor;
     private List<byte[]> stepList;
+    private Random random;
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_SPEED = 160;
@@ -37,54 +36,72 @@ public class GameInfo {
     public static final int DEFAULT_TIME = 120;
     public static final int CHARACTER_NUM = 10;
 
-    int roomId;
-
-    public GameInfo(List<UserAccessInfo> users){
-        startDate = LocalDateTime.now();
-        startTime = System.currentTimeMillis();
-        time = startTime;
-        second = DEFAULT_TIME;
-        mapInfo = new MapInfo();
-
-        for (int[] arr:mapInfo.getFloorList()){
-            for (int i=0; i<arr[2]; i++){
-                floor[arr[0]+i-WALL_WIDTH][arr[1]] = true;
-            }
-        }
-
-        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
-        floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
-        //캐릭터 위치 랜덤배치
-
-
-        //유저 캐릭터 번호 랜덤 매핑
-        for (int i=0; i<users.size(); i++){
-//            characterInfoArr[i].setUserGameInfo();
+    public static final ByteBuffer[] buffer = new ByteBuffer[4];
+    static {
+        for (int i=0; i<buffer.length; i++){
+            buffer[i] = ByteBuffer.allocate(1024);
         }
     }
 
-    public GameInfo(){
+    public enum GameCycle{
+        CREATE, READY, PLAY, CLOSE
+    }
+    private GameCycle gameCycle;
+
+    public GameInfo(List<UserAccessInfo> userList){
         startDate = LocalDateTime.now();
         startTime = System.currentTimeMillis();
         time = startTime;
         second = DEFAULT_TIME;
-        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
-        for (int i=0; i<characterInfoArr.length; i++){
-            characterInfoArr[i] = new CharacterInfo();
-            characterInfoArr[i].setX((1+i)*100);
-            characterInfoArr[i].setY(0);
-            characterInfoArr[i].setVelX(DEFAULT_SPEED);
-        }
-
         mapInfo = new MapInfo();
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
-        List<int[]> list = mapInfo.getFloorList();
-        for (int[] arr:list){
+        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
+        stepList = new ArrayList<>();
+        random = new Random();
+        gameCycle = GameCycle.CREATE;
+
+        //캐릭터 위치 랜덤배치
+        List<int[]> floorPos = new LinkedList<>();
+        //유저 캐릭터 번호 랜덤 매핑
+        List<Byte> idxs = new LinkedList<>();
+        for (int[] arr:mapInfo.getFloorList()){
             for (int i=0; i<arr[2]; i++){
                 floor[arr[0]+i-WALL_WIDTH][arr[1]] = true;
+                floorPos.add(new int[]{arr[0]+i-WALL_WIDTH,arr[1]});
             }
         }
-        stepList = new ArrayList<>();
+
+        for (byte i=0; i<CHARACTER_NUM; i++){
+            idxs.add(i);
+        }
+        Collections.shuffle(idxs);
+        Collections.shuffle(floorPos);
+
+        for (byte i=0; i<userList.size(); i++){
+            CharacterInfo characterInfo = new CharacterInfo();
+            UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(), idxs.get(i),i,(byte)(0));
+
+            characterInfo.setUserGameInfo(userGameInfo);
+            characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
+            characterInfo.setY(floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f);
+            characterInfo.setDirection((int) ((random.nextInt(2)-0.5f)*2));
+            characterInfo.setVelX(DEFAULT_SPEED * characterInfo.getDirection());
+            characterInfo.setVelY(0);
+            characterInfoArr[idxs.get(i)] = characterInfo;
+            users.put(userList.get(i).getSession(), userGameInfo);
+        }
+
+        for (int i= userList.size(); i<characterInfoArr.length ; i++){
+            CharacterInfo characterInfo = new CharacterInfo();
+
+            characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
+            characterInfo.setY(floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f);
+            characterInfo.setDirection((int) ((random.nextInt(2)-0.5f)*2));
+            characterInfo.setVelX(DEFAULT_SPEED * characterInfo.getDirection());
+            characterInfo.setVelY(0);
+            characterInfoArr[idxs.get(i)] = characterInfo;
+        }
+
     }
 
     private GameInfo(int num){ //리팩토링 필요
@@ -133,24 +150,73 @@ public class GameInfo {
         return false;
     }
 
-    public void putStep(ByteBuffer buffer){
-        buffer.put(SendBinaryMessageType.STEP.getValue())
-                .put((byte) stepList.size());
-        for (int i=0; i<stepList.size(); i++){
-            buffer.put(stepList.get(i)[0]).put(stepList.get(i)[1]).put(stepList.get(i)[2]);
+
+    public void putReadyInfo() {
+        if (gameCycle!=GameCycle.CREATE) return;;
+        putTime();
+        for (Map.Entry<WebSocketSession,UserGameInfo> entry: getUsers().entrySet()) {
+            putSetCharacter(entry.getKey());
+        }
+        putTestMap();
+        gameCycle = GameCycle.PLAY;
+    }
+
+    public void putSetCharacter(WebSocketSession session){
+        UserGameInfo userGameInfo = users.get(session);
+        buffer[userGameInfo.getPlayerNum()].put(SendBinaryMessageType.SET_CHARACTER.getValue())
+                .put(userGameInfo.getCharacterNum());
+    }
+
+    public void putTime(){
+        if (!checkSecond()) return;
+        for (int i=0; i< users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.TIME.getValue())
+                    .put((byte) second);
         }
         stepList.clear();
     }
 
-    public void putTime(ByteBuffer buffer){
-        buffer.put(SendBinaryMessageType.TIME.getValue())
-                .put((byte)second);
+    public void putPhysicsState() {
+        for (int i = 0; i < users.size(); i++) {
+//            System.out.println(buffer[i].position());
+            buffer[i].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
+                    .put((byte) characterInfoArr.length);
+            for (CharacterInfo cInfo:characterInfoArr){
+                buffer[i].putFloat(cInfo.getX());
+                buffer[i].putFloat(cInfo.getY());
+                buffer[i].putFloat(cInfo.getVelX());
+                buffer[i].putFloat(cInfo.getVelY());
+            }
+        }
+    }
+
+    public void putStep(){
+        if (stepList.isEmpty()) return;
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.STEP.getValue())
+                    .put((byte) stepList.size());
+            for (int j=0; j<stepList.size(); j++){
+                buffer[i].put(stepList.get(j)[0]).put(stepList.get(j)[1]).put(stepList.get(j)[2]);
+            }
+        }
+        stepList.clear();
+    }
+    public void putTestMap(){
+        for (int i=0; i< users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.TEST_MAP.getValue())
+                    .put((byte) mapInfo.getFloorList().size());
+            for (int[] arr: mapInfo.getFloorList()){
+                buffer[i].put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
+            }
+        }
+
     }
 
     //세션과 캐릭터를 매핑한다.
-    public void putSession(WebSocketSession session){
-        byte num = (byte) users.size();
-        UserGameInfo user = new UserGameInfo(session, num, num, num, (byte) 0);
+    public void insertSession(WebSocketSession session){
+        byte num = 0;
+        while (characterInfoArr[num].getUserGameInfo()==null) num++;
+        UserGameInfo user = new UserGameInfo(session, (byte) users.size(), num, (byte) 0);
         users.put(session, user);
         characterInfoArr[num].setUserGameInfo(user);
     }
@@ -160,4 +226,15 @@ public class GameInfo {
         users.remove(session);
     }
 
+    public void sendBuffer(){
+        for (Map.Entry<WebSocketSession,UserGameInfo> entry: getUsers().entrySet()){
+            int bufferNum = entry.getValue().getPlayerNum();
+            try {
+                SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
+            } catch (Exception e){
+                buffer[bufferNum].clear();
+//                e.printStackTrace();
+            }
+        }
+    }
 }

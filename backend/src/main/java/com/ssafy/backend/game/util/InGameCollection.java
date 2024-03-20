@@ -2,15 +2,13 @@ package com.ssafy.backend.game.util;
 
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.*;
-import com.ssafy.backend.game.dto.RoomDto;
 import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Component
@@ -19,7 +17,6 @@ public class InGameCollection {
     private final Queue<GameInfo> addQueue;
     private final Queue<GameInfo> delQueue;
     public final HashMap<WebSocketSession, GameInfo> inGameUser;
-    private final ByteBuffer[] buffer;
     private final PriorityQueue<CharacterInfo> characterQueue;
     public Iterator<GameInfo> getGameInfoIterator(){
         return inGameList.iterator();
@@ -30,30 +27,24 @@ public class InGameCollection {
 //        for (UserAccessInfo user:roomDto.getUserArr())
 //    }
     public void addGame(List<UserAccessInfo> users){
-        GameInfo gameInfo = new GameInfo();
+        GameInfo gameInfo = new GameInfo(users);
         for (UserAccessInfo user:users){
-            gameInfo.putSession(user.getSession());
             inGameUser.put(user.getSession(), gameInfo);
+            user.setGameInfo(gameInfo);
         }
+//        gameInfo.putTime();
+//        gameInfo.putTestMap();
 
-        for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()) {
-            int bufferNum = entry.getValue().getBufferNum();
-            gameInfo.putTime(buffer[bufferNum]);
-            buffer[bufferNum].put(SendBinaryMessageType.TEST_MAP.getValue())
-                    .put((byte) gameInfo.getMapInfo().getFloorList().size());
-            for (int[] arr:gameInfo.getMapInfo().getFloorList()){
-                buffer[bufferNum].put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
-            }
-
-            SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
-        }
+        gameInfo.sendBuffer();
         addQueue.offer(gameInfo);
     }
+
+
 
     public void insertUser(WebSocketSession session){
         if (inGameList.isEmpty()) return;
         GameInfo gameInfo = inGameList.get((inGameList.size())-1);
-        gameInfo.putSession(session);
+        gameInfo.insertSession(session);
         inGameUser.put(session, gameInfo);
     }
 
@@ -74,10 +65,6 @@ public class InGameCollection {
         addQueue = new ConcurrentLinkedQueue<>();
         delQueue = new ConcurrentLinkedQueue<>();
         inGameUser = new HashMap<>();
-        buffer = new ByteBuffer[GameInfo.MAX_PLAYER];
-        for (int i=0; i<buffer.length; i++){
-            buffer[i] = ByteBuffer.allocate(1024);
-        }
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
     }
 
@@ -89,16 +76,6 @@ public class InGameCollection {
         boolean[][] floor = gameInfo.getFloor();
 
         characterQueue.clear();
-
-        boolean checkSecond = gameInfo.checkSecond();
-
-        for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-            int bufferNum = entry.getValue().getBufferNum();
-            buffer[bufferNum].clear();
-            if (checkSecond) gameInfo.putTime(buffer[bufferNum]);
-            buffer[bufferNum].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
-                    .put((byte) characterInfoArr.length);
-        }
 //                System.out.print(2);
 //phaser.js 에서 x좌표 이동 후 중력가속도 적용하는것처럼 작동함
         for (int i=0; i<characterInfoArr.length; i++){
@@ -229,29 +206,11 @@ public class InGameCollection {
         }
 //                System.out.println(4);
 //                System.out.println("game logic");
-        for (Map.Entry<WebSocketSession,UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-            int bufferNum = entry.getValue().getBufferNum();
-
-            for (CharacterInfo cInfo:characterInfoArr){
-
-                buffer[bufferNum].putFloat(cInfo.getX());
-                buffer[bufferNum].putFloat(cInfo.getY());
-                buffer[bufferNum].putFloat(cInfo.getVelX());
-                buffer[bufferNum].putFloat(cInfo.getVelY());
-            }
-
-
-            if (!gameInfo.getStepList().isEmpty()){
-                gameInfo.putStep(buffer[bufferNum]);
-//                        System.out.println(stepList.size());
-            }
-
-            try {
-                SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
-            } catch (Exception e){
-//                error
-            }
-        }
+        gameInfo.putReadyInfo();
+        gameInfo.putTime();
+        gameInfo.putPhysicsState();
+        gameInfo.putStep();
+        gameInfo.sendBuffer();
     }
 
     public boolean indexCheck(int idx, int size){
