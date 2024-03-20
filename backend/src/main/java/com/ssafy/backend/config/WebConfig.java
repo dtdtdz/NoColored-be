@@ -8,7 +8,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {    @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
-                .allowedOrigins("*");
+                .allowedOrigins("*")
+                .allowedMethods("GET","PUT", "POST", "DELETE", "PATCH")
+                .allowCredentials(true)
+                .maxAge(3000);
+
+
+//        corsRegistry.addMapping("/**")
+//                .allowedOrigins("*");
+
+
     //                .allowedOrigins("https://i10a709.p.ssafy.io");
 
 //        corsRegistry.addMapping("/**")
