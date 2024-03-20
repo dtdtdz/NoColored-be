@@ -6,11 +6,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/game")
+@RequestMapping("/ready")
 public class GameController {
     @GetMapping
     private ResponseEntity<String> ready(){
-
         return ResponseEntity.ok("확인");
     }
 }
