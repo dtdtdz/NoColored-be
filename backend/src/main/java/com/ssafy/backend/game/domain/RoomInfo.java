@@ -13,7 +13,7 @@ import java.util.UUID;
 public class RoomInfo {
 
     private int password;
-    private UserAccessInfo[] userArr;
+    private UserAccessInfo[] userAccessInfos;
     private RoomDto roomDto;
     private boolean isGameStart;
 

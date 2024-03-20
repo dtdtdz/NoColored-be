@@ -5,6 +5,7 @@ import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.game.domain.MapInfo;
 import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.user.dto.UserProfileDto;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class RoomDto {
 //    private UUID gameId;//seq로 바꾸는거 생각해보셈 sequential UUID를 쓸까?
     private String title;

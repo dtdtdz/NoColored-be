@@ -122,10 +122,10 @@ public class MatchingCollection {
                     delMatching(matchingQueue.get(i).get(0));
                 }
 
-                RoomDto roomDto = new RoomDto(list);
-                for (UserAccessInfo userAccessInfo:list){
-                    SynchronizedSend.textSend(userAccessInfo.getSession(), "matching", roomDto);
-                }
+//                RoomDto roomDto = new RoomDto(list);
+//                for (UserAccessInfo userAccessInfo:list){
+//                    SynchronizedSend.textSend(userAccessInfo.getSession(), "matching", roomDto);
+//                }
                 inGameCollection.addGame(list);
                 System.out.println("matching success");
             }

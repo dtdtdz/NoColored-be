@@ -42,6 +42,9 @@ public class SynchronizedSend {
         try {
             wrapper.setAction(action);
             wrapper.setData(data);
+            String messageContent = objectMapper.writeValueAsString(wrapper);
+            // 메시지 내용 출력
+            System.out.println("Sending message: " + messageContent);
             synchronized (session){
                 session.sendMessage(new TextMessage(objectMapper.writeValueAsString(wrapper)));
             }
