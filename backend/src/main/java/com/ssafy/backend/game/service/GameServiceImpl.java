@@ -25,9 +25,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class GameServiceImpl implements GameService {
 
-
-
-
     private final ScheduledExecutorService scheduledExecutorService;
 //    private final ScheduledExecutorService
     private final SessionCollection sessionCollection;
