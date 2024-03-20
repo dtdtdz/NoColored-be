@@ -6,6 +6,7 @@ import com.ssafy.backend.game.domain.UserAccessInfo;
 import com.ssafy.backend.game.dto.RoomDto;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.play.domain.MatchingInfo;
+import com.ssafy.backend.websocket.domain.SendTextMessageType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
@@ -64,7 +65,8 @@ public class MatchingCollection {
         }
         matchingInfoMap.remove(userAccessInfo);
         WebSocketSession session = userAccessInfo.getSession();
-        SynchronizedSend.textSend(session, "matchingCancel",null);
+        SynchronizedSend.textSend(session,
+                SendTextMessageType.MATCHING_CANCEL.getValue(), null);
     }
 
     @Scheduled(fixedRate = 500)
