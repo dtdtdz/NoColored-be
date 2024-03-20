@@ -32,15 +32,16 @@ public class GameServiceImpl implements GameService {
 //    private final ScheduledExecutorService
     private final SessionCollection sessionCollection;
     private final InGameCollection inGameCollection;
-    JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
     private ScheduledFuture<?> future;
     GameServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
                     SessionCollection sessionRepository,
-                    InGameCollection inGameRepository){
+                    InGameCollection inGameRepository,
+                    JwtUtil jwtUtil){
         this.scheduledExecutorService = scheduledExecutorService;
         this.sessionCollection = sessionRepository;
         this.inGameCollection = inGameRepository;
-
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
