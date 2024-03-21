@@ -2,6 +2,7 @@ package com.ssafy.backend.game.domain;
 
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.socket.WebSocketSession;

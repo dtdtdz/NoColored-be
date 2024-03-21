@@ -1,6 +1,6 @@
 package com.ssafy.backend.play.domain;
 
-import com.ssafy.backend.game.domain.UserAccessInfo;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.Getter;
 import lombok.Setter;
 

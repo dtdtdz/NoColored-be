@@ -1,6 +1,6 @@
 package com.ssafy.backend.play.service;
 
-import com.ssafy.backend.game.domain.UserAccessInfo;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.play.util.MatchingCollection;
 import com.ssafy.backend.user.util.JwtUtil;
 import org.springframework.stereotype.Service;

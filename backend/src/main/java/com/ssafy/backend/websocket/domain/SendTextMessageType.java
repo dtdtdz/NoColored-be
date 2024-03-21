@@ -8,7 +8,9 @@ import java.util.Map;
 public enum SendTextMessageType {
     // sendbinarymessagetype처럼 만들고
     // synchronizedsend 참고해서 보내면 된다
-
+    UNKNOWN_ACTION("unknownAction"),
+    INVALID_TOKEN("invalidToken"),
+    AUTHORIZATION("authorization"),
     MATCHING("matching"),
     MATCHING_CANCEL("matchingCancel"),
     READY_CHANGE("readyChange"),

@@ -3,7 +3,7 @@ package com.ssafy.backend.play.service;
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.MapInfo;
 import com.ssafy.backend.game.domain.RoomInfo;
-import com.ssafy.backend.game.domain.UserAccessInfo;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.game.dto.FriendlyRoomDto;
 import com.ssafy.backend.game.dto.RoomDto;
 import com.ssafy.backend.game.dto.UserRoomDto;
