@@ -11,7 +11,9 @@ public enum SendTextMessageType {
 
     MATCHING("matching"),
     MATCHING_CANCEL("matchingCancel"),
-    READY_CHANGE("readyChange"),
+    READY_ON("readyOn"),
+    READY_OFF("readyOff"),
+    GAME_START("gameStart"),
     NEW_USER("newUser");
 
     private final String value;
