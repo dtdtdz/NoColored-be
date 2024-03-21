@@ -17,17 +17,17 @@ public class UserProfileDto {
     boolean isGuest;
     int rating;
     String tier;
-    String skinId;
-    String titleId;
+    String skin;
+    String title;
     public UserProfileDto(UserProfile userProfile){
         this.userCode = userProfile.getUserCode();
         this.nickName = userProfile.getUserNickname();
         this.exp = userProfile.getUserExp();
         this.isGuest = true;
         this.rating = userProfile.getUserRating();
-        this.tier = null; //로직
-        this.skinId = userProfile.getUserSkin();
-        this.titleId = userProfile.getUserTitle();
+        this.tier = "nocolored"; //로직
+        this.skin = userProfile.getUserSkin();
+        this.title = userProfile.getUserTitle();
     }
     public UserProfileDto(UserProfile userProfile, String token){
         this(userProfile);
