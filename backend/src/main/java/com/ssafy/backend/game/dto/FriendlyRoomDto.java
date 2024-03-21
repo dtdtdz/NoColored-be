@@ -10,7 +10,7 @@ import lombok.Setter;
 public class FriendlyRoomDto {
 
     private String roomTitle;
-    private int roomCode;
+    private String roomCode;
     private int mapId;
     private int userNumber;
 
