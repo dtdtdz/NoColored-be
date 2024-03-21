@@ -75,7 +75,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         roomInfo.setMapInfo(new MapInfo()); // 고치기
         userAccessInfo.setRoomInfo(roomInfo);
         roomInfoMap.put(roomInfo.getRoomCodeInt(),roomInfo);
-
+        // 리턴
         return ResponseEntity.ok(roomDto);
     }
 
@@ -104,18 +104,15 @@ public class FriendlyServiceImpl implements FriendlyService {
             // 페이징된 목록 생성
             for (int i = startIndex; i < endIndex; i++) {
                 RoomInfo roomInfo = sortedRooms.get(i);
-
                 // 게임 시작한 방은 안가져온다
                 if(roomInfo.isGameStart()){
                     endIndex++;
                     continue;
                 }
-
                 FriendlyRoomDto friendlyRoomDto = new FriendlyRoomDto();
                 friendlyRoomDto.setRoomTitle(roomInfo.getRoomDto().getRoomTitle());
                 friendlyRoomDto.setRoomCode(roomInfo.getRoomDto().getRoomCodeString());
                 friendlyRoomDto.setMapId(roomInfo.getMapInfo().getMapId());
-
                 // 유저 수 계산
                 int userNumber = (int) Arrays.stream(roomInfo.getUserAccessInfos()).filter(Objects::nonNull).count();
                 friendlyRoomDto.setUserNumber(userNumber);
@@ -128,19 +125,15 @@ public class FriendlyServiceImpl implements FriendlyService {
 
     @Override
     public synchronized ResponseEntity<?> enterRoom(int code, String password, UserAccessInfo userAccessInfo) {
-
         RoomInfo roomInfo = roomInfoMap.get(code);
-
         // 방이 존재하지 않음
         if (roomInfo == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("방이 존재하지 않습니다.");
         }
-
         // 비밀번호 불일치
         if (!password.equals(roomInfo.getRoomDto().getRoomPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("틀린 비밀번호입니다.");
         }
-
         // 겜 이미 시작했음
         if(roomInfo.isGameStart()){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("이미 게임이 시작된 방입니다.");
@@ -231,7 +224,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                         }
                     }
                 }else{
-                    // 방장 아니면
+                    // 방장 아님
                     // 상태 변경
                     if(players[i].isReady()){
                         players[i].setReady(false);
@@ -274,5 +267,235 @@ public class FriendlyServiceImpl implements FriendlyService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저가 방 안에 존재하지 않습니다.");
     }
 
+    @Override
+    public ResponseEntity<?> renewRoom(UserAccessInfo userAccessInfo, String title, String password, int mapId){
+
+        RoomInfo roomInfo = userAccessInfo.getRoomInfo();
+        // 방이 존재하지 않음
+        if (roomInfo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("방이 존재하지 않습니다.");
+        }
+
+        UserAccessInfo[] userAccessInfos=roomInfo.getUserAccessInfos();
+        // 내 위치 찾기
+        for(int i=0;i<4;i++) {
+            // 찾으면 해당하는 userRoomDto의 상태 변경
+            if (userAccessInfos[i] == userAccessInfo) {
+                RoomDto roomDto = roomInfo.getRoomDto();
+                // 방장이면
+                if (i == roomDto.getMasterIndex()) {
+                    roomDto.setRoomTitle(title);
+                    roomDto.setRoomPassword(password);
+                    roomInfo.setRoomDto(roomDto);
+                    roomInfo.setMapInfo(new MapInfo()); // 맵인포 고쳐야함!!!!!!!!!
+                    return ResponseEntity.ok("대기실 정보 수정 완료입니다.");
+                }
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("당신은 방장이 아닙니다.");
+    }
+
+    @Override
+    public synchronized ResponseEntity<?> quitRoom(UserAccessInfo userAccessInfo){
+
+        RoomInfo roomInfo = userAccessInfo.getRoomInfo();
+        // 방이 존재하지 않음
+        if (roomInfo == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("방이 존재하지 않습니다.");
+        }
+
+        UserAccessInfo[] userAccessInfos=roomInfo.getUserAccessInfos();
+        // 내 위치 찾기
+        for(int i=0;i<4;i++) {
+            // 찾으면 해당하는 userRoomDto의 상태 변경
+            if (userAccessInfos[i] == userAccessInfo) {
+                RoomDto roomDto = roomInfo.getRoomDto();
+                UserRoomDto[] players=roomDto.getPlayers();
+                // 방장이면
+                if (i == roomDto.getMasterIndex()) {
+                    // 방에 있는 유저 수
+                    int userNumber = (int) Arrays.stream(userAccessInfos).filter(Objects::nonNull).count();
+
+                    // 방장 혼자 있다면
+                    if(userNumber==1){
+                        // 자신 정보 바꾸고 맵에서 방 삭제
+                        userAccessInfo.clearPosition();
+                        roomInfoMap.remove(roomInfo.getRoomCodeInt());
+                        return ResponseEntity.ok("방장이 방을 나가 대기실이 삭제됩니다.");
+                    }else{
+                        // 방장을 넘겨줄 사람 찾기
+                        int startIndex=i+1;
+                        // 최대 3번 탐색
+                        for(int j=0;j<3;j++){
+                            // 범위 벗어나면
+                            if(startIndex>3){ startIndex-=4; }
+                            // 넘겨줄 사람 찾으면 넘기기
+                            if(userAccessInfos[startIndex]!=null){
+                                roomDto.setMasterIndex(startIndex);
+                                // 자신 정보 바꾸기
+                                players[i].setPlayer(null);
+                                players[i].setReady(false);
+                                roomDto.setPlayers(players);
+                                userAccessInfos[i]=null;
+                                userAccessInfo.clearPosition();
+                                roomInfo.setUserAccessInfos(userAccessInfos);
+                                roomInfo.setRoomDto(roomDto);
+                                // 변경했다고 세션 뿌리기
+                                for(int k=0;k<4;k++){
+                                    UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[k];
+                                    if(tempUserAccessInfo!=null){
+                                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.QUIT_PLAYER.getValue(), i);
+                                    }
+                                }
+                                return ResponseEntity.ok(roomDto);
+                            }else{
+                                startIndex++;
+                            }
+                        }
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("다른 플레이어를 찾을 수 없습니다.");
+                    }
+                }else{
+                    // 방장 아니면
+                    // 자신 위치의 정보 초기화
+                    players[i].setPlayer(null);
+                    players[i].setReady(false);
+                    roomDto.setPlayers(players);
+                    // roomInfo 반영
+                    userAccessInfos[i]=null;
+                    userAccessInfo.clearPosition();
+                    roomInfo.setUserAccessInfos(userAccessInfos);
+                    roomInfo.setRoomDto(roomDto);
+
+                    // 변경했다고 세션 뿌리기
+                    for(int j=0;j<4;j++){
+                        UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
+                        if(tempUserAccessInfo!=null){
+                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.QUIT_PLAYER.getValue(), i);
+                        }
+                    }
+                }
+                return ResponseEntity.ok(roomDto);
+            }
+        }
+        // 방에 플레이어가 없음
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("플레이어를 찾을 수 없습니다.");
+
+//        // roomdto 세팅
+//        RoomDto roomDto=new RoomDto();
+//        roomDto.setRoomTitle(roomTitle);
+//        roomDto.setRoomCodeString(String.valueOf(roomInfo.getRoomCodeInt()));
+//        roomDto.setMasterIndex(0);
+//        roomDto.setRoomPassword(roomPassword);
+//
+//        // userRoomDtos 세팅
+//        UserRoomDto[] players = new UserRoomDto[4];
+//        // 방장 세팅
+//        players[0]= new UserRoomDto();
+//        players[0].setUserIndex(0);
+//        players[0].setPlayer(new UserProfileDto(userAccessInfo.getUserProfile()));
+//        players[0].setReady(false);
+//        // 1번부터 3번까지 세팅
+//        for(int i=1;i<4;i++){
+//            players[i]= new UserRoomDto();
+//            players[i].setUserIndex(i);
+//            players[i].setPlayer(null);
+//            players[i].setReady(false);
+//        }
+//        roomDto.setPlayers(players);
+//        roomDto.setMapId(1); // 이거 고쳐야할듯
+//
+//        // roominfo 세팅
+//        roomInfo.setUserAccessInfos(new UserAccessInfo[] {userAccessInfo,null,null,null});
+//        roomInfo.setRoomDto(roomDto);
+//        roomInfo.setGameStart(false);
+//        roomInfo.setMapInfo(new MapInfo()); // 고치기
+//        userAccessInfo.setRoomInfo(roomInfo);
+//        roomInfoMap.put(roomInfo.getRoomCodeInt(),roomInfo);
+//
+//        return ResponseEntity.ok(roomDto);
+
+//        UserAccessInfo[] userAccessInfos=roomInfo.getUserAccessInfos();
+//        // 내 위치 찾기
+//        for(int i=0;i<4;i++){
+//            // 찾으면 해당하는 userRoomDto의 레디 상태 변경
+//            if(userAccessInfos[i]==userAccessInfo){
+//                RoomDto roomDto=roomInfo.getRoomDto();
+//                UserRoomDto[] players=roomDto.getPlayers();
+//                // 방장이면
+//                if(i==roomDto.getMasterIndex()){
+//                    // 방에 있는 유저 수
+//                    int userNumber = (int) Arrays.stream(userAccessInfos).filter(Objects::nonNull).count();
+//                    // 레디한 사람의 수를 센다
+//                    int readyCount=0;
+//                    for(int j=0;j<4;j++){
+//                        if(j==i){continue;}
+//                        if(players[j].isReady()){readyCount++;}
+//                    }
+//                    // 혼자라면
+//                    if(userNumber==1){
+//                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("혼자서 게임을 플레이 할 수 없습니다.");
+//                    }else{
+//                        // 모든 사람이 레디 했으면
+//                        if(readyCount==userNumber-1){
+//                            // 상태 변경
+//                            players[i].setReady(true);
+//                            roomDto.setPlayers(players);
+//                            // roominfo에 반영
+//                            roomInfo.setRoomDto(roomDto);
+//                            roomInfo.setGameStart(true);
+//
+//                            // 변경했다고 세션 뿌리기
+//                            for(int j=0;j<4;j++){
+//                                UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
+//                                if(tempUserAccessInfo!=null){
+//                                    SynchronizedSend.textSend(tempUserAccessInfo.getSession(), SendTextMessageType.GAME_START.getValue(),null);
+//                                }
+//                            }
+//                            // 리턴
+//                            return ResponseEntity.ok("게임 시작");
+//                        }
+//                    }
+//                }else{
+//                    // 방장 아님
+//                    // 상태 변경
+//                    if(players[i].isReady()){
+//                        players[i].setReady(false);
+//                        roomDto.setPlayers(players);
+//
+//                        // roominfo에 반영
+//                        roomInfo.setRoomDto(roomDto);
+//
+//                        // 변경했다고 세션 뿌리기
+//                        for(int j=0;j<4;j++){
+//                            UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
+//                            if(tempUserAccessInfo!=null){
+//                                SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.READY_OFF.getValue(), i);
+//                            }
+//                        }
+//                        // 리턴
+//                        return ResponseEntity.ok("레디 해제");
+//                    }
+//                    else{
+//                        players[i].setReady(true);
+//                        roomDto.setPlayers(players);
+//
+//                        // roominfo에 반영
+//                        roomInfo.setRoomDto(roomDto);
+//
+//                        // 변경했다고 세션 뿌리기
+//                        for(int j=0;j<4;j++){
+//                            UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
+//                            if(tempUserAccessInfo!=null){
+//                                SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.READY_ON.getValue(), i);
+//                            }
+//                        }
+//                        // 리턴
+//                        return ResponseEntity.ok("레디 성공");
+//                    }
+//                }
+//            }
+//        }
+        
+    }
 
 }

@@ -18,5 +18,8 @@ public interface FriendlyService {
 
     ResponseEntity<?> readyRoom(UserAccessInfo userAccessInfo);
 
+    ResponseEntity<?> renewRoom(UserAccessInfo userAccessInfo, String title, String password, int mapId);
+
+    ResponseEntity<?> quitRoom(UserAccessInfo userAccessInfo);
 
 }

@@ -80,16 +80,19 @@ public class FriendlyController {
         return friendlyService.readyRoom(userAccessInfo);
     }
 
-    @DeleteMapping
-    private ResponseEntity<?> quitRoom(){
-        return ResponseEntity.ok("");
+    @PostMapping("/renew")
+    private ResponseEntity<?> renewRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody){
+        String roomTitle=(String) requestBody.get("roomTitle");
+        String roomPassword = (String) requestBody.get("roomPassword");
+        int mapId = Integer.parseInt(requestBody.get("mapId").toString());
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        return friendlyService.renewRoom(userAccessInfo, roomTitle, roomPassword, mapId);
     }
-    @GetMapping("/start")
-    private ResponseEntity<?> startGame(){
-        return ResponseEntity.ok("");
+
+    @PatchMapping("/out")
+    private ResponseEntity<?> quitRoom(@RequestHeader("Authorization") String token){
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        return friendlyService.quitRoom(userAccessInfo);
     }
-    @GetMapping("/ready")
-    private ResponseEntity<?> readyGame(){
-        return ResponseEntity.ok("");
-    }
+
 }

@@ -14,6 +14,7 @@ public enum SendTextMessageType {
     READY_ON("readyOn"),
     READY_OFF("readyOff"),
     GAME_START("gameStart"),
+    QUIT_PLAYER("quitPlayer"),
     NEW_USER("newUser");
 
     private final String value;
