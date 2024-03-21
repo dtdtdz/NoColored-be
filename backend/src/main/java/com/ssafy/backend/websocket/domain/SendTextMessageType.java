@@ -11,6 +11,7 @@ public enum SendTextMessageType {
 
     MATCHING("matching"),
     MATCHING_CANCEL("matchingCancel"),
+    READY_CHANGE("readyChange"),
     NEW_USER("newUser");
 
     private final String value;

@@ -12,9 +12,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RoomInfo {
 
-    private int password;
     private UserAccessInfo[] userAccessInfos;
+    private int roomCodeInt;
     private RoomDto roomDto;
     private boolean isGameStart;
-
+    private MapInfo mapInfo;
 }
