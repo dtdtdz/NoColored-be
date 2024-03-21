@@ -129,7 +129,7 @@ public class MatchingCollection {
 //                    SynchronizedSend.textSend(userAccessInfo.getSession(), "matching", roomDto);
 //                }
                 inGameCollection.addGame(list);
-                System.out.println("matching success");
+//                System.out.println(SendTextMessageType.MATCHING.getValue());
             }
         }
     }

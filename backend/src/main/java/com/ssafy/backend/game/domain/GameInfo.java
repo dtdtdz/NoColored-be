@@ -43,9 +43,36 @@ public class GameInfo {
         }
     }
 
-    public enum GameCycle{
-        CREATE, READY, PLAY, CLOSE
+    public enum GameCycle {
+        CREATE {
+            @Override
+            public GameCycle next() {
+                return READY;
+            }
+        },
+        READY {
+            @Override
+            public GameCycle next() {
+                return PLAY;
+            }
+        },
+        PLAY {
+            @Override
+            public GameCycle next() {
+                return CLOSE;
+            }
+        },
+        CLOSE {
+            @Override
+            public GameCycle next() {
+                return CLOSE;
+            }
+        };
+
+        // 모든 열거형 상수가 구현해야 하는 추상 메서드
+        public abstract GameCycle next();
     }
+
     private GameCycle gameCycle;
 
     public GameInfo(List<UserAccessInfo> userList){
@@ -104,22 +131,22 @@ public class GameInfo {
 
     }
 
-    private GameInfo(int num){ //리팩토링 필요
-        startDate = LocalDateTime.now();
-        startTime = System.currentTimeMillis();
-        time = startTime;
-        second = DEFAULT_TIME;
-        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
-        for (int i=0; i<characterInfoArr.length; i++){
-            characterInfoArr[i] = new CharacterInfo();
-            characterInfoArr[i].setX((1+i)*100);
-            characterInfoArr[i].setY(0);
-            characterInfoArr[i].setVelX(DEFAULT_SPEED);
-        }
-
-        mapInfo = new MapInfo();//num
-        floor = new boolean[MAP_HEIGHT][MAP_WIDTH];
-    }
+//    private GameInfo(int num){ //리팩토링 필요
+//        startDate = LocalDateTime.now();
+//        startTime = System.currentTimeMillis();
+//        time = startTime;
+//        second = DEFAULT_TIME;
+//        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
+//        for (int i=0; i<characterInfoArr.length; i++){
+//            characterInfoArr[i] = new CharacterInfo();
+//            characterInfoArr[i].setX((1+i)*100);
+//            characterInfoArr[i].setY(0);
+//            characterInfoArr[i].setVelX(DEFAULT_SPEED);
+//        }
+//
+//        mapInfo = new MapInfo();//num
+//        floor = new boolean[MAP_HEIGHT][MAP_WIDTH];
+//    }
 
     public void toLeft(int idx){
         characterInfoArr[idx].setVelX(-Math.abs(characterInfoArr[idx].getVelX()));
@@ -152,7 +179,7 @@ public class GameInfo {
 
 
     public void putReadyInfo() {
-        if (gameCycle!=GameCycle.CREATE) return;;
+        if (gameCycle!=GameCycle.CREATE) return;
         putTime();
         for (Map.Entry<WebSocketSession,UserGameInfo> entry: getUsers().entrySet()) {
             putSetCharacter(entry.getKey());
@@ -224,6 +251,10 @@ public class GameInfo {
     //사용 안하나?
     public void delSession(WebSocketSession session){
         users.remove(session);
+    }
+
+    public void goToNextCycle(){
+        gameCycle = gameCycle.next();
     }
 
     public void sendBuffer(){

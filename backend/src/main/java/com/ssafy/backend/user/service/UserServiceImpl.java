@@ -62,6 +62,7 @@ public class UserServiceImpl implements UserService {
                     .userRating(0)
                     .userSkin(0)
                     .userTitle(0)
+                    .isGuest(true)
                     .build();
             userProfileRepository.save(userProfile);
             return userProfile;
@@ -105,6 +106,7 @@ public class UserServiceImpl implements UserService {
                     .userRating(0)
                     .userSkin(0)
                     .userTitle(0)
+                    .isGuest(false)
                     .build();
 
             userProfileRepository.save(userProfile);
