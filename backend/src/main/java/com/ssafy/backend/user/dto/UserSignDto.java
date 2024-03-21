@@ -12,5 +12,10 @@ import lombok.Setter;
 public class UserSignDto {
     String id;
     String password;
+    String passwordConfirm;
     String nickname;
+
+    public boolean confirm(){
+        return password.equals(passwordConfirm);
+    }
 }

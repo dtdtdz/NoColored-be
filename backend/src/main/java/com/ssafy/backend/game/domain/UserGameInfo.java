@@ -16,4 +16,16 @@ public class UserGameInfo {
     private byte characterNum;
     private byte playerNum;
     private byte score;
+    private boolean isAccess;
+
+    public UserGameInfo(WebSocketSession webSocketSession,
+                        byte characterNum,
+                        byte playerNum){
+        this.webSocketSession = webSocketSession;
+        this.characterNum = characterNum;
+        this.playerNum = playerNum;
+        score = 0;
+        isAccess = false;
+    }
+
 }
