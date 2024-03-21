@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/ready")
-public class ReadyController {
-    @GetMapping
+@RequestMapping("/ingame")
+public class InGameController {
+    @GetMapping("/ready")
     private ResponseEntity<String> ready(){
         return ResponseEntity.ok("확인");
     }

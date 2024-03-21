@@ -26,13 +26,13 @@ public class UserProfile {
     @Column(nullable = false, length = 9)
     private String userNickname;
 
-    private Integer userSkin;
-
     private boolean isGuest;
 
     private Long userExp;
 
-    private Integer userTitle;
+    private String userSkin;
+
+    private String userTitle;
 
     private Integer userRating;
 
