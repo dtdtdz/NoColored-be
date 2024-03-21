@@ -1,19 +1,16 @@
 package com.ssafy.backend.game.service;
 
 import com.ssafy.backend.game.util.InGameCollection;
+import com.ssafy.backend.game.util.InGameLogic;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.game.domain.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -29,15 +26,18 @@ public class GameServiceImpl implements GameService {
 //    private final ScheduledExecutorService
     private final SessionCollection sessionCollection;
     private final InGameCollection inGameCollection;
+    private final InGameLogic inGameLogic;
     private final JwtUtil jwtUtil;
     private ScheduledFuture<?> future;
     GameServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
                     SessionCollection sessionRepository,
                     InGameCollection inGameRepository,
+                    InGameLogic inGameLogic,
                     JwtUtil jwtUtil){
         this.scheduledExecutorService = scheduledExecutorService;
         this.sessionCollection = sessionRepository;
         this.inGameCollection = inGameRepository;
+        this.inGameLogic = inGameLogic;
         this.jwtUtil = jwtUtil;
     }
 
@@ -78,7 +78,7 @@ public class GameServiceImpl implements GameService {
 
                 } else {
                     try {
-                        inGameCollection.physics(gameInfo);
+                        inGameLogic.scheduledLogic(gameInfo);
                     } catch (Exception e){
                         e.printStackTrace();
                         throw e;
