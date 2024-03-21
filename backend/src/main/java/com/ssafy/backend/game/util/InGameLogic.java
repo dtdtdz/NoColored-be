@@ -41,6 +41,7 @@ public class InGameLogic {
             gameInfo.setSecond(3);
             gameInfo.putTime();
             gameInfo.goToNextCycle();
+            gameInfo.putStart();
             gameInfo.sendBuffer();
         }
     }

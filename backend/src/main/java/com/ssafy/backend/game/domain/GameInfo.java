@@ -211,6 +211,11 @@ public class GameInfo {
         stepList.clear();
     }
 
+    public void putStart(){
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.START.getValue());
+        }
+    }
     public void putPhysicsState() {
         for (int i = 0; i < users.size(); i++) {
 //            System.out.println(buffer[i].position());
