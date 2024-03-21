@@ -43,7 +43,9 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public synchronized void ready(String token) {
-
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        GameInfo gameInfo = userAccessInfo.getGameInfo();
+        gameInfo.getUsers().get(userAccessInfo.getSession()).setAccess(true);
     }
 
     @EventListener(ApplicationReadyEvent.class)
