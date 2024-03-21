@@ -1,17 +1,10 @@
 package com.ssafy.backend.game.dto;
 
 
-import com.ssafy.backend.game.domain.GameInfo;
-import com.ssafy.backend.game.domain.MapInfo;
-import com.ssafy.backend.game.domain.UserAccessInfo;
-import com.ssafy.backend.user.dto.UserProfileDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter

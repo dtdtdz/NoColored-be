@@ -5,6 +5,7 @@ import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.game.domain.MapInfo;
 import com.ssafy.backend.game.domain.UserGameInfo;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.util.*;
 
@@ -17,28 +18,46 @@ public class InGameLogic {
     }
     public void scheduledLogic(GameInfo gameInfo){
         switch (gameInfo.getGameCycle()){
-//            case CREATE -> create(gameInfo);
-//            case READY -> ready(gameInfo);
-//            case PLAY -> play(gameInfo);
-//            case CLOSE -> close(gameInfo);
+            case CREATE -> create(gameInfo);
+            case READY -> ready(gameInfo);
+            case PLAY -> play(gameInfo);
+            case CLOSE -> close(gameInfo);
         }
-        play(gameInfo);
+//        play(gameInfo);
 
     }
     public void create(GameInfo gameInfo){
+        gameInfo.tick();
         //http 요청을 10초 기다린다. -> gameinfo 생성자
         //모든 유저준비 완료
+        //사람 없으면 게임 제거
         if (gameInfo.isAllReady() || gameInfo.checkSecond() && gameInfo.getSecond()<=0){
-            //사람 없으면 게임 제거
-            gameInfo.putReadyInfo();
-            gameInfo.sendBuffer();
+//            3초 카운트 시작
+            for (Map.Entry<WebSocketSession,UserGameInfo> entry: gameInfo.getUsers().entrySet()) {
+                gameInfo.putSetCharacter(entry.getKey());
+            }
+            gameInfo.putTestMap();
+            gameInfo.putPhysicsState();
+            gameInfo.setSecond(3);
+            gameInfo.putTime();
             gameInfo.goToNextCycle();
+            gameInfo.putStart();
+            gameInfo.sendBuffer();
         }
-        gameInfo.sendBuffer();
     }
     public void ready(GameInfo gameInfo){
-//        gameInfo.putReadyInfo();
-//        gameInfo.sendBuffer();
+        gameInfo.tick();
+        if (gameInfo.checkSecond()){
+            if (gameInfo.getSecond()<=0){
+                gameInfo.goToNextCycle();
+                for (CharacterInfo characterInfo: gameInfo.getCharacterInfoArr()){
+                    characterInfo.setVelX(GameInfo.DEFAULT_SPEED);
+                }
+                gameInfo.setSecond(GameInfo.DEFAULT_TIME);
+            }
+            gameInfo.putTime();
+            gameInfo.sendBuffer();
+        }
     }
 
     public void play(GameInfo gameInfo){
@@ -53,7 +72,7 @@ public class InGameLogic {
 //phaser.js 에서 x좌표 이동 후 중력가속도 적용하는것처럼 작동함
         for (int i=0; i<characterInfoArr.length; i++){
             CharacterInfo cInfo = characterInfoArr[i];
-            float tarX = cInfo.getX()+(dt/1000f)*cInfo.getVelX();
+            float tarX = cInfo.getX()+(dt/1000f)*cInfo.getVelX()*cInfo.getDir();
             float halfSize = GameInfo.CHARACTER_SIZE/2f;
             if (tarX + halfSize > mapInfo.getRight()){
                 gameInfo.toLeft(i);
@@ -179,8 +198,9 @@ public class InGameLogic {
         }
 //                System.out.println(4);
 //                System.out.println("game logic");
+        if (gameInfo.checkSecond())
+            gameInfo.putTime();
 
-        gameInfo.putTime();
         gameInfo.putPhysicsState();
         gameInfo.putStep();
         gameInfo.sendBuffer();

@@ -3,6 +3,7 @@ package com.ssafy.backend.game.service;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.game.util.InGameLogic;
 import com.ssafy.backend.user.util.JwtUtil;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.game.domain.*;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,7 +44,9 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public synchronized void ready(String token) {
-
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        GameInfo gameInfo = userAccessInfo.getGameInfo();
+        gameInfo.getUsers().get(userAccessInfo.getSession()).setAccess(true);
     }
 
     @EventListener(ApplicationReadyEvent.class)

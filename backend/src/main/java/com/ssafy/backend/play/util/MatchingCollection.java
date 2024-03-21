@@ -2,8 +2,7 @@ package com.ssafy.backend.play.util;
 
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
-import com.ssafy.backend.game.domain.UserAccessInfo;
-import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.play.domain.MatchingInfo;
 import com.ssafy.backend.websocket.domain.SendTextMessageType;

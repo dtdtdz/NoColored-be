@@ -2,6 +2,7 @@ package com.ssafy.backend.game.domain;
 
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.socket.WebSocketSession;
@@ -103,16 +104,18 @@ public class GameInfo {
         Collections.shuffle(floorPos);
 
         for (byte i=0; i<userList.size(); i++){
-            CharacterInfo characterInfo = new CharacterInfo();
+
             UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
                     idxs.get(i),i);
+            CharacterInfo characterInfo = new CharacterInfo();
 
             characterInfo.setUserGameInfo(userGameInfo);
             characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
             characterInfo.setY(floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f);
-            characterInfo.setDirection((int) ((random.nextInt(2)-0.5f)*2));
-            characterInfo.setVelX(DEFAULT_SPEED * characterInfo.getDirection());
+            characterInfo.setDir((int) ((random.nextInt(2)-0.5f)*2));
+            characterInfo.setVelX(0);
             characterInfo.setVelY(0);
+
             characterInfoArr[idxs.get(i)] = characterInfo;
             users.put(userList.get(i).getSession(), userGameInfo);
         }
@@ -122,9 +125,10 @@ public class GameInfo {
 
             characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
             characterInfo.setY(floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f);
-            characterInfo.setDirection((int) ((random.nextInt(2)-0.5f)*2));
-            characterInfo.setVelX(DEFAULT_SPEED * characterInfo.getDirection());
+            characterInfo.setDir((int) ((random.nextInt(2)-0.5f)*2));
+            characterInfo.setVelX(0);
             characterInfo.setVelY(0);
+
             characterInfoArr[idxs.get(i)] = characterInfo;
         }
 
@@ -149,18 +153,17 @@ public class GameInfo {
 
     public boolean isAllReady(){
         for (Map.Entry<WebSocketSession, UserGameInfo> entry:users.entrySet()){
-            if (!entry.getValue().isAccess()) return false;
+            if (!entry.getValue().isAccess()) return true;
         }
         return true;
     }
 
-
     public void toLeft(int idx){
-        characterInfoArr[idx].setVelX(-Math.abs(characterInfoArr[idx].getVelX()));
+        characterInfoArr[idx].setDir(-1);
     }
 
     public void toRight(int idx){
-        characterInfoArr[idx].setVelX(Math.abs(characterInfoArr[idx].getVelX()));
+        characterInfoArr[idx].setDir(1);
     }
 
     public void jump(int idx){
@@ -192,13 +195,7 @@ public class GameInfo {
 
 
     public void putReadyInfo() {
-        if (gameCycle!=GameCycle.CREATE) return;
-        putTime();
-        for (Map.Entry<WebSocketSession,UserGameInfo> entry: getUsers().entrySet()) {
-            putSetCharacter(entry.getKey());
-        }
-        putTestMap();
-        gameCycle = GameCycle.PLAY;
+
     }
 
     public void putSetCharacter(WebSocketSession session){
@@ -208,7 +205,6 @@ public class GameInfo {
     }
 
     public void putTime(){
-        if (!checkSecond()) return;
         for (int i=0; i< users.size(); i++){
             buffer[i].put(SendBinaryMessageType.TIME.getValue())
                     .put((byte) second);
@@ -216,6 +212,11 @@ public class GameInfo {
         stepList.clear();
     }
 
+    public void putStart(){
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.START.getValue());
+        }
+    }
     public void putPhysicsState() {
         for (int i = 0; i < users.size(); i++) {
 //            System.out.println(buffer[i].position());
@@ -224,7 +225,7 @@ public class GameInfo {
             for (CharacterInfo cInfo:characterInfoArr){
                 buffer[i].putFloat(cInfo.getX());
                 buffer[i].putFloat(cInfo.getY());
-                buffer[i].putFloat(cInfo.getVelX());
+                buffer[i].putFloat(cInfo.getVelX()*cInfo.getDir());
                 buffer[i].putFloat(cInfo.getVelY());
             }
         }
