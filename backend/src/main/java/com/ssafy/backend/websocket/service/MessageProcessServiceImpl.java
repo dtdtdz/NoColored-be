@@ -63,6 +63,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             if (result!=null) {
                 result.setSession(session);
                 sessionCollection.userWebsocketMap.put(session, result);
+                SynchronizedSend.textSend(session, "authorization",null);
 //                System.out.println(result.getUserProfile().getUserNickname());
 //                System.out.println(result.getUserProfile().getId());
             }

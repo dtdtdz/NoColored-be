@@ -26,10 +26,20 @@ public class InGameLogic {
 
     }
     public void create(GameInfo gameInfo){
-        gameInfo.putReadyInfo();
-//        gameInfo.getGameCycle().next();
+        //http 요청을 10초 기다린다. -> gameinfo 생성자
+        //모든 유저준비 완료
+        if (gameInfo.isAllReady() || gameInfo.checkSecond() && gameInfo.getSecond()<=0){
+            //사람 없으면 게임 제거
+            gameInfo.putReadyInfo();
+            gameInfo.sendBuffer();
+            gameInfo.goToNextCycle();
+        }
+        gameInfo.sendBuffer();
     }
-    public void ready(GameInfo gameInfo){}
+    public void ready(GameInfo gameInfo){
+//        gameInfo.putReadyInfo();
+//        gameInfo.sendBuffer();
+    }
 
     public void play(GameInfo gameInfo){
         long dt = gameInfo.tick();

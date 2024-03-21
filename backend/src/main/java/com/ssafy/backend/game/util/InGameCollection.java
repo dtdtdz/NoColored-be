@@ -45,8 +45,6 @@ public class InGameCollection {
         addQueue.offer(gameInfo);
     }
 
-
-
     public void insertUser(WebSocketSession session){
         if (inGameList.isEmpty()) return;
         GameInfo gameInfo = inGameList.get((inGameList.size())-1);

@@ -15,7 +15,7 @@ import java.util.*;
 @AllArgsConstructor
 public class GameInfo {
     private LocalDateTime startDate;
-    private long startTime;
+    private long targetTime;
     private long time;
     private int second;
     private Map<WebSocketSession, UserGameInfo> users = new LinkedHashMap<>();
@@ -77,9 +77,7 @@ public class GameInfo {
 
     public GameInfo(List<UserAccessInfo> userList){
         startDate = LocalDateTime.now();
-        startTime = System.currentTimeMillis();
-        time = startTime;
-        second = DEFAULT_TIME;
+        setSecond(10);
         mapInfo = new MapInfo();
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
@@ -106,7 +104,8 @@ public class GameInfo {
 
         for (byte i=0; i<userList.size(); i++){
             CharacterInfo characterInfo = new CharacterInfo();
-            UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(), idxs.get(i),i,(byte)(0));
+            UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
+                    idxs.get(i),i);
 
             characterInfo.setUserGameInfo(userGameInfo);
             characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
@@ -148,6 +147,14 @@ public class GameInfo {
 //        floor = new boolean[MAP_HEIGHT][MAP_WIDTH];
 //    }
 
+    public boolean isAllReady(){
+        for (Map.Entry<WebSocketSession, UserGameInfo> entry:users.entrySet()){
+            if (!entry.getValue().isAccess()) return false;
+        }
+        return true;
+    }
+
+
     public void toLeft(int idx){
         characterInfoArr[idx].setVelX(-Math.abs(characterInfoArr[idx].getVelX()));
     }
@@ -168,8 +175,14 @@ public class GameInfo {
         return result;
     }
 
+    public void setSecond(int second){
+        time = System.currentTimeMillis();
+        targetTime = time+(long)second*1000;
+        this.second = second;
+    }
+
     public boolean checkSecond(){
-        int newSecond = DEFAULT_TIME-(int)((time-startTime)/1000);
+        int newSecond = (int)Math.ceil((targetTime-time)/1000f);
         if (newSecond<second){
             second = newSecond;
             return true;
@@ -243,7 +256,7 @@ public class GameInfo {
     public void insertSession(WebSocketSession session){
         byte num = 0;
         while (characterInfoArr[num].getUserGameInfo()==null) num++;
-        UserGameInfo user = new UserGameInfo(session, (byte) users.size(), num, (byte) 0);
+        UserGameInfo user = new UserGameInfo(session, (byte) users.size(), num);
         users.put(session, user);
         characterInfoArr[num].setUserGameInfo(user);
     }

@@ -23,14 +23,16 @@ public class UserController {
         return ResponseEntity.ok(userService.generateUserInfoDtoWithToken(userProfile));
     }
     @PostMapping("/guest")
-    public ResponseEntity<UserProfileDto> guestConvert(@RequestHeader("Authorization") String token,
+    public ResponseEntity<?> guestConvert(@RequestHeader("Authorization") String token,
                                                        @RequestBody UserSignDto user){
+        if (!user.confirm()) return ResponseEntity.badRequest().body("password confirm failed");
         return ResponseEntity.ok(userService.guestConvert(token, user));
     }
 
 
     @PostMapping("/signup")
-    public ResponseEntity<UserProfileDto> signUp(@RequestBody UserSignDto user){
+    public ResponseEntity<?> signUp(@RequestBody UserSignDto user){
+        if (!user.confirm()) return ResponseEntity.badRequest().body("password confirm failed");
         UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
         return ResponseEntity.ok(userService.generateUserInfoDtoWithToken(userProfile));
     }

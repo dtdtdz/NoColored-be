@@ -55,7 +55,7 @@ public class FriendlyController {
     @PatchMapping
     private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody ){
 
-        String code=(String) requestBody.get("roomCode");
+        int code=Integer.parseInt(requestBody.get("roomCode").toString());
         String password=(String) requestBody.get("roomPassword");
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
 
@@ -73,22 +73,25 @@ public class FriendlyController {
         return friendlyService.createRoom(roomTitle,roomPassword,mapId,userAccessInfo);
     }
 
-    @PatchMapping("/ready/{roomCode}")
-    private ResponseEntity<?> readyRoom(@RequestHeader("Authorization") String token, @PathVariable("roomCode") String roomCode){
+    @PatchMapping("/ready")
+    private ResponseEntity<?> readyRoom(@RequestHeader("Authorization") String token){
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        return friendlyService.readyRoom(userAccessInfo,roomCode);
+        return friendlyService.readyRoom(userAccessInfo);
     }
 
-    @DeleteMapping
-    private ResponseEntity<?> quitRoom(){
-        return ResponseEntity.ok("");
+    @PostMapping("/renew")
+    private ResponseEntity<?> renewRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody){
+        String roomTitle=(String) requestBody.get("roomTitle");
+        String roomPassword = (String) requestBody.get("roomPassword");
+        int mapId = Integer.parseInt(requestBody.get("mapId").toString());
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        return friendlyService.renewRoom(userAccessInfo, roomTitle, roomPassword, mapId);
     }
-    @GetMapping("/start")
-    private ResponseEntity<?> startGame(){
-        return ResponseEntity.ok("");
+
+    @PatchMapping("/out")
+    private ResponseEntity<?> quitRoom(@RequestHeader("Authorization") String token){
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        return friendlyService.quitRoom(userAccessInfo);
     }
-    @GetMapping("/ready")
-    private ResponseEntity<?> readyGame(){
-        return ResponseEntity.ok("");
-    }
+
 }
