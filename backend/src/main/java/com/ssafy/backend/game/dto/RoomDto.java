@@ -19,11 +19,12 @@ import java.util.Map;
 @AllArgsConstructor
 public class RoomDto {
 //    private UUID gameId;//seq로 바꾸는거 생각해보셈 sequential UUID를 쓸까?
-    private String title;
-    private int code;
-    private int master; // 방장의 위치.ranking에서는 null
-    private UserRoomDto[] userRoomDtos;
-    private MapInfo mapInfo;
+    private String roomTitle;
+    private String roomCodeString;
+    private int masterIndex; // 방장의 위치.ranking에서는 null
+    private String roomPassword;
+    private UserRoomDto[] players;
+    private int mapId;
 
 //    public RoomDto(UserAccessInfo user, int mapId, String title){//친선전 생성
 //        userArr = new UserProfileDto[GameInfo.MAX_PLAYER];
