@@ -22,14 +22,4 @@ public interface FriendlyService {
 
     ResponseEntity<?> quitRoom(UserAccessInfo userAccessInfo);
 
-
-
-
-
-
-
-    ResponseEntity<?> createRoomTest(String roomTitle, String roomPassword, int mapId, UserAccessInfo userAccessInfo);
-    ResponseEntity<?> getRoomListTest(int offset);
-    ResponseEntity<?> enterRoomTest(int code, String password, UserAccessInfo userAccessInfo);
-
 }

@@ -150,6 +150,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                 RoomDto roomDto=roomInfo.getRoomDto();
                 // 입장하는 사람 정보가 담긴 UserProfileDto 만들어서 userRoomDtos에 반영
                 UserRoomDto[] players=roomDto.getPlayers();
+                players[i]=new UserRoomDto(i,null,false);
                 UserProfileDto player=new UserProfileDto(userAccessInfo.getUserProfile());
                 players[i].setPlayer(player);
                 // roomDto에 userRoomDtos 반영
@@ -187,7 +188,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         // 내 위치 찾기
         for(int i=0;i<4;i++){
             // 찾으면 해당하는 userRoomDto의 레디 상태 변경
-            if(userAccessInfos[i]==userAccessInfo){
+            if(userAccessInfos[i] != null && userAccessInfos[i].getUserProfile().getUserCode().equals(userAccessInfo.getUserProfile().getUserCode())){
                 RoomDto roomDto=roomInfo.getRoomDto();
                 UserRoomDto[] players=roomDto.getPlayers();
                 // 방장이면
@@ -197,7 +198,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                     // 레디한 사람의 수를 센다
                     int readyCount=0;
                     for(int j=0;j<4;j++){
-                        if(j==i){continue;}
+                        if(j==i||players[j]==null){continue;}
                         if(players[j].isReady()){readyCount++;}
                     }
                     // 혼자라면
@@ -281,7 +282,8 @@ public class FriendlyServiceImpl implements FriendlyService {
         // 내 위치 찾기
         for(int i=0;i<4;i++) {
             // 찾으면 해당하는 userRoomDto의 상태 변경
-            if (userAccessInfos[i] == userAccessInfo) {
+            // userAccessInfos[i] == userAccessInfo
+            if (userAccessInfos[i] != null && userAccessInfos[i].getUserProfile().getUserCode().equals(userAccessInfo.getUserProfile().getUserCode())) {
                 RoomDto roomDto = roomInfo.getRoomDto();
                 // 방장이면
                 if (i == roomDto.getMasterIndex()) {
@@ -309,7 +311,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         // 내 위치 찾기
         for(int i=0;i<4;i++) {
             // 찾으면 해당하는 userRoomDto의 상태 변경
-            if (userAccessInfos[i] == userAccessInfo) {
+            if (userAccessInfos[i] != null && userAccessInfos[i].getUserProfile().getUserCode().equals(userAccessInfo.getUserProfile().getUserCode())) {
                 RoomDto roomDto = roomInfo.getRoomDto();
                 UserRoomDto[] players=roomDto.getPlayers();
                 // 방장이면
@@ -345,7 +347,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                                 for(int k=0;k<4;k++){
                                     UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[k];
                                     if(tempUserAccessInfo!=null){
-                                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.QUIT_PLAYER.getValue(), i);
+                                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.QUIT_MASTER.getValue(), i);
                                     }
                                 }
                                 return ResponseEntity.ok(roomDto);
@@ -381,224 +383,5 @@ public class FriendlyServiceImpl implements FriendlyService {
         // 방에 플레이어가 없음
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("플레이어를 찾을 수 없습니다.");
     }
-
-
-
-
-
-
-
-    // 테스트 코드들 모음
-    // 테스트 코드들 모음
-    // 테스트 코드들 모음
-    // 테스트 코드들 모음
-    // 테스트 코드들 모음
-    // 테스트 코드들 모음
-
-    UserProfileDto p0=new UserProfileDto(null,"abcdefg1","방장",330,100,true,1,"gold","url0","url1");
-    UserProfileDto p1=new UserProfileDto(null,"abcdefg2","유저1",330,100,true,1,"gold","url2","url3");
-    UserProfileDto p2=new UserProfileDto(null,"abcdefg3","유저2",30,2,false,1,"gold","url4","url5");
-    UserProfileDto p3=new UserProfileDto(null,"abcdefg3","유저3",3000,1,false,1,"gold","url6","url7");
-    UserRoomDto player0= new UserRoomDto(0,p0,false);
-    UserRoomDto player1= new UserRoomDto(1,p1,true);
-    UserRoomDto player2= new UserRoomDto(2,p2,false);
-    UserRoomDto player3= new UserRoomDto(3,null,false);
-    UserProfile userProfileUser1=new UserProfile(UUID.randomUUID(),"uscode01","uspro01",false,100L,"skinurl1","titleurl1",1000);
-    UserProfile userProfileGuest1=new UserProfile(UUID.randomUUID(),"uscode02","uspro02",true,1000L,"skinurl2","titleurl2",1500);
-    UserProfile userProfileUser2=new UserProfile(UUID.randomUUID(),"uscode03","uspro03",false,10L,"skinurl3","titleurl3",1234);
-    UserProfile userProfileGuest2=new UserProfile(UUID.randomUUID(),"uscode04","uspro04",true,88L,"skinurl4","titleurl4",5555);
-    UserAccessInfo userAccessInfoUser1=new UserAccessInfo(userProfileUser1);
-    UserAccessInfo userAccessInfoGuest1=new UserAccessInfo(userProfileGuest1);
-    UserAccessInfo userAccessInfoUser2=new UserAccessInfo(userProfileUser2);
-    UserAccessInfo userAccessInfoGuest2=new UserAccessInfo(userProfileGuest2);
-    UserAccessInfo[] userAccessInfoArr1=new UserAccessInfo[]{userAccessInfoUser1,userAccessInfoGuest1,userAccessInfoUser2,userAccessInfoGuest2};
-    UserRoomDto[] players=new UserRoomDto[]{player0,player1,player2,player3};
-    RoomDto roomDto1=new RoomDto("방제목","1001",0,"4321",players,1);
-    MapInfo mapInfo1=new MapInfo();
-    RoomInfo roomInfo1=new RoomInfo(userAccessInfoArr1,1001,roomDto1,false,mapInfo1);
-
-    // 방 번호
-    public static int roomCodeTest=1000;
-    // roomcode, roominfo가 담긴 맵
-    private Map<Integer, RoomInfo> roomInfoMapTest =Collections.synchronizedMap(new HashMap<>());
-
-    @Override
-    public synchronized ResponseEntity<?> createRoomTest(String roomTitle, String roomPassword, int mapId, UserAccessInfo userAccessInfo){
-        // 비밀번호 4글자 검사
-        if(roomPassword.length()!=4){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("비밀번호가 잘못된 형식입니다.");
-        }
-
-        // roomCode 세팅
-        RoomInfo roomInfo=new RoomInfo();
-        synchronized (FriendlyServiceImpl.class) { // 동기화 블록으로 클래스 레벨 락 사용
-            if (roomCodeTest >= 9999) {
-                roomCodeTest = 1000;
-            } else {
-                roomCodeTest++;
-            }
-            roomInfo.setRoomCodeInt(roomCodeTest); // 할당
-        }
-
-        // roomdto 세팅
-        RoomDto roomDto=new RoomDto();
-        roomDto.setRoomTitle(roomTitle);
-        roomDto.setRoomCodeString(String.valueOf(roomInfo.getRoomCodeInt()));
-        roomDto.setMasterIndex(0);
-        roomDto.setRoomPassword(roomPassword);
-
-        // userRoomDtos 세팅
-        UserRoomDto[] players = new UserRoomDto[4];
-        // 방장 세팅
-        players[0]= new UserRoomDto();
-        players[0].setUserIndex(0);
-        players[0].setPlayer(new UserProfileDto(userAccessInfo.getUserProfile()));
-        players[0].setReady(false);
-        // 1번부터 3번까지 세팅
-        for(int i=1;i<4;i++){
-            players[i]= new UserRoomDto();
-            players[i].setUserIndex(i);
-            players[i].setPlayer(null);
-            players[i].setReady(false);
-        }
-        roomDto.setPlayers(players);
-        roomDto.setMapId(1); // 이거 고쳐야할듯
-
-        // roominfo 세팅
-        roomInfo.setUserAccessInfos(new UserAccessInfo[] {userAccessInfo,null,null,null});
-        roomInfo.setRoomDto(roomDto);
-        roomInfo.setGameStart(false);
-        roomInfo.setMapInfo(new MapInfo()); // 고치기
-        userAccessInfo.setRoomInfo(roomInfo);
-        roomInfoMapTest.put(roomInfo.getRoomCodeInt(),roomInfo);
-        // 리턴
-        return ResponseEntity.ok(roomDto);
-    }
-    
-    // getRoomListTest를 위해 roomInfoMapTest를 채우는 메소드
-    public void fillRoomInfoMapTest(){
-        for(int i=1001;i<1090;i++){
-            RoomDto roomDto=new RoomDto();
-            roomDto.setRoomTitle("방제목");
-            roomDto.setRoomCodeString(String.valueOf(i));
-            roomDto.setMasterIndex(0);
-            roomDto.setRoomPassword("4321");
-            roomDto.setPlayers(players);
-            roomDto.setMapId(1);
-            RoomInfo roomInfo=new RoomInfo();
-            roomInfo.setUserAccessInfos(userAccessInfoArr1);
-            roomInfo.setRoomCodeInt(i);
-            roomInfo.setRoomDto(roomDto);
-            roomInfo.setGameStart(false);
-            roomInfo.setMapInfo(new MapInfo());
-            roomInfoMapTest.put(roomInfo.getRoomCodeInt(),roomInfo);
-        }
-    }
-
-    @Override
-    public ResponseEntity<?> getRoomListTest(int offset){
-        fillRoomInfoMapTest();
-        final int roomsPerPage1 = 6;
-        final int maxPages1 = 5;
-        final int maxRooms2 = roomsPerPage1 * maxPages1;
-        List<FriendlyRoomDto> paginatedFriendlyRooms = new ArrayList<>();
-
-        synchronized (roomInfoMapTest){
-            // roomInfoMap에서 RoomInfo 객체들을 방 코드 순서로 정렬
-            List<RoomInfo> sortedRooms = new ArrayList<>(roomInfoMapTest.values());
-            sortedRooms.sort(Comparator.comparingInt(RoomInfo::getRoomCodeInt));
-
-            // 페이징을 위한 계산
-            int totalRooms = sortedRooms.size();
-            int startIndex = (offset - 1) * maxRooms2;
-            if (startIndex >= totalRooms) {
-                return ResponseEntity.ok(Collections.emptyList());
-            }
-            int endIndex = Math.min(startIndex + maxRooms2, totalRooms);
-
-            // 페이징된 목록 생성
-            for (int i = startIndex; i < endIndex; i++) {
-                RoomInfo roomInfo = sortedRooms.get(i);
-                // 게임 시작한 방은 안가져온다
-                if(roomInfo.isGameStart()){
-                    endIndex++;
-                    continue;
-                }
-                FriendlyRoomDto friendlyRoomDto = new FriendlyRoomDto();
-                friendlyRoomDto.setRoomTitle(roomInfo.getRoomDto().getRoomTitle());
-                friendlyRoomDto.setRoomCode(roomInfo.getRoomDto().getRoomCodeString());
-                friendlyRoomDto.setMapId(roomInfo.getMapInfo().getMapId());
-                // 유저 수 계산
-                int userNumber = (int) Arrays.stream(roomInfo.getUserAccessInfos()).filter(Objects::nonNull).count();
-                friendlyRoomDto.setUserNumber(userNumber);
-
-                paginatedFriendlyRooms.add(friendlyRoomDto);
-            }
-        }
-        return ResponseEntity.ok(paginatedFriendlyRooms);
-    }
-
-
-    @Override
-    public synchronized ResponseEntity<?> enterRoomTest(int code, String password, UserAccessInfo userAccessInfo) {
-
-        RoomInfo roomInfo = roomInfoMap.get(code);
-//        System.out.println("11");
-        // 방이 존재하지 않음
-        if (roomInfo == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("방이 존재하지 않습니다.111");
-        }
-        // 비밀번호 불일치
-        if (!password.equals(roomInfo.getRoomDto().getRoomPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("틀린 비밀번호입니다.");
-        }
-        // 겜 이미 시작했음
-        if(roomInfo.isGameStart()){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("이미 게임이 시작된 방입니다.");
-        }
-
-        // 들어갈 곳 찾기
-        for (int i = 0; i < 4; i++) {
-            // 들어갈 곳 찾음
-            if (roomInfo.getUserAccessInfos()[i] == null) {
-                roomInfo.getUserAccessInfos()[i] = userAccessInfo;
-
-                // RoomInfo에서 정보 가져오기
-                RoomDto roomDto=roomInfo.getRoomDto();
-                // 입장하는 사람 정보가 담긴 UserProfileDto 만들어서 userRoomDtos에 반영
-                UserRoomDto[] players=roomDto.getPlayers();
-                UserProfileDto player=new UserProfileDto(userAccessInfo.getUserProfile());
-                players[i].setPlayer(player);
-                // roomDto에 userRoomDtos 반영
-                roomDto.setPlayers(players);
-
-                // roomInfo에 roomDto반영
-                roomInfo.setRoomDto(roomDto);
-                userAccessInfo.setRoomInfo(roomInfo);
-
-                // 입장했다고 세션 뿌리기
-                for(int j=0;j<4;j++){
-                    UserAccessInfo tempUserAccessInfo = roomInfo.getUserAccessInfos()[j];
-                    // if(tempUserAccessInfo != null && userRoomDtos[j]!=null)
-                    if(tempUserAccessInfo != null){
-                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.NEW_USER.getValue(), players[i]);
-                    }
-                }
-                return ResponseEntity.ok(roomDto);
-            }
-        }
-        // 풀방
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("방에 들어갈 공간이 없습니다.");
-    }
-
-
-
-
-
-
-
-
-
-
 
 }
