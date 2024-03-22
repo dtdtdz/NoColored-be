@@ -26,11 +26,9 @@ public class UserController {
     @PostMapping("/guest")
     public ResponseEntity<?> guestConvert(@RequestHeader("Authorization") String token,
                                                        @RequestBody UserSignDto user){
-        if (user.getId().length() < 6) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
-        if (user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
+        if (user.getId().length() < 6 || user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
         if (!user.getId().matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
-        if (user.getPassword().length() < 6) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
-        if (user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
+        if (user.getPassword().length() < 6 || user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
         if (!user.confirm()) return ResponseEntity.badRequest().body("Passwords do not match.");
 
         return ResponseEntity.ok(userService.guestConvert(token, user));
@@ -39,11 +37,9 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody UserSignDto user){
-        if (user.getId().length() < 6) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
-        if (user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
+        if (user.getId().length() < 6 || user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
         if (!user.getId().matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
-        if (user.getPassword().length() < 6) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
-        if (user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
+        if (user.getPassword().length() < 6 || user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
         if (!user.confirm()) return ResponseEntity.badRequest().body("Passwords do not match.");
 
         UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
@@ -66,7 +62,7 @@ public class UserController {
             return ResponseEntity.ok("Password updated successfully.");
         } catch (Exception e){
 //            throw e;
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body("Failed to delete user");
         }
     }
 
@@ -77,7 +73,7 @@ public class UserController {
             userService.updateNickname(token, map.get("nickname"));
             return ResponseEntity.ok("Nickname updated successfully.");
         } catch (Exception e){
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body("Failed to update nickname");
         }
     }
 
@@ -86,9 +82,9 @@ public class UserController {
                                                   @RequestBody Map<String, String> map){
         try {
             userService.deleteUser(token, map.get("password"));
-            return ResponseEntity.ok("user deleted successfully.");
+            return ResponseEntity.ok("User deleted successfully.");
         } catch (Exception e){
-            return ResponseEntity.internalServerError().body(e.getMessage());
+            return ResponseEntity.internalServerError().body("Failed to delete user");
         }
     }
 

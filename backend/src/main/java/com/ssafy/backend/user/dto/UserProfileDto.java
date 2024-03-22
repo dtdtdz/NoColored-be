@@ -24,7 +24,7 @@ public class UserProfileDto {
         this.userCode = userProfile.getUserCode();
         this.nickName = userProfile.getUserNickname();
         this.exp = userProfile.getUserExp();
-        this.isGuest = true;
+        this.isGuest = userProfile.isGuest();
         this.rating = userProfile.getUserRating();
         this.tier = "nocolored"; //로직
         this.skin = userProfile.getUserSkin();
