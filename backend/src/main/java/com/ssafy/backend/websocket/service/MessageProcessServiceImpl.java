@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.websocket.domain.ReceiveBinaryMessageType;
+import com.ssafy.backend.websocket.domain.SendTextMessageType;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.user.util.JwtUtil;
@@ -101,7 +102,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         authScheduledExecutorService.schedule(()->{
             if (!sessionCollection.userWebsocketMap.containsKey(session)){
                 try {
-                    SynchronizedSend.textSend(session,"로그인 실패",null);
+                    SynchronizedSend.textSend(session, SendTextMessageType.LOGIN_FAILED.getValue(), null);
                     session.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
