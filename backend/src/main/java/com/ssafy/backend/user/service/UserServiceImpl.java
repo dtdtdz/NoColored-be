@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -51,6 +50,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserProfileDto getUserProfileDto(String token) {
+        return new UserProfileDto(jwtUtil.getUserAccessInfoRedis(token).getUserProfile());
+    }
+
+    @Override
     public UserProfile guestSignUp(){
         try {
             String userCode = getUserCode();
@@ -72,7 +76,7 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     @Transactional
-    public UserProfileDto guestConvert(String token, UserSignDto userSignDto) {
+    public String guestConvert(String token, UserSignDto userSignDto) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         UserProfile userProfile = userAccessInfo.getUserProfile();
         //userProfile 을 managed 상태로 만들어준다.
@@ -90,7 +94,7 @@ public class UserServiceImpl implements UserService {
                 .isDeleted(false)
                 .build();
         userInfoRepository.save(userInfo);
-        return new UserProfileDto(userProfile, token);
+        return token;
     }
 
     @Override
@@ -128,7 +132,7 @@ public class UserServiceImpl implements UserService {
         }
     }
     @Override
-    public UserProfileDto generateUserInfoDtoWithToken(UserProfile userProfile){
+    public String generateToken(UserProfile userProfile){
         String token = jwtUtil.generateToken(userProfile.getUserCode());
         jwtUtil.setTokenRedis(token, userProfile.getId());
         sessionCollection.userIdMap.put(userProfile.getId(), new UserAccessInfo(userProfile));
@@ -141,15 +145,15 @@ public class UserServiceImpl implements UserService {
 //            }
 //        },10, TimeUnit.SECONDS);
 
-        return new UserProfileDto(userProfile, token);
+        return token;
     }
 
     @Override
-    public UserProfileDto login(String id, String password) {
+    public String login(String id, String password) {
         UserProfile userProfile = userInfoRepository.findByUser(id, password);
         if (userProfile==null) return null;
 
-        return generateUserInfoDtoWithToken(userProfile);
+        return generateToken(userProfile);
     }
 
     @Override
