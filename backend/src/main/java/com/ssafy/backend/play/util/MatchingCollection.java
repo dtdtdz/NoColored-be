@@ -48,12 +48,12 @@ public class MatchingCollection {
         synchronized (delQueue) {
             while (!delQueue.isEmpty()) {
                 UserAccessInfo userAccessInfo = delQueue.poll();
-                delMatching(userAccessInfo);
+                delMatching(userAccessInfo, SendTextMessageType.MATCHING_CANCEL);
             }
         }
     }
 
-    private void delMatching(UserAccessInfo userAccessInfo) {
+    private void delMatching(UserAccessInfo userAccessInfo, SendTextMessageType message) {
         if (!matchingInfoMap.containsKey(userAccessInfo)) return;
         MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
         int high = Math.min(matchingQueue.size()-1, matchingInfo.getRatingLevel() + matchingInfo.getExpandLevel());
@@ -65,7 +65,7 @@ public class MatchingCollection {
         matchingInfoMap.remove(userAccessInfo);
         WebSocketSession session = userAccessInfo.getSession();
         SynchronizedSend.textSend(session,
-                SendTextMessageType.MATCHING_CANCEL.getValue(), null);
+                message.getValue(), null);
     }
 
     @Scheduled(fixedRate = 500)
@@ -120,7 +120,7 @@ public class MatchingCollection {
                     } catch (Exception e){
                         e.printStackTrace();
                     }
-                    delMatching(matchingQueue.get(i).get(0));
+                    delMatching(matchingQueue.get(i).get(0), SendTextMessageType.MATCHING);
                 }
 
 //                RoomDto roomDto = new RoomDto(list);

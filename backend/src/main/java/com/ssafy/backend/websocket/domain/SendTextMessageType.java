@@ -9,6 +9,7 @@ public enum SendTextMessageType {
     // sendbinarymessagetype처럼 만들고
     // synchronizedsend 참고해서 보내면 된다
     UNKNOWN_ACTION("unknownAction"),
+    LOGIN_FAILED("loginFailed"),
     INVALID_TOKEN("invalidToken"),
     AUTHORIZATION("authorization"),
     MATCHING("matching"),
