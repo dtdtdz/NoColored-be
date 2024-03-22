@@ -17,6 +17,7 @@ public class UserController {
         this.userService = userService;
 
     }
+
     @GetMapping("/guest")
     public ResponseEntity<UserProfileDto> guestSignUp(){
         UserProfile userProfile = userService.guestSignUp();
@@ -25,20 +26,36 @@ public class UserController {
     @PostMapping("/guest")
     public ResponseEntity<?> guestConvert(@RequestHeader("Authorization") String token,
                                                        @RequestBody UserSignDto user){
-        if (!user.confirm()) return ResponseEntity.badRequest().body("password confirm failed");
+        if (user.getId().length() < 6) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
+        if (user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
+        if (!user.getId().matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
+        if (user.getPassword().length() < 6) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
+        if (user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
+        if (!user.confirm()) return ResponseEntity.badRequest().body("Passwords do not match.");
+
         return ResponseEntity.ok(userService.guestConvert(token, user));
     }
 
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody UserSignDto user){
-        if (!user.confirm()) return ResponseEntity.badRequest().body("password confirm failed");
+        if (user.getId().length() < 6) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
+        if (user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
+        if (!user.getId().matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
+        if (user.getPassword().length() < 6) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
+        if (user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
+        if (!user.confirm()) return ResponseEntity.badRequest().body("Passwords do not match.");
+
         UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
         return ResponseEntity.ok(userService.generateUserInfoDtoWithToken(userProfile));
     }
     @PostMapping("/login")
-    private ResponseEntity<UserProfileDto> login(@RequestBody UserSignDto user){
-        return ResponseEntity.ok(userService.login(user.getId(),user.getPassword()));
+    private ResponseEntity<?> login(@RequestBody UserSignDto user){
+        try {
+            return ResponseEntity.ok(userService.login(user.getId(),user.getPassword()));
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body("Login failed");
+        }
     }
 
     @PatchMapping("/password")
@@ -46,7 +63,7 @@ public class UserController {
                                              @RequestBody Map<String, String> map){
         try {
             userService.updatePassword(token, map.get("newPassword"),map.get("prePassword"));
-            return ResponseEntity.ok("비밀번호 변경 성공");
+            return ResponseEntity.ok("Password updated successfully.");
         } catch (Exception e){
 //            throw e;
             return ResponseEntity.internalServerError().body(e.getMessage());
@@ -58,7 +75,7 @@ public class UserController {
                                                   @RequestBody Map<String, String> map){
         try {
             userService.updateNickname(token, map.get("nickname"));
-            return ResponseEntity.ok("닉네임 변경 성공");
+            return ResponseEntity.ok("Nickname updated successfully.");
         } catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
@@ -69,7 +86,7 @@ public class UserController {
                                                   @RequestBody Map<String, String> map){
         try {
             userService.deleteUser(token, map.get("password"));
-            return ResponseEntity.ok("유저 삭제 성공");
+            return ResponseEntity.ok("user deleted successfully.");
         } catch (Exception e){
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
@@ -81,9 +98,9 @@ public class UserController {
     }
 
     @GetMapping("/info/{userCode}")
-    private ResponseEntity<UserProfileDto> findUserInfo(@PathVariable("userCode") String userCode){
+    private ResponseEntity<?> findUserInfo(@PathVariable("userCode") String userCode){
         UserProfileDto userProfileDto = userService.findUserInfo(userCode);
-        if (userProfileDto==null) return ResponseEntity.badRequest().body(null);
+        if (userProfileDto==null) return ResponseEntity.badRequest().body("Can't find user");
         return ResponseEntity.ok(userProfileDto);
     }
 }
