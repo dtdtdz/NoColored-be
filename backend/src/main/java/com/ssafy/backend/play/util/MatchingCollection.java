@@ -48,12 +48,15 @@ public class MatchingCollection {
         synchronized (delQueue) {
             while (!delQueue.isEmpty()) {
                 UserAccessInfo userAccessInfo = delQueue.poll();
-                delMatching(userAccessInfo, SendTextMessageType.MATCHING_CANCEL);
+                delMatching(userAccessInfo);
+                WebSocketSession session = userAccessInfo.getSession();
+                SynchronizedSend.textSend(session,
+                        SendTextMessageType.MATCHING_CANCEL.getValue(), null);
             }
         }
     }
 
-    private void delMatching(UserAccessInfo userAccessInfo, SendTextMessageType message) {
+    private void delMatching(UserAccessInfo userAccessInfo) {
         if (!matchingInfoMap.containsKey(userAccessInfo)) return;
         MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
         int high = Math.min(matchingQueue.size()-1, matchingInfo.getRatingLevel() + matchingInfo.getExpandLevel());
@@ -63,9 +66,6 @@ public class MatchingCollection {
             matchingQueue.get(i).remove(userAccessInfo);
         }
         matchingInfoMap.remove(userAccessInfo);
-        WebSocketSession session = userAccessInfo.getSession();
-        SynchronizedSend.textSend(session,
-                message.getValue(), null);
     }
 
     @Scheduled(fixedRate = 500)
@@ -77,6 +77,7 @@ public class MatchingCollection {
                 if (matchingInfoMap.containsKey(userAccessInfo)) {
                     MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
                     matchingQueue.get(matchingInfo.getRatingLevel()).add(userAccessInfo);
+
                     matchingInfo.setExpandLevel(0);
                 }
             }
@@ -120,13 +121,13 @@ public class MatchingCollection {
                     } catch (Exception e){
                         e.printStackTrace();
                     }
-                    delMatching(matchingQueue.get(i).get(0), SendTextMessageType.MATCHING);
+                    delMatching(matchingQueue.get(i).get(0));
                 }
 
 //                RoomDto roomDto = new RoomDto(list);
-//                for (UserAccessInfo userAccessInfo:list){
-//                    SynchronizedSend.textSend(userAccessInfo.getSession(), "matching", roomDto);
-//                }
+                for (UserAccessInfo userAccessInfo:list){
+                    SynchronizedSend.textSend(userAccessInfo.getSession(), SendTextMessageType.MATCHING.getValue(), null);
+                }
                 inGameCollection.addGame(list);
 //                System.out.println(SendTextMessageType.MATCHING.getValue());
             }
