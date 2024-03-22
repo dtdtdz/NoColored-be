@@ -28,7 +28,7 @@ public class UserRoomDto {
         nickName = userProfileDto.getNickName();
         tier = userProfileDto.getTier();
         skin = userProfileDto.getSkin();
-        tier = userProfileDto.getTitle();
+        title = userProfileDto.getTitle();
     }
 
 }

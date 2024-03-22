@@ -81,7 +81,15 @@ public class GameServiceImpl implements GameService {
 
                 } else {
                     try {
-                        inGameLogic.scheduledLogic(gameInfo);
+                       switch (gameInfo.getGameCycle()){
+                            case CREATE -> inGameLogic.create(gameInfo);
+                            case READY -> inGameLogic.ready(gameInfo);
+                            case PLAY -> inGameLogic.play(gameInfo);
+                            case CLOSE -> gameClose(gameInfo);
+
+                            //        play(gameInfo);
+
+                        }
                     } catch (Exception e){
                         e.printStackTrace();
                         throw e;
@@ -95,6 +103,8 @@ public class GameServiceImpl implements GameService {
 
     }
 
+    private void gameClose(GameInfo gameInfo){
 
+    }
 
 }

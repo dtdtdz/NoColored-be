@@ -16,16 +16,20 @@ import java.util.List;
 @AllArgsConstructor
 public class UserPlayInfo {
     int rank;
-    int step;
-    int itemCount;
+    long step;
+    long itemCount;
     LocalDateTime startDate;
     LocalDateTime endTime;
     String gameType;
     List<String[]> users; //code, nickname
-    int againCount;
-    int invincibleCount;
-    int ninjaCount;
-    int lightPullCount;
-    int lightUPonceCount;
-
+    long againCount;
+    long invincibleCount;
+    long ninjaCount;
+    long lightUPallCount;
+    long lightUPonceCount;
+    long fireworksCount;
+    long stopNPCCount;
+    long blackoutCount;
+    long randomBoxCount;
+    long rebelCount;
 }
