@@ -51,7 +51,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserProfileDto getUserProfileDto(String token) {
-        return new UserProfileDto(jwtUtil.getUserAccessInfoRedis(token).getUserProfile());
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        //계산해야됨 어디서 해야됨?
+        return userAccessInfo.getUserProfileDto();
     }
 
     @Override
@@ -135,7 +137,10 @@ public class UserServiceImpl implements UserService {
     public String generateToken(UserProfile userProfile){
         String token = jwtUtil.generateToken(userProfile.getUserCode());
         jwtUtil.setTokenRedis(token, userProfile.getId());
-        sessionCollection.userIdMap.put(userProfile.getId(), new UserAccessInfo(userProfile));
+        UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
+        sessionCollection.userIdMap.put(userProfile.getId(), userAccessInfo);
+        //계산해야됨 티어, 랭킹
+        userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
 //        authScheduledExecutorService.schedule(()->{
 //            if (!sessionCollection.userIdMap.containsKey(userProfile.getId())){
 //                jwtUtil.deleteTokenRedis(token);

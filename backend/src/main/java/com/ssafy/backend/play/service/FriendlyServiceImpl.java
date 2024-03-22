@@ -55,16 +55,11 @@ public class FriendlyServiceImpl implements FriendlyService {
         // userRoomDtos 세팅
         UserRoomDto[] players = new UserRoomDto[4];
         // 방장 세팅
-        players[0]= new UserRoomDto();
-        players[0].setUserIndex(0);
-        players[0].setPlayer(new UserProfileDto(userAccessInfo.getUserProfile()));
-        players[0].setReady(false);
+        players[0]= new UserRoomDto(0, userAccessInfo.getUserProfileDto());
+
         // 1번부터 3번까지 세팅
         for(int i=1;i<4;i++){
-            players[i]= new UserRoomDto();
-            players[i].setUserIndex(i);
-            players[i].setPlayer(null);
-            players[i].setReady(false);
+            players[i]= new UserRoomDto(i, null);
         }
         roomDto.setPlayers(players);
         roomDto.setMapId(1); // 이거 고쳐야할듯
@@ -150,9 +145,9 @@ public class FriendlyServiceImpl implements FriendlyService {
                 RoomDto roomDto=roomInfo.getRoomDto();
                 // 입장하는 사람 정보가 담긴 UserProfileDto 만들어서 userRoomDtos에 반영
                 UserRoomDto[] players=roomDto.getPlayers();
-                players[i]=new UserRoomDto(i,null,false);
-                UserProfileDto player=new UserProfileDto(userAccessInfo.getUserProfile());
-                players[i].setPlayer(player);
+                UserProfileDto player = userAccessInfo.getUserProfileDto();
+                players[i]=new UserRoomDto(i, player);
+
                 // roomDto에 userRoomDtos 반영
                 roomDto.setPlayers(players);
 
@@ -336,9 +331,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                             if(userAccessInfos[startIndex]!=null){
                                 roomDto.setMasterIndex(startIndex);
                                 // 자신 정보 바꾸기
-                                players[i].setPlayer(null);
-                                players[i].setReady(false);
-                                roomDto.setPlayers(players);
+                                players[i] = null;
                                 userAccessInfos[i]=null;
                                 userAccessInfo.clearPosition();
                                 roomInfo.setUserAccessInfos(userAccessInfos);
@@ -360,14 +353,11 @@ public class FriendlyServiceImpl implements FriendlyService {
                 }else{
                     // 방장 아니면
                     // 자신 위치의 정보 초기화
-                    players[i].setPlayer(null);
-                    players[i].setReady(false);
-                    roomDto.setPlayers(players);
+                    players[i] = null;
                     // roomInfo 반영
                     userAccessInfos[i]=null;
                     userAccessInfo.clearPosition();
                     roomInfo.setUserAccessInfos(userAccessInfos);
-                    roomInfo.setRoomDto(roomDto);
 
                     // 변경했다고 세션 뿌리기
                     for(int j=0;j<4;j++){

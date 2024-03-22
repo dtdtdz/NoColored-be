@@ -1,5 +1,6 @@
 package com.ssafy.backend.user.entity;
 
+import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.util.RandomNickname;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,5 +36,4 @@ public class UserProfile {
     private String userTitle;
 
     private Integer userRating;
-
 }

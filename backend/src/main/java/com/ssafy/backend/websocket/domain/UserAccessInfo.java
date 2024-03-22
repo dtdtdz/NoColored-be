@@ -2,6 +2,7 @@ package com.ssafy.backend.websocket.domain;
 
 import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.game.domain.RoomInfo;
+import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.socket.WebSocketSession;
 public class UserAccessInfo {
     private WebSocketSession session;
     private UserProfile userProfile;
+    private UserProfileDto userProfileDto;
     private Object position;//사용할때 상태 확인해야함
 
     public UserAccessInfo(UserProfile userProfile){

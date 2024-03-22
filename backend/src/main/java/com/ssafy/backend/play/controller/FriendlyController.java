@@ -33,10 +33,10 @@ public class FriendlyController {
     UserProfileDto p0=new UserProfileDto("abcdefg1","방장",330,500,100,true,1,"gold","url0","url1");
     UserProfileDto p1=new UserProfileDto("abcdefg2","유저1",330,500,100,true,1,"gold","url2","url3");
     UserProfileDto p2=new UserProfileDto("abcdefg3","유저2",30,500,2,false,1,"gold","1","1");
-    UserRoomDto player0= new UserRoomDto(0,p0,false);
-    UserRoomDto player1= new UserRoomDto(1,p1,true);
-    UserRoomDto player2= new UserRoomDto(2,p2,false);
-    UserRoomDto player3= new UserRoomDto(3,null,false);
+    UserRoomDto player0= new UserRoomDto(0,p0);
+    UserRoomDto player1= new UserRoomDto(1,p1);
+    UserRoomDto player2= new UserRoomDto(2,p2);
+    UserRoomDto player3= null;
 
     UserRoomDto[] players=new UserRoomDto[]{player0,player1,player2,player3};
     RoomDto dummyRoomDto=new RoomDto("방제목","1234",0,"4321",players,1);
