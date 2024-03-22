@@ -1,4 +1,4 @@
-package com.ssafy.backend.game.dto;
+package com.ssafy.backend.play.dto;
 
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
