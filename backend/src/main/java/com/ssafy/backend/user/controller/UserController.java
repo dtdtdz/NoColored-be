@@ -15,38 +15,56 @@ public class UserController {
     private final UserService userService;
     public UserController(UserService userService){
         this.userService = userService;
+    }
 
+    @GetMapping
+    public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token){
+        UserProfileDto userProfileDto = userService.getUserProfileDto(token);
+        if (userProfileDto==null){
+            return ResponseEntity.badRequest().body("Token is invalid");
+        } else {
+            return ResponseEntity.ok(userProfileDto);
+        }
     }
 
     @GetMapping("/guest")
-    public ResponseEntity<UserProfileDto> guestSignUp(){
+    public ResponseEntity<String> guestSignUp(){
         UserProfile userProfile = userService.guestSignUp();
-        return ResponseEntity.ok(userService.generateUserInfoDtoWithToken(userProfile));
+        return ResponseEntity.ok(userService.generateToken(userProfile));
     }
     @PostMapping("/guest")
-    public ResponseEntity<?> guestConvert(@RequestHeader("Authorization") String token,
+    public ResponseEntity<String> guestConvert(@RequestHeader("Authorization") String token,
                                                        @RequestBody UserSignDto user){
         if (user.getId().length() < 6 || user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
         if (!user.getId().matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
         if (user.getPassword().length() < 6 || user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
         if (!user.confirm()) return ResponseEntity.badRequest().body("Passwords do not match.");
-
-        return ResponseEntity.ok(userService.guestConvert(token, user));
+        if (user.getNickname().length() < 2 || user.getNickname().length() > 9) return ResponseEntity.badRequest().body("Nickname does not meet the length requirements (6-20 characters).");
+        try {
+            return ResponseEntity.ok(userService.guestConvert(token, user));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Convert guest failed");
+        }
     }
 
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody UserSignDto user){
+    public ResponseEntity<String> signUp(@RequestBody UserSignDto user){
         if (user.getId().length() < 6 || user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
         if (!user.getId().matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
         if (user.getPassword().length() < 6 || user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
         if (!user.confirm()) return ResponseEntity.badRequest().body("Passwords do not match.");
+        if (user.getNickname().length() < 2 || user.getNickname().length() > 9) return ResponseEntity.badRequest().body("Nickname does not meet the length requirements (6-20 characters).");
 
         UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
-        return ResponseEntity.ok(userService.generateUserInfoDtoWithToken(userProfile));
+        try {
+            return ResponseEntity.ok(userService.generateToken(userProfile));
+        } catch (Exception e){
+            return ResponseEntity.internalServerError().body("User registration failed");
+        }
     }
     @PostMapping("/login")
-    private ResponseEntity<?> login(@RequestBody UserSignDto user){
+    private ResponseEntity<String> login(@RequestBody UserSignDto user){
         try {
             return ResponseEntity.ok(userService.login(user.getId(),user.getPassword()));
         } catch (Exception e){
