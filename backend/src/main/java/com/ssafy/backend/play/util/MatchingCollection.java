@@ -2,8 +2,7 @@ package com.ssafy.backend.play.util;
 
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
-import com.ssafy.backend.game.domain.UserAccessInfo;
-import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.play.domain.MatchingInfo;
 import com.ssafy.backend.websocket.domain.SendTextMessageType;
@@ -49,12 +48,12 @@ public class MatchingCollection {
         synchronized (delQueue) {
             while (!delQueue.isEmpty()) {
                 UserAccessInfo userAccessInfo = delQueue.poll();
-                delMatching(userAccessInfo);
+                delMatching(userAccessInfo, SendTextMessageType.MATCHING_CANCEL);
             }
         }
     }
 
-    private void delMatching(UserAccessInfo userAccessInfo) {
+    private void delMatching(UserAccessInfo userAccessInfo, SendTextMessageType message) {
         if (!matchingInfoMap.containsKey(userAccessInfo)) return;
         MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
         int high = Math.min(matchingQueue.size()-1, matchingInfo.getRatingLevel() + matchingInfo.getExpandLevel());
@@ -66,7 +65,7 @@ public class MatchingCollection {
         matchingInfoMap.remove(userAccessInfo);
         WebSocketSession session = userAccessInfo.getSession();
         SynchronizedSend.textSend(session,
-                SendTextMessageType.MATCHING_CANCEL.getValue(), null);
+                message.getValue(), null);
     }
 
     @Scheduled(fixedRate = 500)
@@ -121,7 +120,7 @@ public class MatchingCollection {
                     } catch (Exception e){
                         e.printStackTrace();
                     }
-                    delMatching(matchingQueue.get(i).get(0));
+                    delMatching(matchingQueue.get(i).get(0), SendTextMessageType.MATCHING);
                 }
 
 //                RoomDto roomDto = new RoomDto(list);

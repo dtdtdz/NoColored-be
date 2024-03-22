@@ -1,10 +1,8 @@
 package com.ssafy.backend.game.domain;
 
 import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-
-import java.util.UUID;
 
 @Getter
 @Setter
