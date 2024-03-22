@@ -7,11 +7,15 @@ import com.ssafy.backend.game.dto.RoomDto;
 import com.ssafy.backend.game.dto.UserRoomDto;
 import com.ssafy.backend.play.service.FriendlyService;
 import com.ssafy.backend.user.dto.UserProfileDto;
+import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.util.JwtUtil;
+import jakarta.persistence.*;
+import lombok.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 
 @RestController
