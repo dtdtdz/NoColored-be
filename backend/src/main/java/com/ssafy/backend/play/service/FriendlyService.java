@@ -1,12 +1,7 @@
 package com.ssafy.backend.play.service;
 
-import com.ssafy.backend.game.domain.RoomInfo;
-import com.ssafy.backend.game.domain.UserAccessInfo;
-import com.ssafy.backend.game.dto.FriendlyRoomDto;
-import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 public interface FriendlyService {
 

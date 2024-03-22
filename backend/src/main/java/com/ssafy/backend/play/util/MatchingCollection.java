@@ -2,8 +2,7 @@ package com.ssafy.backend.play.util;
 
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
-import com.ssafy.backend.game.domain.UserAccessInfo;
-import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.play.domain.MatchingInfo;
 import com.ssafy.backend.websocket.domain.SendTextMessageType;
@@ -50,6 +49,9 @@ public class MatchingCollection {
             while (!delQueue.isEmpty()) {
                 UserAccessInfo userAccessInfo = delQueue.poll();
                 delMatching(userAccessInfo);
+                WebSocketSession session = userAccessInfo.getSession();
+                SynchronizedSend.textSend(session,
+                        SendTextMessageType.MATCHING_CANCEL.getValue(), null);
             }
         }
     }
@@ -64,9 +66,6 @@ public class MatchingCollection {
             matchingQueue.get(i).remove(userAccessInfo);
         }
         matchingInfoMap.remove(userAccessInfo);
-        WebSocketSession session = userAccessInfo.getSession();
-        SynchronizedSend.textSend(session,
-                SendTextMessageType.MATCHING_CANCEL.getValue(), null);
     }
 
     @Scheduled(fixedRate = 500)
@@ -78,6 +77,7 @@ public class MatchingCollection {
                 if (matchingInfoMap.containsKey(userAccessInfo)) {
                     MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
                     matchingQueue.get(matchingInfo.getRatingLevel()).add(userAccessInfo);
+
                     matchingInfo.setExpandLevel(0);
                 }
             }
@@ -125,9 +125,9 @@ public class MatchingCollection {
                 }
 
 //                RoomDto roomDto = new RoomDto(list);
-//                for (UserAccessInfo userAccessInfo:list){
-//                    SynchronizedSend.textSend(userAccessInfo.getSession(), "matching", roomDto);
-//                }
+                for (UserAccessInfo userAccessInfo:list){
+                    SynchronizedSend.textSend(userAccessInfo.getSession(), SendTextMessageType.MATCHING.getValue(), null);
+                }
                 inGameCollection.addGame(list);
 //                System.out.println(SendTextMessageType.MATCHING.getValue());
             }

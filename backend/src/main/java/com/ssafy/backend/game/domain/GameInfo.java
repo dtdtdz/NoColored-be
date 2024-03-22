@@ -2,6 +2,7 @@ package com.ssafy.backend.game.domain;
 
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.web.socket.WebSocketSession;
@@ -15,7 +16,7 @@ import java.util.*;
 @AllArgsConstructor
 public class GameInfo {
     private LocalDateTime startDate;
-    private long startTime;
+    private long targetTime;
     private long time;
     private int second;
     private Map<WebSocketSession, UserGameInfo> users = new LinkedHashMap<>();
@@ -77,9 +78,7 @@ public class GameInfo {
 
     public GameInfo(List<UserAccessInfo> userList){
         startDate = LocalDateTime.now();
-        startTime = System.currentTimeMillis();
-        time = startTime;
-        second = DEFAULT_TIME;
+        setSecond(10);
         mapInfo = new MapInfo();
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
@@ -105,15 +104,18 @@ public class GameInfo {
         Collections.shuffle(floorPos);
 
         for (byte i=0; i<userList.size(); i++){
+
+            UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
+                    idxs.get(i),i);
             CharacterInfo characterInfo = new CharacterInfo();
-            UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(), idxs.get(i),i,(byte)(0));
 
             characterInfo.setUserGameInfo(userGameInfo);
             characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
             characterInfo.setY(floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f);
-            characterInfo.setDirection((int) ((random.nextInt(2)-0.5f)*2));
-            characterInfo.setVelX(DEFAULT_SPEED * characterInfo.getDirection());
+            characterInfo.setDir((int) ((random.nextInt(2)-0.5f)*2));
+            characterInfo.setVelX(0);
             characterInfo.setVelY(0);
+
             characterInfoArr[idxs.get(i)] = characterInfo;
             users.put(userList.get(i).getSession(), userGameInfo);
         }
@@ -123,9 +125,10 @@ public class GameInfo {
 
             characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
             characterInfo.setY(floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f);
-            characterInfo.setDirection((int) ((random.nextInt(2)-0.5f)*2));
-            characterInfo.setVelX(DEFAULT_SPEED * characterInfo.getDirection());
+            characterInfo.setDir((int) ((random.nextInt(2)-0.5f)*2));
+            characterInfo.setVelX(0);
             characterInfo.setVelY(0);
+
             characterInfoArr[idxs.get(i)] = characterInfo;
         }
 
@@ -148,12 +151,19 @@ public class GameInfo {
 //        floor = new boolean[MAP_HEIGHT][MAP_WIDTH];
 //    }
 
+    public boolean isAllReady(){
+        for (Map.Entry<WebSocketSession, UserGameInfo> entry:users.entrySet()){
+            if (!entry.getValue().isAccess()) return true;
+        }
+        return true;
+    }
+
     public void toLeft(int idx){
-        characterInfoArr[idx].setVelX(-Math.abs(characterInfoArr[idx].getVelX()));
+        characterInfoArr[idx].setDir(-1);
     }
 
     public void toRight(int idx){
-        characterInfoArr[idx].setVelX(Math.abs(characterInfoArr[idx].getVelX()));
+        characterInfoArr[idx].setDir(1);
     }
 
     public void jump(int idx){
@@ -168,8 +178,14 @@ public class GameInfo {
         return result;
     }
 
+    public void setSecond(int second){
+        time = System.currentTimeMillis();
+        targetTime = time+(long)second*1000;
+        this.second = second;
+    }
+
     public boolean checkSecond(){
-        int newSecond = DEFAULT_TIME-(int)((time-startTime)/1000);
+        int newSecond = (int)Math.ceil((targetTime-time)/1000f);
         if (newSecond<second){
             second = newSecond;
             return true;
@@ -179,13 +195,7 @@ public class GameInfo {
 
 
     public void putReadyInfo() {
-        if (gameCycle!=GameCycle.CREATE) return;
-        putTime();
-        for (Map.Entry<WebSocketSession,UserGameInfo> entry: getUsers().entrySet()) {
-            putSetCharacter(entry.getKey());
-        }
-        putTestMap();
-        gameCycle = GameCycle.PLAY;
+
     }
 
     public void putSetCharacter(WebSocketSession session){
@@ -195,7 +205,6 @@ public class GameInfo {
     }
 
     public void putTime(){
-        if (!checkSecond()) return;
         for (int i=0; i< users.size(); i++){
             buffer[i].put(SendBinaryMessageType.TIME.getValue())
                     .put((byte) second);
@@ -203,6 +212,11 @@ public class GameInfo {
         stepList.clear();
     }
 
+    public void putStart(){
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.START.getValue());
+        }
+    }
     public void putPhysicsState() {
         for (int i = 0; i < users.size(); i++) {
 //            System.out.println(buffer[i].position());
@@ -211,7 +225,7 @@ public class GameInfo {
             for (CharacterInfo cInfo:characterInfoArr){
                 buffer[i].putFloat(cInfo.getX());
                 buffer[i].putFloat(cInfo.getY());
-                buffer[i].putFloat(cInfo.getVelX());
+                buffer[i].putFloat(cInfo.getVelX()*cInfo.getDir());
                 buffer[i].putFloat(cInfo.getVelY());
             }
         }
@@ -243,7 +257,7 @@ public class GameInfo {
     public void insertSession(WebSocketSession session){
         byte num = 0;
         while (characterInfoArr[num].getUserGameInfo()==null) num++;
-        UserGameInfo user = new UserGameInfo(session, (byte) users.size(), num, (byte) 0);
+        UserGameInfo user = new UserGameInfo(session, (byte) users.size(), num);
         users.put(session, user);
         characterInfoArr[num].setUserGameInfo(user);
     }

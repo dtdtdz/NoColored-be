@@ -9,7 +9,7 @@ import com.ssafy.backend.user.dao.UserProfileRepository;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.user.util.RandomNickname;
 import com.ssafy.backend.websocket.util.SessionCollection;
-import com.ssafy.backend.game.domain.UserAccessInfo;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -132,14 +132,14 @@ public class UserServiceImpl implements UserService {
         String token = jwtUtil.generateToken(userProfile.getUserCode());
         jwtUtil.setTokenRedis(token, userProfile.getId());
         sessionCollection.userIdMap.put(userProfile.getId(), new UserAccessInfo(userProfile));
-        authScheduledExecutorService.schedule(()->{
-            if (!sessionCollection.userIdMap.containsKey(userProfile.getId())){
-                jwtUtil.deleteTokenRedis(token);
-            } else if (sessionCollection.userIdMap.get(userProfile.getId()).getSession()==null){
-                jwtUtil.deleteTokenRedis(token);
-                sessionCollection.userIdMap.remove(userProfile.getId());
-            }
-        },10, TimeUnit.SECONDS);
+//        authScheduledExecutorService.schedule(()->{
+//            if (!sessionCollection.userIdMap.containsKey(userProfile.getId())){
+//                jwtUtil.deleteTokenRedis(token);
+//            } else if (sessionCollection.userIdMap.get(userProfile.getId()).getSession()==null){
+//                jwtUtil.deleteTokenRedis(token);
+//                sessionCollection.userIdMap.remove(userProfile.getId());
+//            }
+//        },10, TimeUnit.SECONDS);
 
         return new UserProfileDto(userProfile, token);
     }

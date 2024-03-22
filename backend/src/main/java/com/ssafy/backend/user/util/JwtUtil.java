@@ -4,7 +4,7 @@ package com.ssafy.backend.user.util;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.ssafy.backend.game.domain.UserAccessInfo;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;

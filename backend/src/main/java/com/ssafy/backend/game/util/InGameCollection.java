@@ -1,14 +1,11 @@
 package com.ssafy.backend.game.util;
 
-import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.*;
-import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Component
@@ -44,8 +41,6 @@ public class InGameCollection {
         gameInfo.sendBuffer();
         addQueue.offer(gameInfo);
     }
-
-
 
     public void insertUser(WebSocketSession session){
         if (inGameList.isEmpty()) return;

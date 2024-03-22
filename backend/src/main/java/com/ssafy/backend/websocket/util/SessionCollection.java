@@ -1,9 +1,7 @@
 package com.ssafy.backend.websocket.util;
 
 
-import com.ssafy.backend.play.domain.MatchingInfo;
-import com.ssafy.backend.game.domain.GameInfo;
-import com.ssafy.backend.game.domain.UserAccessInfo;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
