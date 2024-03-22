@@ -14,7 +14,11 @@ public enum SendTextMessageType {
     AUTHORIZATION("authorization"),
     MATCHING("matching"),
     MATCHING_CANCEL("matchingCancel"),
-    READY_CHANGE("readyChange"),
+    READY_ON("readyOn"),
+    READY_OFF("readyOff"),
+    GAME_START("gameStart"),
+    QUIT_PLAYER("quitPlayer"),
+    QUIT_MASTER("quitMaster"),
     NEW_USER("newUser");
 
     private final String value;

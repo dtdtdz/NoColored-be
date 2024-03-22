@@ -5,15 +5,16 @@ import org.springframework.http.ResponseEntity;
 
 public interface FriendlyService {
 
-//    RoomInfo createRoom(RoomDto roomDto);
     ResponseEntity<?> createRoom(String roomTitle, String roomPassword, int mapId, UserAccessInfo userAccessInfo);
 
-//    List<FriendlyRoomDto> getPaginatedRoomList(int offset);
     ResponseEntity<?> getRoomList(int offset);
 
-    ResponseEntity<?> enterRoom(String code, String password, UserAccessInfo userAccessInfo);
+    ResponseEntity<?> enterRoom(int code, String password, UserAccessInfo userAccessInfo);
 
-    ResponseEntity<?> readyRoom(UserAccessInfo userAccessInfo, String roomCode);
+    ResponseEntity<?> readyRoom(UserAccessInfo userAccessInfo);
 
+    ResponseEntity<?> renewRoom(UserAccessInfo userAccessInfo, String title, String password, int mapId);
+
+    ResponseEntity<?> quitRoom(UserAccessInfo userAccessInfo);
 
 }
