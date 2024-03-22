@@ -1,6 +1,7 @@
 package com.ssafy.backend.game.dto;
 
 import com.ssafy.backend.user.dto.UserProfileDto;
+import com.ssafy.backend.user.entity.UserProfile;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,21 @@ import lombok.Setter;
 public class UserRoomDto {
 
     private int userIndex;
-    private UserProfileDto player;
     private boolean isReady;
+    String userCode;
+    String nickName;
+    String tier;
+    String skin;
+    String title;
+
+    public UserRoomDto(int userIndex, UserProfileDto userProfileDto){
+        this.userIndex = userIndex;
+        isReady = false;
+        userCode = userProfileDto.getUserCode();
+        nickName = userProfileDto.getNickName();
+        tier = userProfileDto.getTier();
+        skin = userProfileDto.getSkin();
+        tier = userProfileDto.getTitle();
+    }
 
 }
