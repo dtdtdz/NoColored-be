@@ -9,7 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfileDto {
-    String token;//이건 로그인 후 자기정보일때만 not null
     String userCode;
     String nickName;
     long exp; //현재 경험치
@@ -29,9 +28,5 @@ public class UserProfileDto {
         this.tier = "nocolored"; //로직
         this.skin = userProfile.getUserSkin();
         this.title = userProfile.getUserTitle();
-    }
-    public UserProfileDto(UserProfile userProfile, String token){
-        this(userProfile);
-        this.token = token;
     }
 }
