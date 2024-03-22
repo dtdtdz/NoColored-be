@@ -1,7 +1,7 @@
 package com.ssafy.backend.websocket.domain;
 
 import com.ssafy.backend.game.domain.GameInfo;
-import com.ssafy.backend.game.domain.RoomInfo;
+import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import lombok.Getter;

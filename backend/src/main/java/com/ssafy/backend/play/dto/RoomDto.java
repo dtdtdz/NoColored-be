@@ -1,4 +1,4 @@
-package com.ssafy.backend.game.dto;
+package com.ssafy.backend.play.dto;
 
 
 import lombok.AllArgsConstructor;
@@ -6,12 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoomDto {
-//    private UUID gameId;//seq로 바꾸는거 생각해보셈 sequential UUID를 쓸까?
+
+    private UUID roomId; // 쿼리스트링으로 fe에 줘야함
     private String roomTitle;
     private String roomCodeString;
     private int masterIndex; // 방장의 위치.ranking에서는 null
