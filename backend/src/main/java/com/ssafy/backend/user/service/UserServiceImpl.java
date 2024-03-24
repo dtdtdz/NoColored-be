@@ -13,28 +13,32 @@ import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.concurrent.ScheduledExecutorService;
 
 @Service
 public class UserServiceImpl implements UserService {
 
+    public static final int defaultRating = 2000;
     private final UserProfileRepository userProfileRepository;
     private final UserInfoRepository userInfoRepository;
     private final JwtUtil jwtUtil;
     private final ScheduledExecutorService authScheduledExecutorService;
     private final SessionCollection sessionCollection;
+    private final RedisTemplate<String,Object> redisTemplate;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
                            @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
-                           SessionCollection sessionCollection
-                           ) {
+                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate
+    ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
         this.jwtUtil = jwtUtil;
         this.authScheduledExecutorService = authScheduledExecutorService;
         this.sessionCollection = sessionCollection;
+        this.redisTemplate = redisTemplate;
     }
 
     private String getUserCode() {
@@ -140,6 +144,32 @@ public class UserServiceImpl implements UserService {
         UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
         sessionCollection.userIdMap.put(userProfile.getId(), userAccessInfo);
         //계산해야됨 티어, 랭킹
+        //nocolored=맨처음
+        //bronze=1판함
+        //silver=3000까지
+        //gold=3500까지
+        //platinum=4200까지
+        //diamond=5000까지
+        //colored=상위10등
+        //rgb=상위5등
+        //origin=1등
+
+        // zset에 넣는거를 게임 끝날때마다 하자
+        
+        
+        // 레디스 zset으로 되어있음?->이거 어캐알음???아 넣을떄(게임끝날때) zset으로만 박자
+        // 가져오는 rating 값이 없을 수 있나?
+        // 기본
+        Integer rating= (Integer) redisTemplate.opsForValue().get(userProfile.getUserRating());
+        int userCount=redisTemplate.keys("*").size();
+
+
+
+
+
+
+
+
         userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
 //        authScheduledExecutorService.schedule(()->{
 //            if (!sessionCollection.userIdMap.containsKey(userProfile.getId())){

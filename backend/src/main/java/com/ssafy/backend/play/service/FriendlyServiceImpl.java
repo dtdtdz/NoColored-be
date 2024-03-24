@@ -2,13 +2,12 @@ package com.ssafy.backend.play.service;
 
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.MapInfo;
-import com.ssafy.backend.game.domain.RoomInfo;
+import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
-import com.ssafy.backend.game.dto.FriendlyRoomDto;
-import com.ssafy.backend.game.dto.RoomDto;
-import com.ssafy.backend.game.dto.UserRoomDto;
+import com.ssafy.backend.play.dto.FriendlyRoomDto;
+import com.ssafy.backend.play.dto.RoomDto;
+import com.ssafy.backend.play.dto.UserRoomDto;
 import com.ssafy.backend.user.dto.UserProfileDto;
-import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.websocket.domain.SendTextMessageType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,9 +57,9 @@ public class FriendlyServiceImpl implements FriendlyService {
         players[0]= new UserRoomDto(0, userAccessInfo.getUserProfileDto());
 
         // 1번부터 3번까지 세팅
-        for(int i=1;i<4;i++){
-            players[i]= new UserRoomDto(i, null);
-        }
+//        for(int i=1;i<4;i++){
+//            players[i]= new UserRoomDto(i, null);
+//        }
         roomDto.setPlayers(players);
         roomDto.setMapId(1); // 이거 고쳐야할듯
 
