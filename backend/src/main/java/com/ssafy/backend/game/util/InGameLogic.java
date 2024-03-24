@@ -16,16 +16,6 @@ public class InGameLogic {
     public InGameLogic(){
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
     }
-    public void scheduledLogic(GameInfo gameInfo){
-        switch (gameInfo.getGameCycle()){
-            case CREATE -> create(gameInfo);
-            case READY -> ready(gameInfo);
-            case PLAY -> play(gameInfo);
-            case CLOSE -> close(gameInfo);
-        }
-//        play(gameInfo);
-
-    }
     public void create(GameInfo gameInfo){
         gameInfo.tick();
         //http 요청을 10초 기다린다. -> gameinfo 생성자
@@ -205,8 +195,6 @@ public class InGameLogic {
         gameInfo.putStep();
         gameInfo.sendBuffer();
     }
-    public void close(GameInfo gameInfo){}
-
     public boolean indexCheck(int idx, int size){
         return idx>=0 && idx<size;
     }
