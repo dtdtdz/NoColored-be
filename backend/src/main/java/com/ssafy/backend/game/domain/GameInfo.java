@@ -162,7 +162,7 @@ public class GameInfo {
 
     public boolean isAllReady(){
         for (Map.Entry<WebSocketSession, UserGameInfo> entry:users.entrySet()){
-            if (!entry.getValue().isAccess()) return true;
+            if (!entry.getValue().isAccess()) return false;
         }
         return true;
     }

@@ -55,7 +55,7 @@ public class GameServiceImpl implements GameService {
     public void scheduleTaskAfterStartup() {
         long initialDelay = 0; // 시작 지연 없음
         long period = 16_666; // 17ms
-
+        
         // 여기에 반복 실행할 태스크의 로직을 작성
         //            System.out.println("태스크 실행: " + System.currentTimeMillis());
         future = scheduledExecutorService.scheduleAtFixedRate(this::gameLogic, initialDelay, period, TimeUnit.MICROSECONDS);
