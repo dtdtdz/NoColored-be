@@ -34,10 +34,12 @@ public class MatchingCollection {
     public void setAddMatching(UserAccessInfo userAccessInfo){
 //        System.out.println("set!");
         MatchingInfo matchingInfo = new MatchingInfo(userAccessInfo);
+        userAccessInfo.setMatchingInfo(matchingInfo);
         matchingInfoMap.put(userAccessInfo, matchingInfo);
         synchronized (addQueue){
             addQueue.offer(userAccessInfo);
         }
+
     }
     public void setDelMatching(UserAccessInfo userAccessInfo){
         synchronized (delQueue){
@@ -49,6 +51,7 @@ public class MatchingCollection {
             while (!delQueue.isEmpty()) {
                 UserAccessInfo userAccessInfo = delQueue.poll();
                 delMatching(userAccessInfo);
+                userAccessInfo.clearPosition();
                 WebSocketSession session = userAccessInfo.getSession();
                 SynchronizedSend.textSend(session,
                         SendTextMessageType.MATCHING_CANCEL.getValue(), null);

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 
 @RestController
@@ -34,18 +35,15 @@ public class FriendlyController {
     private ResponseEntity<?> findRoomUuId(@RequestBody Map<String, Object> requestBody){
         int code = Integer.parseInt((requestBody.get("roomCode").toString()));
         String password=(String) requestBody.get("roomPassword");
-
-        return ResponseEntity.ok("");
+        return ResponseEntity.ok(friendlyService.findRoomId(code, password));
     }
 
-    @PatchMapping("enter")
-    private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody ){
+    @PatchMapping("enter/{uuid}")
+    private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @PathVariable("uuid")UUID uuid){
 
-        int code=Integer.parseInt(requestBody.get("roomCode").toString());
-        String password=(String) requestBody.get("roomPassword");
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
 
-        return friendlyService.enterRoom(code, password, userAccessInfo);
+        return friendlyService.enterRoom(uuid, userAccessInfo);
     }
 
     @PostMapping
