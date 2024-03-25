@@ -12,7 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoomInfo {
-    private UUID roomUuid;
     private UserAccessInfo[] userAccessInfos;
     private int roomCodeInt;
     private RoomDto roomDto;

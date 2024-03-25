@@ -26,10 +26,11 @@ public class GameInfo {
     private List<byte[]> stepList;
     private Random random;
     private GameRoomDto gameRoomDto;
+    public UUID roomUuid;
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_SPEED = 160;
-    public static final int MAX_PLAYER = 4;
+    public static final int MAX_PLAYER = 2;
     public static final float GRAVITY = 200;
     public static final int BLOCK_SIZE = 18;
     public static final int MAP_HEIGHT = 19;

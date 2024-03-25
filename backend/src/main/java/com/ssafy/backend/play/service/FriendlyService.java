@@ -3,6 +3,8 @@ package com.ssafy.backend.play.service;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.http.ResponseEntity;
 
+import java.util.UUID;
+
 public interface FriendlyService {
 
     ResponseEntity<?> createRoom(String roomTitle, String roomPassword, int mapId, UserAccessInfo userAccessInfo);
@@ -11,7 +13,7 @@ public interface FriendlyService {
 
     ResponseEntity<?> findRoomId(int code, String password);
 
-    ResponseEntity<?> enterRoom(int code, String password, UserAccessInfo userAccessInfo);
+    ResponseEntity<?> enterRoom(UUID uuid, UserAccessInfo userAccessInfo);
 
     ResponseEntity<?> readyRoom(UserAccessInfo userAccessInfo);
 

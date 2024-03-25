@@ -19,9 +19,9 @@ public class RoomDto {
     private String roomCode;
     private int masterIndex; // 방장의 위치.ranking에서는 null
     private String roomPassword;
-    private UserRoomDto[] players;
     private int mapId;
-
+    private boolean[] readyState;
+    private UserRoomDto[] players;
 //    public RoomDto(UserAccessInfo user, int mapId, String title){//친선전 생성
 //        userArr = new UserProfileDto[GameInfo.MAX_PLAYER];
 //        userArr[0] = new UserProfileDto(user.getUserProfile());
