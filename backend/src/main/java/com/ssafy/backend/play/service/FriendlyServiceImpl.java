@@ -1,7 +1,6 @@
 package com.ssafy.backend.play.service;
 
 import com.ssafy.backend.assets.SynchronizedSend;
-import com.ssafy.backend.game.domain.MapInfo;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.play.dto.FriendlyRoomDto;
@@ -23,8 +22,8 @@ public class FriendlyServiceImpl implements FriendlyService {
     public static int roomCode=1000;
 
     // roomcode, roominfo가 담긴 맵
-    private Map<Integer, RoomInfo> roomInfoMap =Collections.synchronizedMap(new HashMap<>());
-
+    private Map<Integer, RoomInfo> roomInfoMap = Collections.synchronizedMap(new HashMap<>());
+    private Map<UUID, RoomInfo> uuidRoomInfoMap = Collections.synchronizedMap(new HashMap<>());
     // 대기실 생성
     @Override
     public synchronized ResponseEntity<?> createRoom(String roomTitle, String roomPassword, int mapId, UserAccessInfo userAccessInfo){
@@ -47,7 +46,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         // roomdto 세팅
         RoomDto roomDto=new RoomDto();
         roomDto.setRoomTitle(roomTitle);
-        roomDto.setRoomCodeString(String.valueOf(roomInfo.getRoomCodeInt()));
+        roomDto.setRoomCode(String.valueOf(roomInfo.getRoomCodeInt()));
         roomDto.setMasterIndex(0);
         roomDto.setRoomPassword(roomPassword);
 
@@ -105,7 +104,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                 }
                 FriendlyRoomDto friendlyRoomDto = new FriendlyRoomDto();
                 friendlyRoomDto.setRoomTitle(roomInfo.getRoomDto().getRoomTitle());
-                friendlyRoomDto.setRoomCode(roomInfo.getRoomDto().getRoomCodeString());
+                friendlyRoomDto.setRoomCode(roomInfo.getRoomDto().getRoomCode());
                 friendlyRoomDto.setMapId(roomInfo.getRoomDto().getMapId());
                 // 유저 수 계산
                 int userNumber = (int) Arrays.stream(roomInfo.getUserAccessInfos()).filter(Objects::nonNull).count();

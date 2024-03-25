@@ -22,16 +22,17 @@ public class InGameLogic {
         //모든 유저준비 완료
         //사람 없으면 게임 제거
         if (gameInfo.isAllReady() || gameInfo.checkSecond() && gameInfo.getSecond()<=0){
+            gameInfo.putStart();
 //            3초 카운트 시작
             for (Map.Entry<WebSocketSession,UserGameInfo> entry: gameInfo.getUsers().entrySet()) {
                 gameInfo.putSetCharacter(entry.getKey());
             }
-            gameInfo.putTestMap();
-            gameInfo.putPhysicsState();
+
             gameInfo.setSecond(3);
             gameInfo.putTime();
             gameInfo.goToNextCycle();
-            gameInfo.putStart();
+            gameInfo.putPhysicsState();
+            gameInfo.putTestMap();
             gameInfo.sendBuffer();
         }
     }

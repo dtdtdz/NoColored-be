@@ -16,7 +16,7 @@ public class RoomDto {
 
     private UUID roomId; // 쿼리스트링으로 fe에 줘야함
     private String roomTitle;
-    private String roomCodeString;
+    private String roomCode;
     private int masterIndex; // 방장의 위치.ranking에서는 null
     private String roomPassword;
     private UserRoomDto[] players;
