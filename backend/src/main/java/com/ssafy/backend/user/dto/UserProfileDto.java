@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 public class UserProfileDto {
     String userCode;
-    String nickName;
+    String nickname;
     long exp; //현재 경험치
     long expRequire; //현재 레벨 필요경험치
     int level;
@@ -21,7 +21,7 @@ public class UserProfileDto {
     String title;
     public UserProfileDto(UserProfile userProfile){
         this.userCode = userProfile.getUserCode();
-        this.nickName = userProfile.getUserNickname();
+        this.nickname = userProfile.getUserNickname();
         this.exp = userProfile.getUserExp();
         this.isGuest = userProfile.isGuest();
         this.rating = userProfile.getUserRating();

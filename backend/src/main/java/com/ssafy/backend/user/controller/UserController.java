@@ -79,7 +79,6 @@ public class UserController {
             userService.updatePassword(token, map.get("newPassword"),map.get("prePassword"));
             return ResponseEntity.ok("Password updated successfully.");
         } catch (Exception e){
-//            throw e;
             return ResponseEntity.internalServerError().body("Failed to delete user");
         }
     }

@@ -57,12 +57,14 @@ public class JwtUtil {
     }
 
     public UserAccessInfo getUserAccessInfoRedis(String token){
+        if (token==null|| token.isEmpty()) throw new RuntimeException("Missing token");
         Object value = null;
         synchronized (redisTemplate){
             value = redisTemplate.opsForValue().get(tokenKey(token));
         }
 
         if (value==null) return null;
+//            throw new RuntimeException("Token is invalid");
         UUID id = UUID.fromString((String) value);
         if (sessionCollection.userIdMap.containsKey(id)){
             return sessionCollection.userIdMap.get(id);

@@ -67,7 +67,6 @@ public class FriendlyServiceImpl implements FriendlyService {
         roomInfo.setUserAccessInfos(new UserAccessInfo[] {userAccessInfo,null,null,null});
         roomInfo.setRoomDto(roomDto);
         roomInfo.setGameStart(false);
-        roomInfo.setMapInfo(new MapInfo()); // 고치기
         userAccessInfo.setRoomInfo(roomInfo);
         roomInfoMap.put(roomInfo.getRoomCodeInt(),roomInfo);
         // 리턴
@@ -107,7 +106,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                 FriendlyRoomDto friendlyRoomDto = new FriendlyRoomDto();
                 friendlyRoomDto.setRoomTitle(roomInfo.getRoomDto().getRoomTitle());
                 friendlyRoomDto.setRoomCode(roomInfo.getRoomDto().getRoomCodeString());
-                friendlyRoomDto.setMapId(roomInfo.getMapInfo().getMapId());
+                friendlyRoomDto.setMapId(roomInfo.getRoomDto().getMapId());
                 // 유저 수 계산
                 int userNumber = (int) Arrays.stream(roomInfo.getUserAccessInfos()).filter(Objects::nonNull).count();
                 friendlyRoomDto.setUserNumber(userNumber);
@@ -116,6 +115,12 @@ public class FriendlyServiceImpl implements FriendlyService {
             }
         }
         return ResponseEntity.ok(paginatedFriendlyRooms);
+    }
+
+    @Override
+    public ResponseEntity<?> findRoomId(int code, String password) {
+//        roomInfoMap.get(code).getRoomCodeInt()
+        return null;
     }
 
     @Override
@@ -284,7 +289,6 @@ public class FriendlyServiceImpl implements FriendlyService {
                     roomDto.setRoomTitle(title);
                     roomDto.setRoomPassword(password);
                     roomInfo.setRoomDto(roomDto);
-                    roomInfo.setMapInfo(new MapInfo()); // 맵인포 고쳐야함!!!!!!!!!
                     return ResponseEntity.ok("대기실 정보 수정 완료입니다.");
                 }
             }

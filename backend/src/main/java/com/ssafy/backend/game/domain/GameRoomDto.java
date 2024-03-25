@@ -10,6 +10,6 @@ import java.util.List;
 public class GameRoomDto {
 
     public int mapId;
-    public boolean[][] floor;
+    public List<int[]> floorList;
     public List<String> skins;
 }
