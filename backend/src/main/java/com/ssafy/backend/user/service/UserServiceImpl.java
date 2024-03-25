@@ -92,6 +92,8 @@ public class UserServiceImpl implements UserService {
         userProfile.setUserNickname(userSignDto.getNickname());
 
         userProfileRepository.save(userProfile);
+        userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
+
         UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
                 .userId(userSignDto.getId())
@@ -163,13 +165,6 @@ public class UserServiceImpl implements UserService {
         Integer rating= (Integer) redisTemplate.opsForValue().get(userProfile.getUserRating());
         int userCount=redisTemplate.keys("*").size();
 
-
-
-
-
-
-
-
         userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
 //        authScheduledExecutorService.schedule(()->{
 //            if (!sessionCollection.userIdMap.containsKey(userProfile.getId())){
@@ -195,8 +190,9 @@ public class UserServiceImpl implements UserService {
     public void updatePassword(String token, String pwd, String prePwd) {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
         if (!prePwd.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId())))
-            throw new RuntimeException("잘못된 패스워드 입력입니다");
-
+            throw new RuntimeException("Wrong password");
+        if (pwd.length()<6 || pwd.length()>20)
+            throw new RuntimeException("Password does not meet the length requirements (6-20 characters).");
         userInfoRepository.updatePassword(user.getUserProfile().getId(), pwd);
     }
 
@@ -204,14 +200,18 @@ public class UserServiceImpl implements UserService {
     public void updateNickname(String token, String nickname) {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
         userProfileRepository.updateNickname(user.getUserProfile().getId(), nickname);
+        user.getUserProfile().setUserNickname(nickname);
+        user.setUserProfileDto(new UserProfileDto(user.getUserProfile()));
     }
 
     @Override
     public void deleteUser(String token, String prePwd) {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
         if (!prePwd.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId())))
-            throw new RuntimeException("잘못된 패스워드 입력입니다");
+            throw new RuntimeException("Wrong password");
         userInfoRepository.deleteUser(user.getUserProfile().getId());
+        //token 제거
+        jwtUtil.deleteTokenRedis(token);
     }
 
     @Override
