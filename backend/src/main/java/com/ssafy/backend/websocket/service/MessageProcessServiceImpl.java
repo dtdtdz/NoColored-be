@@ -68,9 +68,11 @@ public class MessageProcessServiceImpl implements MessageProcessService{
 //                System.out.println(result.getUserProfile().getId());
             } else {
                 SynchronizedSend.textSend(session, "invalidToken", null);
+                session.close();
             }
         } else {
             SynchronizedSend.textSend(session, "unknownAction", null);
+            session.close();
 //            System.out.println("Unknown action: " + action);
         }
     }
@@ -102,6 +104,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         authScheduledExecutorService.schedule(()->{
             if (!sessionCollection.userWebsocketMap.containsKey(session)){
                 try {
+                    if (!session.isOpen()) return;
                     SynchronizedSend.textSend(session, SendTextMessageType.WEBSOCKET_TIME_OUT.getValue(), null);
                     session.close();
                 } catch (IOException e) {
