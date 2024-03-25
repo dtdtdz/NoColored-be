@@ -25,7 +25,7 @@ public class FriendlyController {
         this.jwtUtil = jwtUtil;
     }
 
-    @GetMapping("/{offset}")
+    @GetMapping("list/{offset}")
     private ResponseEntity<?> getRoomList(@PathVariable("offset") int offset){
         return friendlyService.getRoomList(offset);
     }
