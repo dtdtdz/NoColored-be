@@ -9,9 +9,9 @@ public enum SendTextMessageType {
     // sendbinarymessagetype처럼 만들고
     // synchronizedsend 참고해서 보내면 된다
     UNKNOWN_ACTION("unknownAction"),
-    WEBSOCKET_TIME_OUT("WebsocketTimeOut"),
+    WEBSOCKET_TIME_OUT("websocketTimeOut"),
     INVALID_TOKEN("invalidToken"),
-    AUTHORIZATION("authorization"),
+    AUTHORIZED("authorized"),
     MATCHING("matching"),
     MATCHING_CANCEL("matchingCancel"),
     READY_ON("readyOn"),

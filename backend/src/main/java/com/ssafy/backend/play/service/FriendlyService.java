@@ -9,6 +9,8 @@ public interface FriendlyService {
 
     ResponseEntity<?> getRoomList(int offset);
 
+    ResponseEntity<?> findRoomId(int code, String password);
+
     ResponseEntity<?> enterRoom(int code, String password, UserAccessInfo userAccessInfo);
 
     ResponseEntity<?> readyRoom(UserAccessInfo userAccessInfo);

@@ -139,7 +139,7 @@ public class GameInfo {
             skins.add(userAccessInfo.getUserProfile().getUserSkin());
         }
         gameRoomDto.setSkins(skins);
-        gameRoomDto.setFloor(floor);
+        gameRoomDto.setFloorList(mapInfo.getFloorList());
         gameRoomDto.setMapId(mapInfo.getMapId());
     }
 

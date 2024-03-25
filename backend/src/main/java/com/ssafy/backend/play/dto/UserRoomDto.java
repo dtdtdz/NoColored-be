@@ -1,7 +1,6 @@
 package com.ssafy.backend.play.dto;
 
 import com.ssafy.backend.user.dto.UserProfileDto;
-import com.ssafy.backend.user.entity.UserProfile;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +24,7 @@ public class UserRoomDto {
         this.userIndex = userIndex;
         isReady = false;
         userCode = userProfileDto.getUserCode();
-        nickName = userProfileDto.getNickName();
+        nickName = userProfileDto.getNickname();
         tier = userProfileDto.getTier();
         skin = userProfileDto.getSkin();
         title = userProfileDto.getTitle();

@@ -5,15 +5,17 @@ import com.ssafy.backend.play.dto.RoomDto;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoomInfo {
-
+    private UUID roomUuid;
     private UserAccessInfo[] userAccessInfos;
     private int roomCodeInt;
     private RoomDto roomDto;
     private boolean isGameStart;
-    private MapInfo mapInfo;
+//    private MapInfo mapInfo;
 }
