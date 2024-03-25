@@ -1,6 +1,7 @@
 package com.ssafy.backend.websocket.domain;
 
 import com.ssafy.backend.game.domain.GameInfo;
+import com.ssafy.backend.play.domain.MatchingInfo;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
@@ -34,10 +35,16 @@ public class UserAccessInfo {
     }
 
     public void setGameInfo(GameInfo gameInfo){
+        if (!(position instanceof RoomInfo || position instanceof MatchingInfo)) throw new RuntimeException("Position conflict");
         position = gameInfo;
     }
 
+    public void setMatchingInfo(MatchingInfo matchingInfo){
+        if (position instanceof GameInfo || position instanceof MatchingInfo) throw new RuntimeException("Position conflict");
+        position = matchingInfo;
+    }
     public void setRoomInfo(RoomInfo roomInfo){
+        if (position instanceof MatchingInfo || position instanceof RoomInfo) throw new RuntimeException("Position conflict");
         position = roomInfo;
     }
 
