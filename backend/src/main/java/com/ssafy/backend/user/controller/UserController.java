@@ -106,7 +106,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/dup/{id}")
     private ResponseEntity<Boolean> existsUserId(@PathVariable("id") String id){
         return ResponseEntity.ok(userService.existsUserId(id));
     }

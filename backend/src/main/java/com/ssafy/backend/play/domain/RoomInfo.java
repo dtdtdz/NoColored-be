@@ -1,6 +1,7 @@
-package com.ssafy.backend.game.domain;
+package com.ssafy.backend.play.domain;
 
-import com.ssafy.backend.game.dto.RoomDto;
+import com.ssafy.backend.game.domain.MapInfo;
+import com.ssafy.backend.play.dto.RoomDto;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.*;
 

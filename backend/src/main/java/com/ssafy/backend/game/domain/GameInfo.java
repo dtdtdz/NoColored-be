@@ -25,6 +25,7 @@ public class GameInfo {
     private boolean[][] floor;
     private List<byte[]> stepList;
     private Random random;
+    private GameRoomDto gameRoomDto;
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_SPEED = 160;
@@ -132,6 +133,14 @@ public class GameInfo {
             characterInfoArr[idxs.get(i)] = characterInfo;
         }
 
+        gameRoomDto = new GameRoomDto();
+        List<String> skins = new LinkedList<>();
+        for (UserAccessInfo userAccessInfo:userList){
+            skins.add(userAccessInfo.getUserProfile().getUserSkin());
+        }
+        gameRoomDto.setSkins(skins);
+        gameRoomDto.setFloor(floor);
+        gameRoomDto.setMapId(mapInfo.getMapId());
     }
 
 //    private GameInfo(int num){ //리팩토링 필요

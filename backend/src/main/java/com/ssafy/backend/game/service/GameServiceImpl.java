@@ -43,10 +43,12 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public synchronized void ready(String token) {
+    public synchronized GameRoomDto ready(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         GameInfo gameInfo = userAccessInfo.getGameInfo();
+        if (gameInfo==null) return null;
         gameInfo.getUsers().get(userAccessInfo.getSession()).setAccess(true);
+        return gameInfo.getGameRoomDto();
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -81,7 +83,15 @@ public class GameServiceImpl implements GameService {
 
                 } else {
                     try {
-                        inGameLogic.scheduledLogic(gameInfo);
+                       switch (gameInfo.getGameCycle()){
+                            case CREATE -> inGameLogic.create(gameInfo);
+                            case READY -> inGameLogic.ready(gameInfo);
+                            case PLAY -> inGameLogic.play(gameInfo);
+                            case CLOSE -> gameClose(gameInfo);
+
+                            //        play(gameInfo);
+
+                        }
                     } catch (Exception e){
                         e.printStackTrace();
                         throw e;
@@ -95,6 +105,8 @@ public class GameServiceImpl implements GameService {
 
     }
 
+    private void gameClose(GameInfo gameInfo){
 
+    }
 
 }

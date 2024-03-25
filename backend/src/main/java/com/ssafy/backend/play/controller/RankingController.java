@@ -15,16 +15,12 @@ public class RankingController {
     @GetMapping
     private ResponseEntity<?> addMatchingList(@RequestHeader("Authorization") String token){
         rankingService.addMatchingList(token);
-        return ResponseEntity.ok("매칭 시작");
+        return ResponseEntity.ok("Started Matching.");
     }
     @DeleteMapping
     private ResponseEntity<?> delMatchingList(@RequestHeader("Authorization") String token){
         rankingService.delMatchingList(token);
-        return ResponseEntity.ok("매칭 취소");
+        return ResponseEntity.ok("Canceled Matching");
     }
 
-    @GetMapping("/test")
-    private ResponseEntity<String> test() throws Exception{
-        return ResponseEntity.ok("");
-    }
 }
