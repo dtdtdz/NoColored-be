@@ -29,7 +29,16 @@ public class FriendlyController {
     private ResponseEntity<?> getRoomList(@PathVariable("offset") int offset){
         return friendlyService.getRoomList(offset);
     }
-    @PatchMapping
+
+    @PostMapping("uuid")
+    private ResponseEntity<?> findRoomUuId(@RequestBody Map<String, Object> requestBody){
+        int code = Integer.parseInt((requestBody.get("roomCode").toString()));
+        String password=(String) requestBody.get("roomPassword");
+
+        return ResponseEntity.ok("");
+    }
+
+    @PatchMapping("enter")
     private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody ){
 
         int code=Integer.parseInt(requestBody.get("roomCode").toString());
@@ -39,7 +48,7 @@ public class FriendlyController {
         return friendlyService.enterRoom(code, password, userAccessInfo);
     }
 
-    @PostMapping()
+    @PostMapping
     private ResponseEntity<?> createRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody){
         // requestbody를 service로 보내서 한번에 처리 가능한거 아님??? 나중에 고쳐라
         String roomTitle = (String) requestBody.get("roomTitle");
