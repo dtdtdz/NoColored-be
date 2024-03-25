@@ -13,7 +13,8 @@ public interface UserService {
     String login(String id, String password);
     void updatePassword(String token, String pwd, String prePwd);
     void updateNickname(String token, String nickname);
-    void deleteUser(String token, String prePwd);
+    boolean confirmUser(String token, String password);
+    void deleteUser(String token);
     boolean existsUserId(String userId);
     UserProfileDto findUserInfo(String userCode);
 }

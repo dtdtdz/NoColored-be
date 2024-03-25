@@ -17,6 +17,7 @@ public class UserProfileDto {
     boolean isGuest;
     int rating;
     String tier;
+    int rank;
     String skin;
     String title;
     public UserProfileDto(UserProfile userProfile){

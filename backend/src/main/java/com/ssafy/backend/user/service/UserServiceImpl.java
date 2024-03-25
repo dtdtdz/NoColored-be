@@ -205,10 +205,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(String token, String prePwd) {
+    public boolean confirmUser(String token, String password) {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
-        if (!prePwd.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId())))
-            throw new RuntimeException("Wrong password");
+
+        return password.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId()));
+    }
+
+    @Override
+    public void deleteUser(String token) {
+        UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
         userInfoRepository.deleteUser(user.getUserProfile().getId());
         //token 제거
         jwtUtil.deleteTokenRedis(token);

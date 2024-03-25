@@ -94,11 +94,17 @@ public class UserController {
         }
     }
 
+    @PostMapping("/confirm")
+    private ResponseEntity<Boolean> confirm(@RequestHeader("Authorization") String token,
+                                            @RequestBody Map<String, String> map){
+
+        return ResponseEntity.ok(userService.confirmUser(token, map.get("password")));
+    }
+
     @DeleteMapping
-    private ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token,
-                                                  @RequestBody Map<String, String> map){
+    private ResponseEntity<String> deleteUser(@RequestHeader("Authorization") String token){
         try {
-            userService.deleteUser(token, map.get("password"));
+            userService.deleteUser(token);
             return ResponseEntity.ok("User deleted successfully.");
         } catch (Exception e){
             return ResponseEntity.internalServerError().body("Failed to delete user");
