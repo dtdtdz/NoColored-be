@@ -102,7 +102,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         authScheduledExecutorService.schedule(()->{
             if (!sessionCollection.userWebsocketMap.containsKey(session)){
                 try {
-                    SynchronizedSend.textSend(session, SendTextMessageType.LOGIN_FAILED.getValue(), null);
+                    SynchronizedSend.textSend(session, SendTextMessageType.WEBSOCKET_TIME_OUT.getValue(), null);
                     session.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
