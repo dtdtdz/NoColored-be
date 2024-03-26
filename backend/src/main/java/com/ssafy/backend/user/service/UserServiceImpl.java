@@ -162,8 +162,8 @@ public class UserServiceImpl implements UserService {
         // 레디스 zset으로 되어있음?->이거 어캐알음???아 넣을떄(게임끝날때) zset으로만 박자
         // 가져오는 rating 값이 없을 수 있나?
         // 기본
-        Integer rating= (Integer) redisTemplate.opsForValue().get(userProfile.getUserRating());
-        int userCount=redisTemplate.keys("*").size();
+//        Integer rating= (Integer) redisTemplate.opsForValue().get(userProfile.getUserRating());
+//        int userCount=redisTemplate.keys("*").size();
 
         userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
 //        authScheduledExecutorService.schedule(()->{
