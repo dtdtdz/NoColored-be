@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/ingame")
 public class InGameController {
@@ -30,11 +33,29 @@ public class InGameController {
 
     @GetMapping("/ready/dummy")
     private ResponseEntity<?> readyDummy(@RequestHeader("Authorization") String token){
-//        GameRoomDto gameRoomDto = gameService.ready(token);
+        GameRoomDto gameRoomDto = new GameRoomDto();
+        gameRoomDto.setMapId(1);
+        List<String> list = new LinkedList<>();
+        list.add("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-butterfly.png");
+        list.add("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-magichat.png");
+        gameRoomDto.setSkins(list);
+
+        List<int[]> list2 = new LinkedList<>();
+        list2.add(new int[]{5,5,6});
+        list2.add(new int[]{15,5,5});
+        list2.add(new int[]{23,5,5});
+        list2.add(new int[]{7,9,8});
+        list2.add(new int[]{20,9,5});
+        list2.add(new int[]{3,13,6});
+        list2.add(new int[]{13,13,7});
+        list2.add(new int[]{24,13,6});
+        list2.add(new int[]{9,17,15});
+
+        gameRoomDto.setFloorList(list2);
 //        if (gameRoomDto!=null){
 //            return ResponseEntity.internalServerError().body("Game containing the player not found");
 //        }
 
-        return ResponseEntity.ok("{\"mapId\":1,\"floorList\":[[5,5,6],[15,5,5],[23,5,5],[7,9,8],[20,9,5],[3,13,6],[13,13,7],[24,13,6],[9,17,15]],\"skins\":[\"\",\"\"]}");
+        return ResponseEntity.ok(gameRoomDto);
     }
 }
