@@ -171,8 +171,7 @@ public class InGameLogic {
                         gameInfo.getStepList().add(new byte[]{ user.getPlayerNum(),
                                 curC.getUserGameInfo().getPlayerNum(),
                                 user.getCharacterNum(),
-                                curC.getUserGameInfo().getCharacterNum(),
-                                user.getScore()});
+                                curC.getUserGameInfo().getCharacterNum()});
                     }
 
                     break;//밟힌 캐릭터는 더 밟힐 수 없다.

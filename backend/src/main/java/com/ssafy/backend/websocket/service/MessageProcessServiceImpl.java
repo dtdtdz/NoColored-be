@@ -63,15 +63,15 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             if (result!=null) {
                 result.setSession(session);
                 sessionCollection.userWebsocketMap.put(session, result);
-                SynchronizedSend.textSend(session, "authorization",null);
+                SynchronizedSend.textSend(session, SendTextMessageType.AUTHORIZED.getValue(), null);
 //                System.out.println(result.getUserProfile().getUserNickname());
 //                System.out.println(result.getUserProfile().getId());
             } else {
-                SynchronizedSend.textSend(session, "invalidToken", null);
+                SynchronizedSend.textSend(session, SendTextMessageType.INVALID_TOKEN.getValue(), null);
                 session.close();
             }
         } else {
-            SynchronizedSend.textSend(session, "unknownAction", null);
+            SynchronizedSend.textSend(session, SendTextMessageType.UNKNOWN_ACTION.getValue(), null);
             session.close();
 //            System.out.println("Unknown action: " + action);
         }

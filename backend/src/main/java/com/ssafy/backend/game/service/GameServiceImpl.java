@@ -106,6 +106,11 @@ public class GameServiceImpl implements GameService {
     }
 
     private void gameClose(GameInfo gameInfo){
+//        roomUuid있으면 해당 룸으로 보낸다.
+        if (gameInfo.getRoomUuid()!=null){
+
+        }
+
 
     }
 
