@@ -11,11 +11,11 @@ public enum SendBinaryMessageType {
     START((byte) 0),
     SET_CHARACTER((byte) 1),
     TIME((byte) 2),
-    ITEM_CREATE((byte) 3),
+    ITEM((byte) 3), //event
     GAME_END((byte) 10),
     PHYSICS_STATE((byte) 100),
     STEP((byte) 101),
-    ITEM_USE((byte) 102),
+    ITEM_USE((byte) 102), //event
     TEST_MAP((byte) 200);
 
     private final byte value;

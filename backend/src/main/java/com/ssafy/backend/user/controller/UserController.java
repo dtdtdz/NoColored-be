@@ -4,6 +4,7 @@ import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.dto.UserSignDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -66,7 +67,9 @@ public class UserController {
     @PostMapping("/login")
     private ResponseEntity<String> login(@RequestBody UserSignDto user){
         try {
-            return ResponseEntity.ok(userService.login(user.getId(),user.getPassword()));
+            String token = userService.login(user.getId(),user.getPassword());
+            if (token==null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("잘못된 접근입니다.");
+            return ResponseEntity.ok(token);
         } catch (Exception e){
             return ResponseEntity.badRequest().body("Login failed");
         }

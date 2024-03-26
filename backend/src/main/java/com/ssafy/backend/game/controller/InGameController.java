@@ -27,4 +27,14 @@ public class InGameController {
 
         return ResponseEntity.ok(gameRoomDto);
     }
+
+    @GetMapping("/ready/dummy")
+    private ResponseEntity<?> readyDummy(@RequestHeader("Authorization") String token){
+        GameRoomDto gameRoomDto = gameService.ready(token);
+        if (gameRoomDto==null){
+            return ResponseEntity.internalServerError().body("Game containing the player not found");
+        }
+
+        return ResponseEntity.ok("{\"mapId\":1,\"floorList\":[[5,5,6],[15,5,5],[23,5,5],[7,9,8],[20,9,5],[3,13,6],[13,13,7],[24,13,6],[9,17,15]],\"skins\":[\"\",\"\"]}");
+    }
 }

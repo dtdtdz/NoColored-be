@@ -26,7 +26,8 @@ public class GameInfo {
     private List<byte[]> stepList;
     private Random random;
     private GameRoomDto gameRoomDto;
-    public UUID roomUuid;
+    private UUID roomUuid;
+
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_SPEED = 160;
@@ -247,7 +248,7 @@ public class GameInfo {
             buffer[i].put(SendBinaryMessageType.STEP.getValue())
                     .put((byte) stepList.size());
             for (int j=0; j<stepList.size(); j++){
-                buffer[i].put(stepList.get(j)[0]).put(stepList.get(j)[1]).put(stepList.get(j)[2]);
+                buffer[i].put(stepList.get(j));
             }
         }
         stepList.clear();
@@ -260,7 +261,16 @@ public class GameInfo {
                 buffer[i].put((byte) arr[0]).put((byte) arr[1]).put((byte) arr[2]);
             }
         }
+    }
 
+    public void putScore(){
+        Set<Map.Entry<WebSocketSession, UserGameInfo>> entrySet = users.entrySet();
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put((byte)102).put((byte) users.size());
+            for (Map.Entry<WebSocketSession, UserGameInfo> entry:users.entrySet()){
+                buffer[i].put(entry.getValue().getScore());
+            }
+        }
     }
 
     //세션과 캐릭터를 매핑한다.
