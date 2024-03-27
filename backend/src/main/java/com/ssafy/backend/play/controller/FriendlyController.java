@@ -35,7 +35,7 @@ public class FriendlyController {
     private ResponseEntity<?> findRoomUuId(@RequestBody Map<String, Object> requestBody){
         int code = Integer.parseInt((requestBody.get("roomCode").toString()));
         String password=(String) requestBody.get("roomPassword");
-        return ResponseEntity.ok(friendlyService.findRoomId(code, password));
+        return friendlyService.findRoomId(code, password);
     }
 
     @PatchMapping("lobby/{uuid}")
@@ -53,7 +53,7 @@ public class FriendlyController {
         String roomPassword = (String) requestBody.get("roomPassword");
         int mapId = Integer.parseInt(requestBody.get("mapId").toString());
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-
+        System.out.println(token);
         return friendlyService.createRoom(roomTitle,roomPassword,mapId,userAccessInfo);
     }
 

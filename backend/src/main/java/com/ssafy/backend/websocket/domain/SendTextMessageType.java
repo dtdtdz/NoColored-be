@@ -14,12 +14,9 @@ public enum SendTextMessageType {
     AUTHORIZED("authorized"),
     MATCHING("matching"),
     MATCHING_CANCEL("matchingCancel"),
-    READY_ON("readyOn"),
-    READY_OFF("readyOff"),
+    READY_STATE("readyState"),
     GAME_START("gameStart"),
-    QUIT_PLAYER("quitPlayer"),
-    QUIT_MASTER("quitMaster"),
-    NEW_USER("newUser");
+    ROOM_INFO("roomInfo");
 
     private final String value;
     private static final Map<String, SendTextMessageType> textMap = new HashMap<>();
