@@ -1,6 +1,8 @@
 package com.ssafy.backend.game.util;
 
 import com.ssafy.backend.game.domain.*;
+import com.ssafy.backend.game.service.GameService;
+import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
@@ -27,15 +29,22 @@ public class InGameCollection {
 //        GameInfo gameInfo = new GameInfo();
 //        for (UserAccessInfo user:roomDto.getUserArr())
 //    }
+    public void addGame(RoomInfo roomInfo){
+        List<UserAccessInfo> users = Arrays.asList(roomInfo.getUserAccessInfos());
+        users.removeIf(Objects::isNull);//null값 제거
+
+        GameInfo gameInfo = new GameInfo(users, roomInfo.getRoomDto().getRoomId());
+        for (UserAccessInfo user:users){
+            user.setGameInfo(gameInfo);
+        }
+        addQueue.offer(gameInfo);
+    }
+
     public void addGame(List<UserAccessInfo> users){
         GameInfo gameInfo = new GameInfo(users);
         for (UserAccessInfo user:users){
             user.setGameInfo(gameInfo);
         }
-//        gameInfo.putTime();
-//        gameInfo.putTestMap();
-
-        gameInfo.sendBuffer();
         addQueue.offer(gameInfo);
     }
 

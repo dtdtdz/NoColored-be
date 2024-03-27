@@ -81,7 +81,10 @@ public class GameInfo {
     }
 
     private GameCycle gameCycle;
-
+    public GameInfo(List<UserAccessInfo> userList, UUID roomUuid){
+        this(userList);
+        this.roomUuid = roomUuid;
+    }
     public GameInfo(List<UserAccessInfo> userList){
         startDate = LocalDateTime.now();
         setSecond(10);

@@ -12,17 +12,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserRoomDto {
 
-    private int userIndex;
-    private boolean isReady;
     String userCode;
     String nickName;
     String tier;
     String skin;
     String title;
 
-    public UserRoomDto(int userIndex, UserProfileDto userProfileDto){
-        this.userIndex = userIndex;
-        isReady = false;
+    public UserRoomDto(UserProfileDto userProfileDto){
         userCode = userProfileDto.getUserCode();
         nickName = userProfileDto.getNickname();
         tier = userProfileDto.getTier();
