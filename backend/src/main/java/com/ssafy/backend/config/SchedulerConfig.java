@@ -16,7 +16,7 @@ public class SchedulerConfig {
         return Executors.newScheduledThreadPool(1); // 예: 스레드 풀 크기를 1로 설정
     }
     @Bean
-    ScheduledExecutorService authScheduledExecutorService(){
+    public ScheduledExecutorService authScheduledExecutorService(){
         return Executors.newScheduledThreadPool(1);
     }
     // 스프링 컨텍스트가 종료될 때 이벤트 리스너

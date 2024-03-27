@@ -27,6 +27,7 @@ public class GameInfo {
     private Random random;
     private GameRoomDto gameRoomDto;
     private UUID roomUuid;
+    private List<Byte> scoreList;
 
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
@@ -46,6 +47,8 @@ public class GameInfo {
             buffer[i] = ByteBuffer.allocate(1024);
         }
     }
+
+
 
     public enum GameCycle {
         CREATE {
@@ -88,7 +91,7 @@ public class GameInfo {
         stepList = new ArrayList<>();
         random = new Random();
         gameCycle = GameCycle.CREATE;
-
+        scoreList = new LinkedList<>();
         //캐릭터 위치 랜덤배치
         List<int[]> floorPos = new LinkedList<>();
         //유저 캐릭터 번호 랜덤 매핑
@@ -107,7 +110,7 @@ public class GameInfo {
         Collections.shuffle(floorPos);
 
         for (byte i=0; i<userList.size(); i++){
-
+            scoreList.add((byte)0);
             UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
                     idxs.get(i),i);
             CharacterInfo characterInfo = new CharacterInfo();
@@ -218,7 +221,7 @@ public class GameInfo {
     public void putTime(){
         for (int i=0; i< users.size(); i++){
             buffer[i].put(SendBinaryMessageType.TIME.getValue())
-                    .put((byte) second);
+                    .put((byte) (Math.max(second, 0)));
         }
         stepList.clear();
     }
@@ -226,6 +229,12 @@ public class GameInfo {
     public void putStart(){
         for (int i=0; i<users.size(); i++){
             buffer[i].put(SendBinaryMessageType.START.getValue());
+        }
+    }
+
+    public void putEnd() {
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.END.getValue());
         }
     }
     public void putPhysicsState() {
@@ -242,16 +251,25 @@ public class GameInfo {
         }
     }
 
-    public void putStep(){
+    public void putStep(){ //변경
         if (stepList.isEmpty()) return;
         for (int i=0; i<users.size(); i++){
-            buffer[i].put(SendBinaryMessageType.STEP.getValue())
+            buffer[i].put(SendBinaryMessageType.SCORE.getValue())
                     .put((byte) stepList.size());
-            for (int j=0; j<stepList.size(); j++){
-                buffer[i].put(stepList.get(j));
+            for (byte[] bytes : stepList) {
+                buffer[i].put(bytes);
             }
         }
         stepList.clear();
+    }
+    public void putScore(){
+        Set<Map.Entry<WebSocketSession, UserGameInfo>> entrySet = users.entrySet();
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.SCORE.getValue()).put((byte) users.size());
+            for (byte score:scoreList){
+                buffer[i].put(score);
+            }
+        }
     }
     public void putTestMap(){
         for (int i=0; i< users.size(); i++){
@@ -263,15 +281,7 @@ public class GameInfo {
         }
     }
 
-    public void putScore(){
-        Set<Map.Entry<WebSocketSession, UserGameInfo>> entrySet = users.entrySet();
-        for (int i=0; i<users.size(); i++){
-            buffer[i].put((byte)102).put((byte) users.size());
-            for (Map.Entry<WebSocketSession, UserGameInfo> entry:users.entrySet()){
-                buffer[i].put(entry.getValue().getScore());
-            }
-        }
-    }
+
 
     //세션과 캐릭터를 매핑한다.
     public void insertSession(WebSocketSession session){
