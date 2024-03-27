@@ -35,7 +35,7 @@ public class FriendlyController {
     private ResponseEntity<?> findRoomUuId(@RequestBody Map<String, Object> requestBody){
         int code = Integer.parseInt((requestBody.get("roomCode").toString()));
         String password=(String) requestBody.get("roomPassword");
-        return ResponseEntity.ok(friendlyService.findRoomId(code, password));
+        return friendlyService.findRoomId(code, password);
     }
 
     @PatchMapping("lobby/{uuid}")
