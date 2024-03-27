@@ -53,8 +53,8 @@ public class RankServiceImpl implements RankService{
         for (String userCode : topRanks) {
             RankDto rankDto = new RankDto(); // MongoDB 조회 결과를 바탕으로 RankDto 생성
             Optional<UserProfile> userProfile=userProfileRepository.findByUserCode(userCode);
-            int userRank=++rank;
-            rankDto.setRank(userRank);
+            int userRankInt=++rank;
+            rankDto.setRank(userRankInt);
             rankDto.setUserCode(userCode);
             rankDto.setNickname(userProfile.get().getUserNickname());
             rankDto.setSkin(userProfile.get().getUserSkin());
