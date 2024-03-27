@@ -81,8 +81,8 @@ public class UserServiceImpl implements UserService {
                     .userCode(userCode)
                     .userExp(0L)
                     .userRating(defaultRating)
-                    .userSkin("")
-                    .userTitle("")
+                    .userSkin("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue.png")
+                    .userTitle("손님")
                     .isGuest(true)
                     .build();
             userProfileRepository.save(userProfile);
@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
         if (userProfile==null) return null;
         userProfile.setGuest(false);
         userProfile.setUserNickname(userSignDto.getNickname());
-
+        userProfile.setUserTitle("파릇파릇 새싹");
         userProfileRepository.save(userProfile);
         userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
 
@@ -153,8 +153,8 @@ public class UserServiceImpl implements UserService {
                     .userCode(userCode)
                     .userExp(0L)
                     .userRating(defaultRating)
-                    .userSkin("")
-                    .userTitle("")
+                    .userSkin("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue.png")
+                    .userTitle("파릇파릇 새싹")
                     .isGuest(false)
                     .build();
             userProfileRepository.save(userProfile);
