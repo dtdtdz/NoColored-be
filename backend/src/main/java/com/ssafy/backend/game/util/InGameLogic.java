@@ -5,7 +5,6 @@ import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.game.domain.MapInfo;
 import com.ssafy.backend.game.domain.UserGameInfo;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.util.*;
 
@@ -175,8 +174,8 @@ public class InGameLogic {
 
                     if (curC.getUserGameInfo()!=null){
                         UserGameInfo user = listC.getUserGameInfo();
-                        gameInfo.getScoreList().set(user.getPlayerNum(),
-                                (byte) (gameInfo.getScoreList().get(user.getPlayerNum())+1));
+                        user.setScore((byte) (user.getScore()+1));
+
                         gameInfo.getStepList().add(new byte[]{ user.getPlayerNum(),
                                 curC.getUserGameInfo().getPlayerNum(),
                                 user.getCharacterNum(),
@@ -200,7 +199,7 @@ public class InGameLogic {
 
         gameInfo.putSetCharacter();
         gameInfo.putPhysicsState();
-        gameInfo.putStep();
+        gameInfo.applyStep();
         gameInfo.putScore();
         gameInfo.sendBuffer();
     }

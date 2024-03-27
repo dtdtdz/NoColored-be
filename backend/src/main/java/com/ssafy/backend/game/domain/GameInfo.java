@@ -20,14 +20,17 @@ public class GameInfo {
     private long time;
     private int second;
     private Map<WebSocketSession, UserGameInfo> users = new LinkedHashMap<>();
+    private List<UserGameInfo> userGameInfoList = new LinkedList<>();
     private MapInfo mapInfo;
     private CharacterInfo[] characterInfoArr;
     private boolean[][] floor;
-    private List<byte[]> stepList;
     private Random random;
     private GameRoomDto gameRoomDto;
     private UUID roomUuid;
-    private List<Byte> scoreList;
+
+    private List<byte[]> stepList;
+    private List<Effect> effectList;
+    private List<byte[]> skinList;
 
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
@@ -44,7 +47,7 @@ public class GameInfo {
     public static final ByteBuffer[] buffer = new ByteBuffer[4];
     static {
         for (int i=0; i<buffer.length; i++){
-            buffer[i] = ByteBuffer.allocate(1024);
+            buffer[i] = ByteBuffer.allocate(2048);
         }
     }
 
@@ -90,10 +93,11 @@ public class GameInfo {
         mapInfo = new MapInfo();
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
-        stepList = new ArrayList<>();
         random = new Random();
         gameCycle = GameCycle.CREATE;
-        scoreList = new LinkedList<>();
+
+        stepList = new ArrayList<>();
+        effectList = new LinkedList<>();
         //캐릭터 위치 랜덤배치
         List<int[]> floorPos = new LinkedList<>();
         //유저 캐릭터 번호 랜덤 매핑
@@ -112,7 +116,6 @@ public class GameInfo {
         Collections.shuffle(floorPos);
 
         for (byte i=0; i<userList.size(); i++){
-            scoreList.add((byte)0);
             UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
                     idxs.get(i),i);
             CharacterInfo characterInfo = new CharacterInfo();
@@ -126,6 +129,7 @@ public class GameInfo {
 
             characterInfoArr[idxs.get(i)] = characterInfo;
             users.put(userList.get(i).getSession(), userGameInfo);
+            userGameInfoList.add(userGameInfo);
         }
 
         for (int i= userList.size(); i<characterInfoArr.length ; i++){
@@ -237,8 +241,6 @@ public class GameInfo {
                     .put((byte) (Math.max(second, 0)));
         }
     }
-
-
     public void putEnd() {
         for (int i=0; i<users.size(); i++){
             buffer[i].put(SendBinaryMessageType.END.getValue());
@@ -258,9 +260,14 @@ public class GameInfo {
         }
     }
 
-    public void putStep(){ //변경
+    public void applyStep(){ //변경
         if (stepList.isEmpty()) return;
         for (int i=0; i<users.size(); i++){
+            byte characterNum = stepList.get(i)[2];
+            effectList.add(new Effect(EffectType.STEP,
+                    characterInfoArr[characterNum].getX(),
+                    characterInfoArr[characterNum].getY()+CHARACTER_SIZE/2f));
+
             buffer[i].put(SendBinaryMessageType.SCORE.getValue())
                     .put((byte) stepList.size());
             for (byte[] bytes : stepList) {
@@ -270,11 +277,36 @@ public class GameInfo {
         stepList.clear();
     }
     public void putScore(){
-        Set<Map.Entry<WebSocketSession, UserGameInfo>> entrySet = users.entrySet();
         for (int i=0; i<users.size(); i++){
             buffer[i].put(SendBinaryMessageType.SCORE.getValue()).put((byte) users.size());
-            for (byte score:scoreList){
-                buffer[i].put(score);
+            for (UserGameInfo user:userGameInfoList){
+                buffer[i].put(user.getScore());
+            }
+        }
+    }
+
+    public void putEffect(){
+        if (effectList.isEmpty()) return;
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.EFFECT.getValue())
+                    .put((byte) effectList.size());
+            for (Effect effect:effectList){
+                buffer[i].put(effectList.get(i).effectType.getValue())
+                        .putFloat(effectList.get(i).getX())
+                        .putFloat(effectList.get(i).getY());
+            }
+        }
+    }
+
+    public void putSkin(){
+        for (UserGameInfo userGameInfo:userGameInfoList){
+            if (userGameInfo.getStates().containsKey(GameUserState.DISPLAY_SKIN))
+                skinList.add(new byte[]{userGameInfo.getPlayerNum(),userGameInfo.getCharacterNum()});
+        }
+        for (int i=0; i<userGameInfoList.size(); i++){
+            buffer[i].put(SendBinaryMessageType.SKIN.getValue());
+            for (int j=0; j<skinList.size(); j++){
+                buffer[i].put(skinList.get(j));
             }
         }
     }
@@ -287,8 +319,6 @@ public class GameInfo {
             }
         }
     }
-
-
 
     //세션과 캐릭터를 매핑한다.
     public void insertSession(WebSocketSession session){

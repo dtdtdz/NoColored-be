@@ -16,7 +16,9 @@ public enum SendBinaryMessageType {
     END((byte) 20),
     PHYSICS_STATE((byte) 100),
     SCORE((byte) 101),
-    ITEM_USE((byte) 102), //event
+    EFFECT((byte) 102),
+    SKIN((byte) 110),
+//    ITEM_USE((byte) 110), //event
     TEST_MAP((byte) 200);
 
     private final byte value;
