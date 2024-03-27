@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,7 +20,10 @@ public class UserGameInfo {
     private byte characterNum;
     private byte playerNum;
     private boolean isAccess;
+    private byte score;
+
     private UserPlayInfo userPlayInfo;
+    private Map<GameUserState, Float> states;
 
     public UserGameInfo(WebSocketSession webSocketSession,
                         byte characterNum,
@@ -26,7 +32,9 @@ public class UserGameInfo {
         this.characterNum = characterNum;
         this.playerNum = playerNum;
         isAccess = false;
+        score = 0;
         userPlayInfo = new UserPlayInfo();
+        states = new LinkedHashMap<>();
     }
 
 }
