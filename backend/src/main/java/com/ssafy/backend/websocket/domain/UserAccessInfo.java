@@ -35,7 +35,7 @@ public class UserAccessInfo {
     }
 
     public void setGameInfo(GameInfo gameInfo){
-        if (!(position instanceof RoomInfo || position instanceof MatchingInfo)) throw new RuntimeException("Position conflict");
+        if (!(position instanceof RoomInfo || position instanceof MatchingInfo || position instanceof GameInfo)) throw new RuntimeException("Position conflict");
         position = gameInfo;
     }
 

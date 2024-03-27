@@ -15,8 +15,6 @@ public class RankDto {
     String nickname;
     int rating;
     String skin;
-    String title;
+    String label;
     String tier;
-    // 레디스에 상위 100개만 캐싱하기
-    // 상위 유저가 변경 요청했을때 적용이되는 로직이 필요함
 }

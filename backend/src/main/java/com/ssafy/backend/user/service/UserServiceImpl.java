@@ -20,6 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Service
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
                     .userNickname(RandomNickname.makeNickname())
                     .userCode(userCode)
                     .userExp(0L)
-                    .userRating(1000)
+                    .userRating(defaultRating)
                     .userSkin("")
                     .userTitle("")
                     .isGuest(true)
@@ -98,7 +99,7 @@ public class UserServiceImpl implements UserService {
             // mongodb에 넣을 rank정보
             RankMongo rankMongo=RankMongo.builder()
                     .userCode(userCode)
-                    .rating(-1)
+                    .rating(defaultRating)
                     .build();
             rankRepository.save(rankMongo);
 
@@ -121,7 +122,14 @@ public class UserServiceImpl implements UserService {
         userProfileRepository.save(userProfile);
         userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
 
-        // usercollection은 처리 안해도 될듯
+//        // usercollection은 처리 안해도 될듯
+//
+//
+//        // rankMongo에 기본 레이팅 값 주기
+//        Optional<RankMongo> rankMongoOptional=rankRepository.findById(userProfile.getUserCode());
+//        RankMongo rankMongo=rankMongoOptional.get();
+//        rankMongo.setRating(defaultRating);
+//        rankRepository.save(rankMongo);
         
         UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
@@ -144,12 +152,11 @@ public class UserServiceImpl implements UserService {
                     .userNickname(nickname)
                     .userCode(userCode)
                     .userExp(0L)
-                    .userRating(1000)
+                    .userRating(defaultRating)
                     .userSkin("")
                     .userTitle("")
                     .isGuest(false)
                     .build();
-
             userProfileRepository.save(userProfile);
 
             // usercollection 생성
@@ -176,7 +183,6 @@ public class UserServiceImpl implements UserService {
                     .userProfile(userProfile)
                     .isDeleted(false)
                     .build();
-
             userInfoRepository.save(userInfo);
             return userProfile;
 

@@ -89,7 +89,7 @@ public class GameInfo {
     }
     public GameInfo(List<UserAccessInfo> userList){
         startDate = LocalDateTime.now();
-        setSecond(10);
+        setSecond(3);
         mapInfo = new MapInfo();
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
@@ -267,12 +267,8 @@ public class GameInfo {
             effectList.add(new Effect(EffectType.STEP,
                     characterInfoArr[characterNum].getX(),
                     characterInfoArr[characterNum].getY()+CHARACTER_SIZE/2f));
-
-            buffer[i].put(SendBinaryMessageType.SCORE.getValue())
-                    .put((byte) stepList.size());
-            for (byte[] bytes : stepList) {
-                buffer[i].put(bytes);
-            }
+            userGameInfoList.get(i).getUserPlayInfo()
+                    .setStep(userGameInfoList.get(i).getUserPlayInfo().getStep()+1);
         }
         stepList.clear();
     }
