@@ -63,8 +63,11 @@ public class JwtUtil {
             value = redisTemplate.opsForValue().get(tokenKey(token));
         }
 
-        if (value==null) return null;
-//            throw new RuntimeException("Token is invalid");
+        if (value==null) {
+            System.out.println("Token is invalid: "+token);
+            throw new RuntimeException("Token is invalid");
+        }
+
         UUID id = UUID.fromString((String) value);
         if (sessionCollection.userIdMap.containsKey(id)){
             return sessionCollection.userIdMap.get(id);

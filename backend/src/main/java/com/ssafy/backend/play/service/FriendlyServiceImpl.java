@@ -28,7 +28,8 @@ public class FriendlyServiceImpl implements FriendlyService {
     @Override
     public synchronized ResponseEntity<?> createRoom(String roomTitle, String roomPassword, int mapId, UserAccessInfo userAccessInfo){
         // 비밀번호 숫자 4글자 검사
-        if(roomPassword.matches("^\\d{4}$")){
+        if(!roomPassword.matches("^\\d{4}$")){
+            System.out.println(roomPassword);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("비밀번호가 잘못된 형식입니다.");
         }
 
@@ -248,7 +249,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                         for(int j=0;j<4;j++){
                             UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
                             if(tempUserAccessInfo!=null){
-                                SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.READY_OFF.getValue(), i);
+                                SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.READY_STATE.getValue(), i);
                             }
                         }
                         // 리턴
@@ -265,7 +266,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                         for(int j=0;j<4;j++){
                             UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
                             if(tempUserAccessInfo!=null){
-                                SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.READY_ON.getValue(), i);
+                                SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.READY_STATE.getValue(), i);
                             }
                         }
                         // 리턴
@@ -353,7 +354,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                                 for(int k=0;k<4;k++){
                                     UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[k];
                                     if(tempUserAccessInfo!=null){
-                                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.QUIT_MASTER.getValue(), i);
+                                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.ROOM_INFO.getValue(), i);
                                     }
                                 }
                                 return ResponseEntity.ok(roomDto);
@@ -376,7 +377,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                     for(int j=0;j<4;j++){
                         UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
                         if(tempUserAccessInfo!=null){
-                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.QUIT_PLAYER.getValue(), i);
+                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.ROOM_INFO.getValue(), i);
                         }
                     }
                 }

@@ -166,6 +166,7 @@ public class UserServiceImpl implements UserService {
 //        int userCount=redisTemplate.keys("*").size();
 
         userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
+        System.out.println(token);
 //        authScheduledExecutorService.schedule(()->{
 //            if (!sessionCollection.userIdMap.containsKey(userProfile.getId())){
 //                jwtUtil.deleteTokenRedis(token);

@@ -53,7 +53,7 @@ public class FriendlyController {
         String roomPassword = (String) requestBody.get("roomPassword");
         int mapId = Integer.parseInt(requestBody.get("mapId").toString());
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-
+        System.out.println(token);
         return friendlyService.createRoom(roomTitle,roomPassword,mapId,userAccessInfo);
     }
 
