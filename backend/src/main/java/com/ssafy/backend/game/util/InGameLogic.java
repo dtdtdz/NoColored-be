@@ -27,8 +27,8 @@ public class InGameLogic {
             gameInfo.putSetCharacter();
             gameInfo.putPhysicsState();
 //            gameInfo.putTestMap();
-            gameInfo.sendBuffer();
             gameInfo.goToNextCycle();
+            gameInfo.sendBuffer();
         }
     }
     public void ready(GameInfo gameInfo){
@@ -201,6 +201,8 @@ public class InGameLogic {
         gameInfo.putPhysicsState();
         gameInfo.applyStep();
         gameInfo.putScore();
+        gameInfo.putEffect();
+        gameInfo.putSkin();
         gameInfo.sendBuffer();
     }
     public boolean indexCheck(int idx, int size){

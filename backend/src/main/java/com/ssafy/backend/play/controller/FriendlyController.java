@@ -38,7 +38,7 @@ public class FriendlyController {
         return friendlyService.findRoomId(code, password);
     }
 
-    @PatchMapping("lobby/{uuid}")
+    @GetMapping("lobby/{uuid}")
     private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @PathVariable("uuid")UUID uuid){
 
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
@@ -57,7 +57,7 @@ public class FriendlyController {
         return friendlyService.createRoom(roomTitle,roomPassword,mapId,userAccessInfo);
     }
 
-    @PatchMapping("/ready")
+    @GetMapping("/ready")
     private ResponseEntity<?> readyRoom(@RequestHeader("Authorization") String token){
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         return friendlyService.readyRoom(userAccessInfo);
@@ -72,7 +72,7 @@ public class FriendlyController {
         return friendlyService.renewRoom(userAccessInfo, roomTitle, roomPassword, mapId);
     }
 
-    @PatchMapping("/out")
+    @GetMapping("/out")
     private ResponseEntity<?> quitRoom(@RequestHeader("Authorization") String token){
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         return friendlyService.quitRoom(userAccessInfo);
