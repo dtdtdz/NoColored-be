@@ -14,7 +14,6 @@ public enum SendTextMessageType {
     AUTHORIZED("authorized"),
     MATCHING("matching"),
     MATCHING_CANCEL("matchingCancel"),
-    READY_STATE("readyState"),
     GAME_START("gameStart"),
     ROOM_INFO("roomInfo");
 
