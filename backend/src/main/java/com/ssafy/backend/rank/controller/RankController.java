@@ -22,7 +22,6 @@ public class RankController {
     // 내 랭크 보기
     @GetMapping
     public ResponseEntity<RankDto> getRank(@RequestHeader("Authorization") String token){
-
         return ResponseEntity.ok(rankService.getRank(token));
     }
 
@@ -32,7 +31,5 @@ public class RankController {
         return ResponseEntity.ok(rankService.getRankList());
     }
 
-//    @GetMapping("/rank")
-//    public ResponseEntity<String>
 
 }

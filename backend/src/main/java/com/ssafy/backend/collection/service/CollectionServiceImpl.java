@@ -72,11 +72,36 @@ public class CollectionServiceImpl implements CollectionService {
     // 더미 데이터 추가
     public ResponseEntity<?> putSkin(){
         List<Skin> skins=new ArrayList<>();
-        skins.add(new Skin(1,"빨강","1"));
-        skins.add(new Skin(2,"주황","2"));
-        skins.add(new Skin(3,"노랑","3"));
-        skins.add(new Skin(4,"초록","4"));
-        skins.add(new Skin(5,"파랑","5"));
+        skins.add(new Skin(1,"character-240px-sheet-pastelyellow.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-pastelyellow.png"));
+        skins.add(new Skin(2,"character-240px-sheet-pastelred.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-pastelred.png"));
+        skins.add(new Skin(3,"character-240px-sheet-pastelpink.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-pastelpink.png"));
+        skins.add(new Skin(4,"character-240px-sheet-pastelgreen.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-pastelgreen.png"));
+        skins.add(new Skin(5,"character-240px-sheet-pastelblue.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-pastelblue.png"));
+        skins.add(new Skin(6,"character-240px-sheet-npcWhite.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-npcWhite.png"));
+        skins.add(new Skin(7,"character-240px-sheet-googlered.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-googlered.png"));
+        skins.add(new Skin(8,"character-240px-sheet-googleorange.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-googleorange.png"));
+        skins.add(new Skin(9,"character-240px-sheet-googlegreen.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-googlegreen.png"));
+        skins.add(new Skin(10,"character-240px-sheet-googleblue.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-googleblue.png"));
+        skins.add(new Skin(11,"character-240px-sheet-basicyellow.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicyellow.png"));
+        skins.add(new Skin(12,"character-240px-sheet-basicyellow-sunglass.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicyellow-sunglass.png"));
+        skins.add(new Skin(13,"character-240px-sheet-basicyellow-magichat.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicyellow-magichat.png"));
+        skins.add(new Skin(14,"character-240px-sheet-basicyellow-butterfly.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicyellow-butterfly.png"));
+        skins.add(new Skin(15,"character-240px-sheet-basicred.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicred.png"));
+        skins.add(new Skin(16,"character-240px-sheet-basicred-sunglass.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicred-sunglass.png"));
+        skins.add(new Skin(17,"character-240px-sheet-basicred-magichat.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicred-magichat.png"));
+        skins.add(new Skin(18,"character-240px-sheet-basicred-butterfly.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicred-butterfly.png"));
+        skins.add(new Skin(19,"character-240px-sheet-basicpink.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicpink.png"));
+        skins.add(new Skin(20,"character-240px-sheet-basicpink-sunglass.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicpink-sunglass.png"));
+        skins.add(new Skin(21,"character-240px-sheet-basicpink-magichat.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicpink-magichat.png"));
+        skins.add(new Skin(22,"character-240px-sheet-basicpink-butterfly.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicpink-butterfly.png"));
+        skins.add(new Skin(23,"character-240px-sheet-basicgreen.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicgreen.png"));
+        skins.add(new Skin(24,"character-240px-sheet-basicgreen-sunglass.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicgreen-sunglass.png"));
+        skins.add(new Skin(25,"character-240px-sheet-basicgreen-magichat.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicgreen-magichat.png"));
+        skins.add(new Skin(26,"character-240px-sheet-basicgreen-butterfly.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicgreen-butterfly.png"));
+        skins.add(new Skin(27,"character-240px-sheet-basicblue.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue.png"));
+        skins.add(new Skin(28,"character-240px-sheet-basicblue-sunglass.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-sunglass.png"));
+        skins.add(new Skin(29,"character-240px-sheet-basicblue-magichat.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-magichat.png"));
+        skins.add(new Skin(30,"character-240px-sheet-basicblue-butterfly.png","https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-butterfly.png"));
         skinRepository.saveAll(skins);
         return ResponseEntity.ok("스킨 생성 완료");
     }
@@ -172,7 +197,7 @@ public class CollectionServiceImpl implements CollectionService {
 
         UserCollectionDto userCollectionDto=new UserCollectionDto();
         userCollectionDto.setSkins(skinDtos);
-        userCollectionDto.setTitles(titleDtos);
+        userCollectionDto.setLabels(titleDtos);
         userCollectionDto.setAchievements(achievementDtos);
 
         return ResponseEntity.ok(userCollectionDto);
