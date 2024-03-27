@@ -1,9 +1,7 @@
 package com.ssafy.backend.collection.controller;
 
 
-import com.ssafy.backend.collection.dao.UserCollection;
 import com.ssafy.backend.collection.service.CollectionService;
-import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.beans.factory.annotation.Autowired;

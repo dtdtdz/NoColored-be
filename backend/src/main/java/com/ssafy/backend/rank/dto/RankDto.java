@@ -1,16 +1,14 @@
 package com.ssafy.backend.rank.dto;
 
 import com.ssafy.backend.user.entity.UserProfile;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class RankDto {
     int rank;
     String userCode;
@@ -19,14 +17,6 @@ public class RankDto {
     String skin;
     String title;
     String tier;
-
-    public RankDto(UserProfile userProfile){
-        rank = 1;
-        userCode = "Umr0Lztd";
-        nickname = "편안한 곰";
-        rating = 1000;
-        tier = "origin";
-        title = "";
-        skin = "";
-    }
+    // 레디스에 상위 100개만 캐싱하기
+    // 상위 유저가 변경 요청했을때 적용이되는 로직이 필요함
 }
