@@ -2,6 +2,7 @@ package com.ssafy.backend.play.controller;
 
 import com.ssafy.backend.play.service.FriendlyServiceImpl;
 import com.ssafy.backend.play.service.RankingService;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

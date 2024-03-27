@@ -31,14 +31,14 @@ public class FriendlyController {
         return friendlyService.getRoomList(offset);
     }
 
-    @PostMapping("uuid")
+    @PostMapping("enter")
     private ResponseEntity<?> findRoomUuId(@RequestBody Map<String, Object> requestBody){
         int code = Integer.parseInt((requestBody.get("roomCode").toString()));
         String password=(String) requestBody.get("roomPassword");
         return ResponseEntity.ok(friendlyService.findRoomId(code, password));
     }
 
-    @PatchMapping("enter/{uuid}")
+    @PatchMapping("lobby/{uuid}")
     private ResponseEntity<?> enterRoom(@RequestHeader("Authorization") String token, @PathVariable("uuid")UUID uuid){
 
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);

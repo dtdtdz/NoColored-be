@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
+import com.ssafy.backend.play.domain.MatchingInfo;
+import com.ssafy.backend.play.domain.RoomInfo;
+import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.websocket.domain.ReceiveBinaryMessageType;
 import com.ssafy.backend.websocket.domain.SendTextMessageType;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
@@ -119,13 +122,13 @@ public class MessageProcessServiceImpl implements MessageProcessService{
     }
 
     private void applyLeft(WebSocketSession session){
-        GameInfo gameInfo = inGameCollection.inGameUser.get(session);
+        GameInfo gameInfo = sessionCollection.userWebsocketMap.get(session).getGameInfo();
         int idx = gameInfo.getUsers().get(session).getCharacterNum();
         gameInfo.toLeft(idx);
 //        System.out.println(0);
     }
     private void applyRight(WebSocketSession session){
-        GameInfo gameInfo = inGameCollection.inGameUser.get(session);
+        GameInfo gameInfo = sessionCollection.userWebsocketMap.get(session).getGameInfo();
         int idx = gameInfo.getUsers().get(session).getCharacterNum();
         gameInfo.toRight(idx);
 //        System.out.println(1);
@@ -133,19 +136,26 @@ public class MessageProcessServiceImpl implements MessageProcessService{
 
     private void applyJump(WebSocketSession session){
         //바닥에 있으면 점프
-        GameInfo gameInfo = inGameCollection.inGameUser.get(session);
+        GameInfo gameInfo = sessionCollection.userWebsocketMap.get(session).getGameInfo();
         int idx = gameInfo.getUsers().get(session).getCharacterNum();
         gameInfo.jump(idx);
     }
 
     private void testStart2(WebSocketSession session) {
-        inGameCollection.insertUser(session);
+        UserAccessInfo user = new UserAccessInfo();
+        user.setUserProfile(new UserProfile());
+        user.setRoomInfo(new RoomInfo());
+        sessionCollection.userWebsocketMap.put(session, user);
+        inGameCollection.insertUser(session, user);
     }
     private void testStart(WebSocketSession session){
         List<UserAccessInfo> users = new ArrayList<>();
         UserAccessInfo user = new UserAccessInfo();
+        user.setUserProfile(new UserProfile());
         user.setSession(session);
+        user.setRoomInfo(new RoomInfo());
         users.add(user);
+        sessionCollection.userWebsocketMap.put(session, user);
         inGameCollection.addGame(users);
     }
 
