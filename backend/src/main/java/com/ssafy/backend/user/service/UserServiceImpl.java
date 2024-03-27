@@ -2,6 +2,8 @@ package com.ssafy.backend.user.service;
 
 import com.ssafy.backend.collection.dao.UserCollection;
 import com.ssafy.backend.collection.repository.UserCollectionRepository;
+import com.ssafy.backend.rank.dao.RankMongo;
+import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.user.dao.UserInfoRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.dto.UserSignDto;
@@ -31,11 +33,12 @@ public class UserServiceImpl implements UserService {
     private final SessionCollection sessionCollection;
     private final RedisTemplate<String,Object> redisTemplate;
     private final UserCollectionRepository userCollectionRepository;
+    private final RankRepository rankRepository;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
                            @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
-                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository
+                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository, RankRepository rankRepository
     ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
@@ -44,6 +47,7 @@ public class UserServiceImpl implements UserService {
         this.sessionCollection = sessionCollection;
         this.redisTemplate = redisTemplate;
         this.userCollectionRepository = userCollectionRepository;
+        this.rankRepository = rankRepository;
     }
 
     private String getUserCode() {
@@ -91,6 +95,13 @@ public class UserServiceImpl implements UserService {
                     .build();
             userCollectionRepository.save(userCollection);
 
+            // mongodb에 넣을 rank정보
+            RankMongo rankMongo=RankMongo.builder()
+                    .userCode(userCode)
+                    .rating(-1)
+                    .build();
+            rankRepository.save(rankMongo);
+
             return userProfile;
         } catch (Exception e){
             throw new RuntimeException("게스트 생성 실패.");
@@ -110,6 +121,8 @@ public class UserServiceImpl implements UserService {
         userProfileRepository.save(userProfile);
         userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
 
+        // usercollection은 처리 안해도 될듯
+        
         UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
                 .userId(userSignDto.getId())
@@ -138,6 +151,22 @@ public class UserServiceImpl implements UserService {
                     .build();
 
             userProfileRepository.save(userProfile);
+
+            // usercollection 생성
+            UserCollection userCollection=UserCollection.builder()
+                    .userCode(userCode)
+                    .skinIds(new ArrayList<>())
+                    .titleIds(new ArrayList<>())
+                    .achievementIds(new ArrayList<>())
+                    .build();
+            userCollectionRepository.save(userCollection);
+
+            // mongodb에 넣을 rank정보
+            RankMongo rankMongo=RankMongo.builder()
+                    .userCode(userCode)
+                    .rating(userProfile.getUserRating())
+                    .build();
+            rankRepository.save(rankMongo);
 
 //        System.out.println(userProfile.getId());
             UserInfo userInfo = UserInfo.builder()
