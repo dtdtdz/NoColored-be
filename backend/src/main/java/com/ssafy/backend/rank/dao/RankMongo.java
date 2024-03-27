@@ -13,6 +13,5 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class RankMongo {
     @Id
     private String userCode;
-
     private Integer rating;
 }
