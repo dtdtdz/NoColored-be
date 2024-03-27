@@ -61,17 +61,15 @@ public class FriendlyServiceImpl implements FriendlyService {
         roomDto.setMasterIndex(0);
         roomDto.setRoomPassword(roomPassword);
         roomDto.setRoomId(UUID.randomUUID());
-        roomDto.setReadyState(new boolean[]{false, false, false, false});
 
         // userRoomDtos 세팅
         UserRoomDto[] players = new UserRoomDto[4];
-        // 방장 세팅
-        players[0]= new UserRoomDto(userAccessInfo.getUserProfileDto());
+        // 모든 유저 세팅
+        for (int i=0; i<4; i++){
+            players[i] = new UserRoomDto();
+        }
+        players[0].setUser(userAccessInfo.getUserProfileDto());
 
-        // 1번부터 3번까지 세팅
-//        for(int i=1;i<4;i++){
-//            players[i]= new UserRoomDto(i, null);
-//        }
         roomDto.setPlayers(players);
         roomDto.setMapId(1); // 이거 고쳐야할듯
 
@@ -184,7 +182,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                 // 입장하는 사람 정보가 담긴 UserProfileDto 만들어서 userRoomDtos에 반영
                 UserRoomDto[] players=roomDto.getPlayers();
                 UserProfileDto player = userAccessInfo.getUserProfileDto();
-                players[i]=new UserRoomDto(player);
+                players[i].setUser(player);
 
                 // roomDto에 userRoomDtos 반영
                 roomDto.setPlayers(players);
@@ -248,8 +246,8 @@ public class FriendlyServiceImpl implements FriendlyService {
                     // 레디한 사람의 수를 센다
                     int readyCount=0;
                     for(int j=0;j<4;j++){
-                        if(j==i||players[j]==null){continue;}
-                        if(roomDto.getReadyState()[j]){readyCount++;}
+                        if(j==i|| players[j].getUserCode().isEmpty()){continue;}
+                        if(roomDto.getPlayers()[j].isReady()){readyCount++;}
                     }
                     // 혼자라면
                     if(userNumber==1){
@@ -258,7 +256,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                         // 모든 사람이 레디 했으면
                         if(readyCount==userNumber-1){
                             // 상태 변경
-                            roomDto.getReadyState()[i] = true;
+                            roomDto.getPlayers()[i].setReady(true);
 
                             inGameCollection.addGame(roomInfo);
                             // roominfo에 반영
@@ -279,16 +277,17 @@ public class FriendlyServiceImpl implements FriendlyService {
                 }else{
                     // 방장 아님
                     // 상태 변경
-                    roomDto.getReadyState()[i] = !roomDto.getReadyState()[i];
+                    roomDto.getPlayers()[i].setReady(!roomDto.getPlayers()[i].isReady());
 
                     for(int j=0;j<4;j++){
                         UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
                         if(tempUserAccessInfo!=null){
-                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.READY_STATE.getValue(), i);
+                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),
+                                    SendTextMessageType.ROOM_INFO.getValue(), roomDto);
                         }
                     }
 
-                    return ResponseEntity.ok("Ready state changed: "+roomDto.getReadyState()[i]);
+                    return ResponseEntity.ok("Ready state changed: "+roomDto.getPlayers()[i].isReady());
                 }
             }
         }
@@ -305,7 +304,7 @@ public class FriendlyServiceImpl implements FriendlyService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The room does not exist.");
         }
         for (int i=0; i<4; i++){
-            roomInfo.getRoomDto().getReadyState()[i] = false;
+            roomInfo.getRoomDto().getPlayers()[i].setReady(false);
         }
 
         UserAccessInfo[] userAccessInfos=roomInfo.getUserAccessInfos();
@@ -366,16 +365,15 @@ public class FriendlyServiceImpl implements FriendlyService {
                             if(userAccessInfos[startIndex]!=null){
                                 roomDto.setMasterIndex(startIndex);
                                 // 자신 정보 바꾸기
-                                players[i] = null;
+                                players[i].setEmptyUser();
                                 userAccessInfos[i]=null;
                                 userAccessInfo.clearPosition();
-                                roomInfo.setUserAccessInfos(userAccessInfos);
-                                roomInfo.setRoomDto(roomDto);
                                 // 변경했다고 세션 뿌리기
                                 for(int k=0;k<4;k++){
                                     UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[k];
                                     if(tempUserAccessInfo!=null){
-                                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.ROOM_INFO.getValue(), i);
+                                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),
+                                                SendTextMessageType.ROOM_INFO.getValue(), roomDto);
                                     }
                                 }
                                 return ResponseEntity.ok(roomDto);
@@ -388,17 +386,17 @@ public class FriendlyServiceImpl implements FriendlyService {
                 }else{
                     // 방장 아니면
                     // 자신 위치의 정보 초기화
-                    players[i] = null;
+                    players[i].setEmptyUser();
                     // roomInfo 반영
                     userAccessInfos[i]=null;
                     userAccessInfo.clearPosition();
-                    roomInfo.setUserAccessInfos(userAccessInfos);
-                    roomInfo.getRoomDto().getReadyState()[i] = false;
+
                     // 변경했다고 세션 뿌리기
                     for(int j=0;j<4;j++){
                         UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
                         if(tempUserAccessInfo!=null){
-                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),SendTextMessageType.ROOM_INFO.getValue(), i);
+                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),
+                                    SendTextMessageType.ROOM_INFO.getValue(), roomDto);
                         }
                     }
                 }

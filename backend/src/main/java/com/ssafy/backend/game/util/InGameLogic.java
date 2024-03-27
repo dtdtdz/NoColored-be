@@ -23,13 +23,11 @@ public class InGameLogic {
         //사람 없으면 게임 제거
         if (gameInfo.isAllReady() || gameInfo.checkSecond() && gameInfo.getSecond()<=0){
             gameInfo.setSecond(3);
-            gameInfo.putTime();
+            gameInfo.putCountDown();
 //            3초 카운트 시작
-            for (Map.Entry<WebSocketSession,UserGameInfo> entry: gameInfo.getUsers().entrySet()) {
-                gameInfo.putSetCharacter(entry.getKey());
-            }
+            gameInfo.putSetCharacter();
             gameInfo.putPhysicsState();
-            gameInfo.putTestMap();
+//            gameInfo.putTestMap();
             gameInfo.sendBuffer();
             gameInfo.goToNextCycle();
         }
@@ -37,6 +35,7 @@ public class InGameLogic {
     public void ready(GameInfo gameInfo){
         gameInfo.tick();
         if (gameInfo.checkSecond()){
+
             if (gameInfo.getSecond()<=0){
                 gameInfo.putStart();
                 gameInfo.goToNextCycle();
@@ -45,7 +44,7 @@ public class InGameLogic {
                 }
                 gameInfo.setSecond(GameInfo.DEFAULT_TIME);
             }
-            gameInfo.putTime();
+            gameInfo.putCountDown();
             gameInfo.sendBuffer();
         }
     }
@@ -199,6 +198,7 @@ public class InGameLogic {
 //                System.out.println(4);
 //                System.out.println("game logic");
 
+        gameInfo.putSetCharacter();
         gameInfo.putPhysicsState();
         gameInfo.putStep();
         gameInfo.putScore();

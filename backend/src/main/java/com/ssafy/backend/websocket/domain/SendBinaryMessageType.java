@@ -11,7 +11,8 @@ public enum SendBinaryMessageType {
     START((byte) 0),
     SET_CHARACTER((byte) 1),
     TIME((byte) 2),
-    ITEM((byte) 3), //event
+    COUNT_DOWN((byte) 3),
+    ITEM((byte) 10), //event
     END((byte) 20),
     PHYSICS_STATE((byte) 100),
     SCORE((byte) 101),

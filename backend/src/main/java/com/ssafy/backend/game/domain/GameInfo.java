@@ -49,7 +49,6 @@ public class GameInfo {
     }
 
 
-
     public enum GameCycle {
         CREATE {
             @Override
@@ -210,15 +209,19 @@ public class GameInfo {
         return false;
     }
 
-
-    public void putReadyInfo() {
-
+    public void putStart(){
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.START.getValue());
+        }
     }
 
-    public void putSetCharacter(WebSocketSession session){
-        UserGameInfo userGameInfo = users.get(session);
-        buffer[userGameInfo.getPlayerNum()].put(SendBinaryMessageType.SET_CHARACTER.getValue())
-                .put(userGameInfo.getCharacterNum());
+    public void putSetCharacter(){
+        for (Map.Entry<WebSocketSession,UserGameInfo> entry:users.entrySet()){
+            buffer[entry.getValue().getPlayerNum()]
+                    .put(SendBinaryMessageType.SET_CHARACTER.getValue())
+                    .put(entry.getValue().getCharacterNum());
+
+        }
     }
 
     public void putTime(){
@@ -226,14 +229,15 @@ public class GameInfo {
             buffer[i].put(SendBinaryMessageType.TIME.getValue())
                     .put((byte) (Math.max(second, 0)));
         }
-        stepList.clear();
     }
 
-    public void putStart(){
-        for (int i=0; i<users.size(); i++){
-            buffer[i].put(SendBinaryMessageType.START.getValue());
+    public void putCountDown() {
+        for (int i=0; i< users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.COUNT_DOWN.getValue())
+                    .put((byte) (Math.max(second, 0)));
         }
     }
+
 
     public void putEnd() {
         for (int i=0; i<users.size(); i++){

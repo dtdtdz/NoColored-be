@@ -17,13 +17,18 @@ public class UserRoomDto {
     String tier;
     String skin;
     String title;
+    boolean isReady;
 
-    public UserRoomDto(UserProfileDto userProfileDto){
+    public void setEmptyUser(){
+        userCode = nickName = tier = skin = title = "";
+    }
+    public void setUser(UserProfileDto userProfileDto){
         userCode = userProfileDto.getUserCode();
         nickName = userProfileDto.getNickname();
         tier = userProfileDto.getTier();
         skin = userProfileDto.getSkin();
         title = userProfileDto.getTitle();
+        isReady = false;
     }
 
 }
