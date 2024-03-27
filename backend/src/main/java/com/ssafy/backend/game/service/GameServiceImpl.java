@@ -72,30 +72,20 @@ public class GameServiceImpl implements GameService {
             Iterator<GameInfo> gameInfoIterator = inGameCollection.getGameInfoIterator();
             while (gameInfoIterator.hasNext()){
                 GameInfo gameInfo = gameInfoIterator.next();
-//                개선필요
-                if (Duration.between(gameInfo.getStartDate(), LocalDateTime.now()).getSeconds()>=100){
-                    System.out.println("game close");
-                    for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-                        inGameCollection.inGameUser.remove(entry.getKey());
+
+                try {
+                    switch (gameInfo.getGameCycle()){
+                        case CREATE -> inGameLogic.create(gameInfo);
+                        case READY -> inGameLogic.ready(gameInfo);
+                        case PLAY -> inGameLogic.play(gameInfo);
+                        case CLOSE -> gameClose(gameInfo);
+
+                        //        play(gameInfo);
+
                     }
-
-                    inGameCollection.removeGame(gameInfo);
-
-                } else {
-                    try {
-                       switch (gameInfo.getGameCycle()){
-                            case CREATE -> inGameLogic.create(gameInfo);
-                            case READY -> inGameLogic.ready(gameInfo);
-                            case PLAY -> inGameLogic.play(gameInfo);
-                            case CLOSE -> gameClose(gameInfo);
-
-                            //        play(gameInfo);
-
-                        }
-                    } catch (Exception e){
-                        e.printStackTrace();
-                        throw e;
-                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                    throw e;
                 }
             }
 
@@ -107,11 +97,20 @@ public class GameServiceImpl implements GameService {
 
     private void gameClose(GameInfo gameInfo){
 //        roomUuid있으면 해당 룸으로 보낸다.
-        if (gameInfo.getRoomUuid()!=null){
+
+        System.out.println("game close");
+        for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
+            UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(entry.getKey());
+            if (gameInfo.getRoomUuid()!=null){
+//                의성 해줘
+//                userAccessInfo.setRoomInfo();
+            } else {
+                userAccessInfo.clearPosition();
+            }
 
         }
 
-
+        inGameCollection.removeGame(gameInfo);
     }
 
 }

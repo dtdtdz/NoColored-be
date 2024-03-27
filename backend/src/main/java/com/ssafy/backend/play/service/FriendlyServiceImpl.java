@@ -49,6 +49,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         roomDto.setRoomCode(String.valueOf(roomInfo.getRoomCodeInt()));
         roomDto.setMasterIndex(0);
         roomDto.setRoomPassword(roomPassword);
+        roomDto.setRoomId(UUID.randomUUID());
 
         // userRoomDtos 세팅
         UserRoomDto[] players = new UserRoomDto[4];
@@ -61,7 +62,6 @@ public class FriendlyServiceImpl implements FriendlyService {
 //        }
         roomDto.setPlayers(players);
         roomDto.setMapId(1); // 이거 고쳐야할듯
-        roomDto.setRoomId(UUID.randomUUID());
 
         // roominfo 세팅
         roomInfo.setUserAccessInfos(new UserAccessInfo[] {userAccessInfo,null,null,null});
@@ -72,7 +72,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         roomInfoMap.put(roomInfo.getRoomCodeInt(),roomInfo);
         uuidRoomInfoMap.put(roomInfo.getRoomDto().getRoomId(), roomInfo);
         // 리턴
-        return ResponseEntity.ok(roomDto);
+        return ResponseEntity.ok(roomInfo.getRoomDto().getRoomId());
     }
 
     // 5페이지 분량 방 가져오기
@@ -145,7 +145,10 @@ public class FriendlyServiceImpl implements FriendlyService {
         if(roomInfo.isGameStart()){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("이미 게임이 시작된 방입니다.");
         }
-
+        for (int i=0; i<4; i++){
+            if (roomInfo.getUserAccessInfos()[i]==userAccessInfo)
+                return ResponseEntity.ok(roomInfo.getRoomDto());
+        }
         // 들어갈 곳 찾기
         for (int i = 0; i < 4; i++) {
             // 들어갈 곳 찾음

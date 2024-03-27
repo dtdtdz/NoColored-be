@@ -1,6 +1,7 @@
 package com.ssafy.backend.game.domain;
 
 
+import com.ssafy.backend.game.document.UserPlayInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,8 +16,8 @@ public class UserGameInfo {
     private WebSocketSession webSocketSession;
     private byte characterNum;
     private byte playerNum;
-    private byte score;
     private boolean isAccess;
+    private UserPlayInfo userPlayInfo;
 
     public UserGameInfo(WebSocketSession webSocketSession,
                         byte characterNum,
@@ -24,8 +25,8 @@ public class UserGameInfo {
         this.webSocketSession = webSocketSession;
         this.characterNum = characterNum;
         this.playerNum = playerNum;
-        score = 0;
         isAccess = false;
+        userPlayInfo = new UserPlayInfo();
     }
 
 }

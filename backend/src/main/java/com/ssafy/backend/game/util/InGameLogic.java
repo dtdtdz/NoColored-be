@@ -22,24 +22,23 @@ public class InGameLogic {
         //모든 유저준비 완료
         //사람 없으면 게임 제거
         if (gameInfo.isAllReady() || gameInfo.checkSecond() && gameInfo.getSecond()<=0){
-            gameInfo.putStart();
+            gameInfo.setSecond(3);
+            gameInfo.putTime();
 //            3초 카운트 시작
             for (Map.Entry<WebSocketSession,UserGameInfo> entry: gameInfo.getUsers().entrySet()) {
                 gameInfo.putSetCharacter(entry.getKey());
             }
-
-            gameInfo.setSecond(3);
-            gameInfo.putTime();
-            gameInfo.goToNextCycle();
             gameInfo.putPhysicsState();
             gameInfo.putTestMap();
             gameInfo.sendBuffer();
+            gameInfo.goToNextCycle();
         }
     }
     public void ready(GameInfo gameInfo){
         gameInfo.tick();
         if (gameInfo.checkSecond()){
             if (gameInfo.getSecond()<=0){
+                gameInfo.putStart();
                 gameInfo.goToNextCycle();
                 for (CharacterInfo characterInfo: gameInfo.getCharacterInfoArr()){
                     characterInfo.setVelX(GameInfo.DEFAULT_SPEED);
@@ -54,6 +53,16 @@ public class InGameLogic {
     public void play(GameInfo gameInfo){
         long dt = gameInfo.tick();
 
+        if (gameInfo.checkSecond()){
+            if (gameInfo.getSecond()<=0){
+                gameInfo.goToNextCycle();
+                gameInfo.putTime();
+                gameInfo.putEnd();
+                gameInfo.sendBuffer();
+                return;
+            }
+            gameInfo.putTime();
+        }
         MapInfo mapInfo = gameInfo.getMapInfo();
         CharacterInfo[] characterInfoArr = gameInfo.getCharacterInfoArr();
         boolean[][] floor = gameInfo.getFloor();
@@ -167,7 +176,8 @@ public class InGameLogic {
 
                     if (curC.getUserGameInfo()!=null){
                         UserGameInfo user = listC.getUserGameInfo();
-                        user.setScore((byte) (user.getScore()+1));
+                        gameInfo.getScoreList().set(user.getPlayerNum(),
+                                (byte) (gameInfo.getScoreList().get(user.getPlayerNum())+1));
                         gameInfo.getStepList().add(new byte[]{ user.getPlayerNum(),
                                 curC.getUserGameInfo().getPlayerNum(),
                                 user.getCharacterNum(),
@@ -188,11 +198,10 @@ public class InGameLogic {
         }
 //                System.out.println(4);
 //                System.out.println("game logic");
-        if (gameInfo.checkSecond())
-            gameInfo.putTime();
 
         gameInfo.putPhysicsState();
         gameInfo.putStep();
+        gameInfo.putScore();
         gameInfo.sendBuffer();
     }
     public boolean indexCheck(int idx, int size){

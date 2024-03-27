@@ -13,13 +13,11 @@ public class InGameCollection {
     private final LinkedList<GameInfo> inGameList;
     private final Queue<GameInfo> addQueue;
     private final Queue<GameInfo> delQueue;
-    public final HashMap<WebSocketSession, GameInfo> inGameUser;
 
     public InGameCollection(){
         inGameList = new LinkedList<>();
         addQueue = new ConcurrentLinkedQueue<>();
         delQueue = new ConcurrentLinkedQueue<>();
-        inGameUser = new HashMap<>();
     }
     public Iterator<GameInfo> getGameInfoIterator(){
         return inGameList.iterator();
@@ -32,7 +30,6 @@ public class InGameCollection {
     public void addGame(List<UserAccessInfo> users){
         GameInfo gameInfo = new GameInfo(users);
         for (UserAccessInfo user:users){
-            inGameUser.put(user.getSession(), gameInfo);
             user.setGameInfo(gameInfo);
         }
 //        gameInfo.putTime();
@@ -42,11 +39,13 @@ public class InGameCollection {
         addQueue.offer(gameInfo);
     }
 
-    public void insertUser(WebSocketSession session){
+    public void insertUser(WebSocketSession session, UserAccessInfo user){
         if (inGameList.isEmpty()) return;
         GameInfo gameInfo = inGameList.get((inGameList.size())-1);
         gameInfo.insertSession(session);
-        inGameUser.put(session, gameInfo);
+
+        user.setSession(session);
+        user.setGameInfo(gameInfo);
     }
 
     public void removeGame(GameInfo gameInfo){
@@ -60,8 +59,4 @@ public class InGameCollection {
             inGameList.offer(addQueue.poll());
         }
     }
-
-
-
-
 }

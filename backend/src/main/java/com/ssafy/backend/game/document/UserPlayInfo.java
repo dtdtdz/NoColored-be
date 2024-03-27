@@ -1,13 +1,14 @@
 package com.ssafy.backend.game.document;
 
+import com.ssafy.backend.game.domain.GameItemType;
+import com.ssafy.backend.user.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 //@Document
 @Getter
@@ -19,17 +20,17 @@ public class UserPlayInfo {
     long step;
     long itemCount;
     LocalDateTime startDate;
-    LocalDateTime endTime;
+    LocalDateTime endDate;
     String gameType;
     List<String[]> users; //code, nickname
-    long againCount;
-    long invincibleCount;
-    long ninjaCount;
-    long lightUPallCount;
-    long lightUPonceCount;
-    long fireworksCount;
-    long stopNPCCount;
-    long blackoutCount;
-    long randomBoxCount;
-    long rebelCount;
+    Map<String, Integer> itemCountMap;
+    public UserPlayInfo(String gameType){
+        users = new LinkedList<>();
+        itemCountMap = new LinkedHashMap<>();
+
+        for (GameItemType type: GameItemType.values()) {
+            itemCountMap.put(type.name().toLowerCase(),0);
+        }
+    }
+
 }

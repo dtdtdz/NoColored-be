@@ -1,5 +1,7 @@
 package com.ssafy.backend.user.service;
 
+import com.ssafy.backend.collection.dao.UserCollection;
+import com.ssafy.backend.collection.repository.UserCollectionRepository;
 import com.ssafy.backend.user.dao.UserInfoRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.dto.UserSignDto;
@@ -10,11 +12,12 @@ import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.user.util.RandomNickname;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Service
@@ -27,11 +30,12 @@ public class UserServiceImpl implements UserService {
     private final ScheduledExecutorService authScheduledExecutorService;
     private final SessionCollection sessionCollection;
     private final RedisTemplate<String,Object> redisTemplate;
+    private final UserCollectionRepository userCollectionRepository;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
                            @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
-                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate
+                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository
     ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
@@ -39,6 +43,7 @@ public class UserServiceImpl implements UserService {
         this.authScheduledExecutorService = authScheduledExecutorService;
         this.sessionCollection = sessionCollection;
         this.redisTemplate = redisTemplate;
+        this.userCollectionRepository = userCollectionRepository;
     }
 
     private String getUserCode() {
@@ -61,6 +66,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserProfile guestSignUp(){
         try {
             String userCode = getUserCode();
@@ -75,6 +81,16 @@ public class UserServiceImpl implements UserService {
                     .isGuest(true)
                     .build();
             userProfileRepository.save(userProfile);
+
+            // usercollection 생성
+            UserCollection userCollection=UserCollection.builder()
+                    .userCode(userCode)
+                    .skinIds(new ArrayList<>())
+                    .titleIds(new ArrayList<>())
+                    .achievementIds(new ArrayList<>())
+                    .build();
+            userCollectionRepository.save(userCollection);
+
             return userProfile;
         } catch (Exception e){
             throw new RuntimeException("게스트 생성 실패.");
