@@ -234,8 +234,8 @@ public class GameInfo {
     public void putSetCharacter(){
         for (UserGameInfo userGameInfo: userGameInfoList){
             buffer[userGameInfo.getPlayerNum()]
-                    .put(userGameInfo.getPlayerNum())
                     .put(SendBinaryMessageType.SET_CHARACTER.getValue())
+                    .put(userGameInfo.getPlayerNum())
                     .put(userGameInfo.getCharacterNum());
 
         }
@@ -282,6 +282,7 @@ public class GameInfo {
                     characterInfoArr[characterNum].getY()+CHARACTER_SIZE/2f));
             userGameInfoList.get(i).getUserPlayInfo()
                     .setStep(userGameInfoList.get(i).getUserPlayInfo().getStep()+1);
+//            userGameInfoList.get
         }
         stepList.clear();
     }
