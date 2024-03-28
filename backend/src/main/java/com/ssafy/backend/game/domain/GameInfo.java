@@ -305,7 +305,7 @@ public class GameInfo {
                             val = random.nextInt(CHARACTER_NUM);
                         } while (characterInfoArr[val].getUserGameInfo()!=null);
                         characterInfoArr[val].setUserGameInfo(userGameInfo);
-                        characterInfoArr[userGameInfo.getCharacterNum()] = null;
+                        characterInfoArr[userGameInfo.getCharacterNum()].setUserGameInfo(null);
                         userGameInfo.setCharacterNum((byte) val);
                     }
                 } else {
