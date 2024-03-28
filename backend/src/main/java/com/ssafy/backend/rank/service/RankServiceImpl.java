@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.ssafy.backend.rank.util.RankUtil.tierCalculation;
+
 @Service
 public class RankServiceImpl implements RankService{
 
@@ -98,46 +100,20 @@ public class RankServiceImpl implements RankService{
 
     // 내 랭크 보기
     @Override
-    public UserProfileDto getRank(String token) {
-        UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
+    public UserProfileDto getRank(UserAccessInfo user) {
         UserProfile userProfile=user.getUserProfile();
         String userCode=userProfile.getUserCode();
+        UserProfileDto userProfileDto=user.getUserProfileDto();
         // 게스트는 랭킹 조회 안됌
         if(userProfile.isGuest()){
             return null;
         }
-        // 레디스에서 사용자의 점수(score)와 등수(rank) 조회
-        String key = "userRank";
-        Double score = redisTemplate.opsForZSet().score(key, userCode);
-        Long rank = redisTemplate.opsForZSet().reverseRank(key, userCode);
+        rankUtil.getMyRank(userProfileDto);
 
-        // 점수(score)가 null인 경우, 사용자가 랭킹에 없는 것으로 간주하고 초기 값을 설정
-        int userScore = (score != null) ? score.intValue() : 0;
-        // 등수(rank)는 0부터 시작하므로 실제 등수를 얻기 위해 +1
-        int userRank = (rank != null) ? rank.intValue() + 1 : -1; // 랭킹에 없는 경우 -1로 설정
-
-        // 프로필에 레이팅 점수 저장
-        userProfile.setUserRating(userScore);
-        userProfileRepository.save(userProfile);
-
-        // mongodb에도 레이팅 점수 저장
-//        Optional<RankMongo> rankMongoOptional=rankRepository.findById(userProfile.getUserCode());
-//        if(rankMongoOptional.isPresent()){
-//            RankMongo rankMongo=rankMongoOptional.get();
-//            rankMongo.setRating(userScore);
-//        }
-
-        // UserProfile에서 나머지 필요한 정보를 가져와 RankDto 객체 생성
-//        return RankDto.builder()
-//                .rank(userRank)
-//                .userCode(userCode)
-//                .nickname(userProfile.getUserNickname())
-//                .rating(userScore)
-//                .skin(userProfile.getUserSkin())
-//                .label(userProfile.getUserLabel())
-//                .tier(rankUtil.tierCalculation(userRank,userScore))
-//                .build();
-        return null;
+//        // 프로필에 레이팅 점수 저장
+//        userProfile.setUserRating(userRating);
+//        userProfileRepository.save(userProfile);
+        return userProfileDto;
     }
 
 }

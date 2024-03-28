@@ -18,4 +18,6 @@ public interface UserService {
     boolean existsUserId(String userId);
     UserProfileDto findUserInfo(String userCode);
     void logout(String token);
+
+    void doUserProfileDto(UserProfileDto userProfileDto);
 }
