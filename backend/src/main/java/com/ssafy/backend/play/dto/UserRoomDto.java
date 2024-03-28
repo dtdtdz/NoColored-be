@@ -20,7 +20,7 @@ public class UserRoomDto {
     boolean isReady;
 
     public void setEmptyUser(){
-        userCode = nickname = tier = skin = title = "";
+        userCode = nickname = tier = skin = label = "";
     }
     public void setUser(UserProfileDto userProfileDto){
         userCode = userProfileDto.getUserCode();
