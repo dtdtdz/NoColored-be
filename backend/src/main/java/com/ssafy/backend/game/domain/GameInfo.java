@@ -37,13 +37,14 @@ public class GameInfo {
     public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_SPEED = 160;
     public static final int MAX_PLAYER = 2;
-    public static final float GRAVITY = 200;
+    public static final float GRAVITY = 300;
     public static final int BLOCK_SIZE = 18;
     public static final int MAP_HEIGHT = 19;
     public static final int MAP_WIDTH = 27;
     public static final int WALL_WIDTH = 3;
     public static final int DEFAULT_TIME = 120;
     public static final int CHARACTER_NUM = 10;
+    public static final int JUMP_HEIGHT = -280;
 
     public static final ByteBuffer[] buffer = new ByteBuffer[4];
     static {
@@ -216,16 +217,24 @@ public class GameInfo {
         return false;
     }
 
+    public void setCharacterDirection() {
+        for (CharacterInfo characterInfo:characterInfoArr){
+            if (characterInfo.getUserGameInfo()!=null) continue;
+            if (random.nextInt(300) < 1){
+                characterInfo.setDir(-characterInfo.getDir());
+            }
+        }
+    }
     public void putStart(){
         for (int i=0; i<users.size(); i++){
             buffer[i].put(SendBinaryMessageType.START.getValue());
         }
     }
 
-    public void putSetCharacter(){
+    public void putCharacterMapping(){
         for (UserGameInfo userGameInfo: userGameInfoList){
             buffer[userGameInfo.getPlayerNum()]
-                    .put(SendBinaryMessageType.SET_CHARACTER.getValue())
+                    .put(SendBinaryMessageType.CHARACTER_MAPPING.getValue())
                     .put(userGameInfo.getPlayerNum())
                     .put(userGameInfo.getCharacterNum());
 

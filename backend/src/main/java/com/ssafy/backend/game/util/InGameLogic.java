@@ -24,7 +24,7 @@ public class InGameLogic {
             gameInfo.setSecond(3);
             gameInfo.putCountDown();
 //            3초 카운트 시작
-            gameInfo.putSetCharacter();
+            gameInfo.putCharacterMapping();
             gameInfo.putPhysicsState();
 //            gameInfo.putTestMap();
             gameInfo.goToNextCycle();
@@ -70,8 +70,10 @@ public class InGameLogic {
         characterQueue.clear();
 //                System.out.print(2);
 //phaser.js 에서 x좌표 이동 후 중력가속도 적용하는것처럼 작동함
+        gameInfo.setCharacterDirection();
         for (int i=0; i<characterInfoArr.length; i++){
             CharacterInfo cInfo = characterInfoArr[i];
+
             float tarX = cInfo.getX()+(dt/1000f)*cInfo.getVelX()*cInfo.getDir();
             float halfSize = GameInfo.CHARACTER_SIZE/2f;
             if (tarX + halfSize > mapInfo.getRight()){
@@ -140,7 +142,7 @@ public class InGameLogic {
 //                    System.out.print(3+":"+i+":2 ");
             if (isPlatForm) {
                 if (cInfo.isJump()){
-                    velY = -190;
+                    velY = GameInfo.JUMP_HEIGHT;
                     cInfo.setJump(false);
                 } else {
                     velY = 0;
@@ -199,7 +201,7 @@ public class InGameLogic {
 //                System.out.println(4);
 //                System.out.println("game logic");
 
-        gameInfo.putSetCharacter();
+        gameInfo.putCharacterMapping();
         gameInfo.putPhysicsState();
         gameInfo.applyStep();
         gameInfo.putScore();

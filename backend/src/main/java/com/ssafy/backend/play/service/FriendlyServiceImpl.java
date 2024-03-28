@@ -67,6 +67,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         // 모든 유저 세팅
         for (int i=0; i<4; i++){
             players[i] = new UserRoomDto();
+            players[i].setEmptyUser();
         }
         players[0].setUser(userAccessInfo.getUserProfileDto());
 
@@ -280,13 +281,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                     // 상태 변경
                     roomDto.getPlayers()[i].setReady(!roomDto.getPlayers()[i].isReady());
 
-                    for(int j=0;j<4;j++){
-                        UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
-                        if(tempUserAccessInfo!=null){
-                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),
-                                    SendTextMessageType.ROOM_INFO.getValue(), roomDto);
-                        }
-                    }
+                    sendRoomDto(roomInfo);
 
                     return ResponseEntity.ok("Ready state changed: "+roomDto.getPlayers()[i].isReady());
                 }
@@ -320,6 +315,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                     roomDto.setRoomTitle(title);
                     roomDto.setRoomPassword(password);
                     roomInfo.setRoomDto(roomDto);
+                    sendRoomDto(roomInfo);
                     return ResponseEntity.ok("The room information has been updated.");
                 }
             }
@@ -407,5 +403,11 @@ public class FriendlyServiceImpl implements FriendlyService {
         // 방에 플레이어가 없음
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unable to find the player.");
     }
-
+    private void sendRoomDto(RoomInfo roomInfo){
+        for (UserAccessInfo userAccessInfo:roomInfo.getUserAccessInfos()){
+            if (userAccessInfo!=null && userAccessInfo.getSession().isOpen()) {
+                SynchronizedSend.textSend(userAccessInfo.getSession(),SendTextMessageType.ROOM_INFO.getValue(),roomInfo.getRoomDto() );
+            }
+        }
+    }
 }

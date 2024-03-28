@@ -91,6 +91,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         if (binaryMessageType==null) return;
 //        System.out.println(binaryMessageType);
         switch (binaryMessageType){
+            case READY -> applyReady(session);
             case DIRECTION_CHANGE -> applyDirectionChange(session);
             case JUMP -> applyJump(session);
             case TEST_START2 -> testStart2(session);
@@ -98,6 +99,8 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             case TEST_LOGIN -> testLogin(session);
         }
     }
+
+
 
     @Override
     public void setAuthSessionTimeOut(WebSocketSession session) throws Exception {
@@ -119,6 +122,10 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         return jwtUtil.getUserAccessInfoRedis(node.asText());
     }
 
+    private void applyReady(WebSocketSession session) {
+        GameInfo gameInfo = sessionCollection.userWebsocketMap.get(session).getGameInfo();
+        gameInfo.getUsers().get(session).setAccess(true);
+    }
     private void applyDirectionChange(WebSocketSession session){
         GameInfo gameInfo = sessionCollection.userWebsocketMap.get(session).getGameInfo();
         int idx = gameInfo.getUsers().get(session).getCharacterNum();
