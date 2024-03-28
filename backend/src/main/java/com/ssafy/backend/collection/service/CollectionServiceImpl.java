@@ -13,6 +13,7 @@ import com.ssafy.backend.collection.repository.SkinRepository;
 import com.ssafy.backend.collection.repository.LabelRepository;
 import com.ssafy.backend.collection.repository.UserCollectionRepository;
 import com.ssafy.backend.user.dao.UserProfileRepository;
+import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.http.ResponseEntity;
@@ -351,6 +352,9 @@ public class CollectionServiceImpl implements CollectionService {
         if(changeLabel.isPresent()){
             userProfile.setUserLabel(changeLabel.get().getName()); // 스킨 설정
             userProfileRepository.save(userProfile); // 변경 사항 저장
+            UserProfileDto userProfileDto=userAccessInfo.getUserProfileDto();
+            userProfileDto.setLabel(changeLabel.get().getName());
+            userAccessInfo.setUserProfileDto(userProfileDto);
             return ResponseEntity.ok().body("칭호 변경 완료!");
         }else{
             return ResponseEntity.badRequest().body(Map.of("error", "칭호가 없습니다."));
@@ -363,6 +367,9 @@ public class CollectionServiceImpl implements CollectionService {
         if(changeSkin.isPresent()){
             userProfile.setUserSkin(changeSkin.get().getLink()); // 스킨 설정
             userProfileRepository.save(userProfile); // 변경 사항 저장
+            UserProfileDto userProfileDto=userAccessInfo.getUserProfileDto();
+            userProfileDto.setSkin(changeSkin.get().getLink());
+            userAccessInfo.setUserProfileDto(userProfileDto);
             return ResponseEntity.ok().body("스킨 변경 완료!");
         }else{
             return ResponseEntity.badRequest().body(Map.of("error", "스킨이 없습니다."));

@@ -17,4 +17,8 @@ public interface UserService {
     void deleteUser(String token);
     boolean existsUserId(String userId);
     UserProfileDto findUserInfo(String userCode);
+
+    // void calcLevelExp();
+
+
 }

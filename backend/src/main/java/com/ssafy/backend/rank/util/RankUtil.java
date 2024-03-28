@@ -67,7 +67,7 @@ public class RankUtil {
     }
 
     // 등수랑 레이팅 가지고 티어 계산
-    public String tierCalculation(int rank, int rating){
+    public static String tierCalculation(int rank, int rating){
         if(rank<2){
             return "origin";
         }else if(rank<=5){

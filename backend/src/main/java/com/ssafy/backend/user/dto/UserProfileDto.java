@@ -20,13 +20,17 @@ public class UserProfileDto {
     int rank;
     String skin;
     String label;
+    
+    // exp, expRequire, level, 묶어서 계산
+    // tier, rank 묶어서 계산
+    
     public UserProfileDto(UserProfile userProfile){
         this.userCode = userProfile.getUserCode();
         this.nickname = userProfile.getUserNickname();
         this.exp = userProfile.getUserExp();
         this.isGuest = userProfile.isGuest();
         this.rating = userProfile.getUserRating();
-        this.tier = "nocolored"; //로직
+//        this.tier = "nocolored"; //로직
         this.skin = userProfile.getUserSkin();
         this.label = userProfile.getUserLabel();
     }

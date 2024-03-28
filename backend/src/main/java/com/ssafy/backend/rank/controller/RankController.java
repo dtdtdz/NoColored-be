@@ -23,11 +23,11 @@ public class RankController {
 
     // 내 랭크 보기
     @GetMapping
-    public ResponseEntity<RankDto> getRank(@RequestHeader("Authorization") String token){
+    public ResponseEntity<?> getRank(@RequestHeader("Authorization") String token){
         return ResponseEntity.ok(rankService.getRank(token));
     }
 
-    // 상위 100명 랭크 가져오기
+    // 최대 상위 100명 랭크 가져오기
     @GetMapping("/list")
     public ResponseEntity<?> getRankList(){
         return ResponseEntity.ok(rankService.getRankList());
