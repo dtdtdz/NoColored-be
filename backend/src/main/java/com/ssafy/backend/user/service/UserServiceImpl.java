@@ -282,6 +282,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void logout(String token) {
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        jwtUtil.deleteTokenRedis(token);
         
     }
 
