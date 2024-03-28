@@ -7,10 +7,9 @@ import java.util.Map;
 
 @Getter
 public enum ReceiveBinaryMessageType {
-    LEFT((byte) 0),
-    RIGHT((byte) 1),
+    READY((byte) 0),
+    DIRECTION_CHANGE((byte) 1),
     JUMP((byte) 2),
-    READY((byte) 3),
     TEST_START2((byte) 125),
     TEST_START((byte) 126),
     TEST_LOGIN((byte) 127);
