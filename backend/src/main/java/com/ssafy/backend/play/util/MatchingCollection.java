@@ -90,7 +90,7 @@ public class MatchingCollection {
         //접속중인 유저를 매칭 리스트에 추가한다.
         for (MatchingInfo matchingInfo: matchingInfoMap.values()){
 
-            if (!matchingInfo.getUserAccessInfo().getSession().isOpen()) {
+            if (matchingInfo.getUserAccessInfo().getSession()==null || !matchingInfo.getUserAccessInfo().getSession().isOpen()) {
                 setDelMatching(matchingInfo.getUserAccessInfo());
                 continue;
             }
