@@ -16,18 +16,18 @@ public class UserRoomDto {
     String nickname;
     String tier;
     String skin;
-    String title;
+    String label;
     boolean isReady;
 
     public void setEmptyUser(){
-        userCode = nickname = tier = skin = title = "";
+        userCode = nickname = tier = skin = label = "";
     }
     public void setUser(UserProfileDto userProfileDto){
         userCode = userProfileDto.getUserCode();
         nickname = userProfileDto.getNickname();
         tier = userProfileDto.getTier();
         skin = userProfileDto.getSkin();
-        title = userProfileDto.getTitle();
+        label = userProfileDto.getTitle();
         isReady = false;
     }
 
