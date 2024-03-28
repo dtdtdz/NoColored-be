@@ -16,6 +16,6 @@ public class UserCollection {
     @Id
     private String userCode;
     private List<Integer> skinIds; // 가지고 있는 스킨
-    private List<Integer> titleIds; // 가지고 있는 칭호
+    private List<Integer> labelIds; // 가지고 있는 칭호
     private List<Integer> achievementIds; // 가지고 있는 업적
 }

@@ -33,7 +33,7 @@ public class UserProfile {
 
     private String userSkin;
 
-    private String userTitle;
+    private String userLabel;
 
     private Integer userRating;
 }

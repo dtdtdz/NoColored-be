@@ -31,6 +31,7 @@ public class RankUtil {
         redisTemplate.opsForZSet().add(key,userCode,(double)rating);
     }
 
+    // 게임 끝나고 호출함!
     // userprofile의 rating은 로그아웃할때 갱신
     // userprofile을 가지고 몽고 안에 있는 레이팅도 갱신함
     // 그 후 회원이면 레디스 안에 있는 rating을 갱신한다
@@ -46,7 +47,6 @@ public class RankUtil {
             rankMongo.setRating(rankMongo.getRating()+plusRating);
             rankRepository.save(rankMongo);
         }
-
         // 게스트면 데이터 갱신 안함
         if(userProfile.isGuest()){
             return;
@@ -64,6 +64,31 @@ public class RankUtil {
         double timeFactor = 1.0 / currentTimeMillis;
         newRating+=timeFactor;
         redisTemplate.opsForZSet().add(key,userCode,newRating);
+    }
+
+    // 등수랑 레이팅 가지고 티어 계산
+    public String tierCalculation(int rank, int rating){
+        if(rank<2){
+            return "origin";
+        }else if(rank<=5){
+            return "rgb";
+        }else if(rank<=10){
+            return "colored";
+        }else{
+            if(rating<=2000){
+                return "nocolored";
+            }else if(rating<=2500){
+                return "bronze";
+            }else if(rating<=3000){
+                return "silver";
+            }else if(rating<=3500){
+                return "gold";
+            }else if(rating<=4200){
+                return "platinum";
+            }else {
+                return "diamond";
+            }
+        }
     }
 
 
@@ -92,30 +117,5 @@ public class RankUtil {
 //            }
 //        }
 //    }
-    
-    // 등수랑 레이팅 가지고 티어 계산
-    public String tierCalculation(int rank, int rating){
-        if(rank<2){
-            return "theorigin";
-        }else if(rank<=5){
-            return "rgb";
-        }else if(rank<=10){
-            return "colored";
-        }else{
-            if(rating<=2000){
-                return "nocolored";
-            }else if(rating<=2500){
-                return "bronze";
-            }else if(rating<=3000){
-                return "silver";
-            }else if(rating<=3500){
-                return "gold";
-            }else if(rating<=4200){
-                return "platinum";
-            }else {
-                return "diamond";
-            }
-        }
-    }
     
 }
