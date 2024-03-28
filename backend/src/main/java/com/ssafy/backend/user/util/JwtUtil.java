@@ -46,7 +46,7 @@ public class JwtUtil {
     public void setTokenRedis(String token, UUID id){
 //        if (redisTemplate.opsForValue().get(tokenKey(token)) !=null) System.out.println("dup");
         synchronized (redisTemplate){
-            redisTemplate.opsForValue().set(tokenKey(token), id, 3600*8, TimeUnit.SECONDS);//8시간 살아있음
+            redisTemplate.opsForValue().set(tokenKey(token), id, 1800, TimeUnit.SECONDS);//30분 살아있음
         }
     }
 
@@ -67,7 +67,7 @@ public class JwtUtil {
             System.out.println("Token is invalid: "+token);
             throw new RuntimeException("Token is invalid");
         }
-
+        redisTemplate.expire(tokenKey(token),1800, TimeUnit.SECONDS);
         UUID id = UUID.fromString((String) value);
         if (sessionCollection.userIdMap.containsKey(id)){
             return sessionCollection.userIdMap.get(id);
