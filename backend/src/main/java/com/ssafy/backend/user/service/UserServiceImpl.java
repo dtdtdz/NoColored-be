@@ -277,7 +277,7 @@ public class UserServiceImpl implements UserService {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
         userProfileRepository.updateNickname(user.getUserProfile().getId(), nickname);
         user.getUserProfile().setUserNickname(nickname);
-        user.setUserProfileDto(new UserProfileDto(user.getUserProfile()));
+        user.getUserProfileDto().setNickname(nickname);
     }
 
     @Override

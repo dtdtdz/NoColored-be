@@ -197,16 +197,7 @@ public class GameInfo {
         long result = now - time;
         time = now;
 
-        for (UserGameInfo userGameInfo:userGameInfoList){
-            for (Map.Entry<GameUserState,Long> entry:userGameInfo.getStates().entrySet()){
-                long leftTime = entry.getValue()-result;
-                if (leftTime>0){
-                    userGameInfo.getStates().put(entry.getKey(), leftTime);
-                } else {
-                    userGameInfo.getStates().remove(entry.getKey());
-                }
-            }
-        }
+        applyTimeAtState(result);
         return result;
     }
 
@@ -277,17 +268,53 @@ public class GameInfo {
         if (stepList.isEmpty()) return;
         for (byte[] bytes : stepList) {
             byte characterNum = bytes[2];
-            byte playerNum = bytes[0];
+            UserGameInfo user1 = userGameInfoList.get(bytes[0]);
+            UserGameInfo user2 = userGameInfoList.get(bytes[1]);
+
             effectList.add(new Effect(EffectType.STEP,
                     characterInfoArr[characterNum].getX(),
                     characterInfoArr[characterNum].getY() + CHARACTER_SIZE / 2f));
-            userGameInfoList.get(playerNum).getUserPlayInfo()
-                    .setStep(userGameInfoList.get(playerNum).getUserPlayInfo().getStep() + 1);
-//            userGameInfoList.get(playerNum).ge
-//            userGameInfoList.get
+            user1.getUserPlayInfo()
+                    .setStep(user1.getUserPlayInfo().getStep() + 1);
+            applyState(user1, GameUserState.DISPLAY_SKIN, 1000L);
+            applyState(user2, GameUserState.DISPLAY_SKIN, 1000L);
+            applyState(user2, GameUserState.STEPED, 1000L);
+            applyState(user2, GameUserState.STOP, 1000L);
+            characterInfoArr[user2.getCharacterNum()].setX(0);
         }
         stepList.clear();
     }
+    public void applyState(UserGameInfo userGameInfo, GameUserState state, long time){
+        userGameInfo.getStates().compute(state, (key, currentValue) ->
+                Math.max(currentValue == null ? 0L : currentValue, time));
+    }
+
+    public void applyTimeAtState(long dt){
+        for (UserGameInfo userGameInfo : userGameInfoList) {
+            Iterator<Map.Entry<GameUserState, Long>> it = userGameInfo.getStates().entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<GameUserState, Long> entry = it.next();
+                long time = entry.getValue() - dt;
+                if (time < 0) {
+                    it.remove(); // 안전하게 원소 제거
+                    if (entry.getKey().equals(GameUserState.STOP)) {
+                        characterInfoArr[userGameInfo.getCharacterNum()].setX(DEFAULT_SPEED);
+                    } else if (entry.getKey().equals(GameUserState.STEPED)){
+                        int val;
+                        do {
+                            val = random.nextInt(CHARACTER_NUM);
+                        } while (characterInfoArr[val].getUserGameInfo()!=null);
+                        characterInfoArr[val].setUserGameInfo(userGameInfo);
+                        characterInfoArr[userGameInfo.getCharacterNum()] = null;
+                        userGameInfo.setCharacterNum((byte) val);
+                    }
+                } else {
+                    entry.setValue(time); // 값을 직접 수정하는 것은 안전함
+                }
+            }
+        }
+    }
+
     public void putScore(){
         for (int i=0; i<users.size(); i++){
             buffer[i].put(SendBinaryMessageType.SCORE.getValue()).put((byte) users.size());
