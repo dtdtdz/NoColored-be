@@ -234,8 +234,8 @@ public class GameInfo {
     public void putSetCharacter(){
         for (UserGameInfo userGameInfo: userGameInfoList){
             buffer[userGameInfo.getPlayerNum()]
-                    .put(userGameInfo.getPlayerNum())
                     .put(SendBinaryMessageType.SET_CHARACTER.getValue())
+                    .put(userGameInfo.getPlayerNum())
                     .put(userGameInfo.getCharacterNum());
 
         }
@@ -275,13 +275,16 @@ public class GameInfo {
 
     public void applyStep(){ //변경
         if (stepList.isEmpty()) return;
-        for (int i=0; i<users.size(); i++){
-            byte characterNum = stepList.get(i)[2];
+        for (byte[] bytes : stepList) {
+            byte characterNum = bytes[2];
+            byte playerNum = bytes[0];
             effectList.add(new Effect(EffectType.STEP,
                     characterInfoArr[characterNum].getX(),
-                    characterInfoArr[characterNum].getY()+CHARACTER_SIZE/2f));
-            userGameInfoList.get(i).getUserPlayInfo()
-                    .setStep(userGameInfoList.get(i).getUserPlayInfo().getStep()+1);
+                    characterInfoArr[characterNum].getY() + CHARACTER_SIZE / 2f));
+            userGameInfoList.get(playerNum).getUserPlayInfo()
+                    .setStep(userGameInfoList.get(playerNum).getUserPlayInfo().getStep() + 1);
+//            userGameInfoList.get(playerNum).ge
+//            userGameInfoList.get
         }
         stepList.clear();
     }
@@ -300,9 +303,9 @@ public class GameInfo {
             buffer[i].put(SendBinaryMessageType.EFFECT.getValue())
                     .put((byte) effectList.size());
             for (Effect effect:effectList){
-                buffer[i].put(effectList.get(i).effectType.getValue())
-                        .putFloat(effectList.get(i).getX())
-                        .putFloat(effectList.get(i).getY());
+                buffer[i].put(effect.effectType.getValue())
+                        .putFloat(effect.getX())
+                        .putFloat(effect.getY());
             }
         }
     }

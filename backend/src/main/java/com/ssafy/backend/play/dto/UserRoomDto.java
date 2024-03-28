@@ -13,18 +13,18 @@ import lombok.Setter;
 public class UserRoomDto {
 
     String userCode;
-    String nickName;
+    String nickname;
     String tier;
     String skin;
     String label;
     boolean isReady;
 
     public void setEmptyUser(){
-        userCode = nickName = tier = skin = label = "";
+        userCode = nickname = tier = skin = label = "";
     }
     public void setUser(UserProfileDto userProfileDto){
         userCode = userProfileDto.getUserCode();
-        nickName = userProfileDto.getNickname();
+        nickname = userProfileDto.getNickname();
         tier = userProfileDto.getTier();
         skin = userProfileDto.getSkin();
         label = userProfileDto.getLabel();
