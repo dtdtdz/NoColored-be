@@ -307,6 +307,11 @@ public class UserServiceImpl implements UserService {
         return new UserProfileDto(userProfile);
     }
 
+    @Override
+    public void logout(String token) {
+        
+    }
+
     private void calcLevelExp(UserProfileDto userProfileDto){
         long currentExp=userProfileDto.getExp();
         int level=0;
