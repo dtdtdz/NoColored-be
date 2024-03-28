@@ -71,7 +71,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         players[0].setUser(userAccessInfo.getUserProfileDto());
 
         roomDto.setPlayers(players);
-        roomDto.setMapId(1); // 이거 고쳐야할듯
+        roomDto.setMapId(mapId); // 이거 고쳐야할듯
 
         // roominfo 세팅
         roomInfo.setUserAccessInfos(new UserAccessInfo[] {userAccessInfo,null,null,null});
