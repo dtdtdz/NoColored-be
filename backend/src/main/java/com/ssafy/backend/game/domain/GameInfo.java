@@ -303,9 +303,9 @@ public class GameInfo {
             buffer[i].put(SendBinaryMessageType.EFFECT.getValue())
                     .put((byte) effectList.size());
             for (Effect effect:effectList){
-                buffer[i].put(effectList.get(i).effectType.getValue())
-                        .putFloat(effectList.get(i).getX())
-                        .putFloat(effectList.get(i).getY());
+                buffer[i].put(effect.effectType.getValue())
+                        .putFloat(effect.getX())
+                        .putFloat(effect.getY());
             }
         }
     }
