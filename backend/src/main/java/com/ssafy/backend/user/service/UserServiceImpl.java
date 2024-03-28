@@ -126,12 +126,11 @@ public class UserServiceImpl implements UserService {
         userProfile.setUserNickname(userSignDto.getNickname());
         userProfile.setUserLabel("파릇파릇 새싹");
         userProfileRepository.save(userProfile);
-        UserProfileDto userProfileDto=new UserProfileDto(userProfile);
-        calcLevelExp(userProfileDto);
+
+        UserProfileDto userProfileDto=userAccessInfo.getUserProfileDto();
+        doUserProfileDto(userProfileDto);
+        // userAccessInfo에 반영
         userAccessInfo.setUserProfileDto(userProfileDto);
-//        userAccessInfo.getUserProfileDto().setTier(tierCalculation());
-        // 순위, 티어 계산해주기
-        
 
         // 파릇파릇 새싹 칭호 얻었다고 처리
         UserProfile tempUserProfile = userProfile;
@@ -140,12 +139,6 @@ public class UserServiceImpl implements UserService {
                 new NoSuchElementException("해당 사용자의 UserCollection이 존재하지 않습니다: " + tempUserProfile.getUserCode()));
         userCollection.getLabelIds().add(93);
         userCollectionRepository.save(userCollection);
-
-//        // rankMongo에 기본 레이팅 값 주기
-//        Optional<RankMongo> rankMongoOptional=rankRepository.findById(userProfile.getUserCode());
-//        RankMongo rankMongo=rankMongoOptional.get();
-//        rankMongo.setRating(defaultRating);
-//        rankRepository.save(rankMongo);
         
         UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
@@ -155,10 +148,6 @@ public class UserServiceImpl implements UserService {
                 .isDeleted(false)
                 .build();
         userInfoRepository.save(userInfo);
-
-        // redis에 넣기
-        rankUtil.createUserRankRedis(userProfile);
-
         return token;
     }
 
@@ -196,7 +185,7 @@ public class UserServiceImpl implements UserService {
             rankRepository.save(rankMongo);
 
             // redis에 넣기
-            rankUtil.createUserRankRedis(userProfile);
+            // rankUtil.createUserRankRedis(userProfileDto);
 
 
 //        System.out.println(userProfile.getId());
@@ -220,23 +209,7 @@ public class UserServiceImpl implements UserService {
         jwtUtil.setTokenRedis(token, userProfile.getId());
         UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
         sessionCollection.userIdMap.put(userProfile.getId(), userAccessInfo);
-        //계산해야됨 티어, 랭킹
-        //nocolored=맨처음
-        //bronze=1판함
-        //silver=3000까지
-        //gold=3500까지
-        //platinum=4200까지
-        //diamond=5000까지
-        //colored=상위10등
-        //rgb=상위5등
-        //origin=1등
 
-        // zset에 넣는거를 게임 끝날때마다 하자
-        
-        
-        // 레디스 zset으로 되어있음?->이거 어캐알음???아 넣을떄(게임끝날때) zset으로만 박자
-        // 가져오는 rating 값이 없을 수 있나?
-        // 기본
 //        Integer rating= (Integer) redisTemplate.opsForValue().get(userProfile.getUserRating());
 //        int userCount=redisTemplate.keys("*").size();
 
@@ -335,5 +308,16 @@ public class UserServiceImpl implements UserService {
         userProfileDto.setExp(currentExp);
         userProfileDto.setExpRequire(reqExp);
     }
+
+    public void doUserProfileDto(UserProfileDto userProfileDto){
+        if(!userProfileDto.isGuest()){
+            calcLevelExp(userProfileDto); // exp, expRequire, level 계산
+            rankUtil.createUserRankRedis(userProfileDto); // redis에 넣기
+            rankUtil.getMyRank(userProfileDto); // 순위, 티어 계산
+        }
+    }
+
+
+
 
 }

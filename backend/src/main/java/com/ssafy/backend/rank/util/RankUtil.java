@@ -2,6 +2,7 @@ package com.ssafy.backend.rank.util;
 
 import com.ssafy.backend.rank.dao.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
+import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -20,14 +21,10 @@ public class RankUtil {
     }
 
     // userRank 레디스에 데이터 생성하기
-    public void createUserRankRedis(UserProfile userProfile){
+    public void createUserRankRedis(UserProfileDto userProfileDto){
         String key="userRank";
-        String userCode=userProfile.getUserCode();
-        int rating=userProfile.getUserRating();
-        // 게스트면 데이터 안넣는다
-        if(userProfile.isGuest()){
-            return;
-        }
+        String userCode=userProfileDto.getUserCode();
+        int rating=userProfileDto.getRating();
         redisTemplate.opsForZSet().add(key,userCode,(double)rating);
     }
 
@@ -92,30 +89,20 @@ public class RankUtil {
     }
 
 
-//    // 유저 랭킹 정보를 레디스에 저장
-//    // 점수가 같으면 먼저 들어간 사람이 먼저 나옴
-//    public void saveRankMongoToRedis(RankMongo rankMongo) {
-//        String key="userRank";
-//        String userCode=rankMongo.getUserCode();
-//        double rating=rankMongo.getRating() == null ? 0.0 : rankMongo.getRating().doubleValue();
-//        // 현재 시간(밀리세컨드)의 역수를 점수에 반영
-//        long currentTimeMillis = System.currentTimeMillis();
-//        // 시간 역수를 스코어에 적용하여 유니크한 스코어 생성
-//        double score = rating - (1.0 / currentTimeMillis);
-//        redisTemplate.opsForZSet().add(key,userCode,score);
-//    }
-//
-//    // 랭겜 끝나면 점수를 레디스에 넣는 메소드
-//    // 게스트인지 확인하고 saveRankMongoToRedis 호출
-//    public void saveToRedis(UserProfile userProfile, int plusRating){
-//        if(!userProfile.isGuest()){
-//            Optional<RankMongo> rankMongoOptional=rankRepository.findById(userProfile.getUserCode());
-//            if(rankMongoOptional.isPresent()){
-//                RankMongo rankMongo=rankMongoOptional.get();
-//                rankMongo.setRating(rankMongo.getRating()+plusRating);
-//                saveRankMongoToRedis(rankMongo);
-//            }
-//        }
-//    }
-    
+    public void getMyRank(UserProfileDto userProfileDto){
+        String userCode=userProfileDto.getUserCode();
+        // 레디스에서 사용자의 점수(rating)와 등수(rank) 조회
+        String key = "userRank";
+        Double rating = redisTemplate.opsForZSet().score(key, userCode);
+        Long rank = redisTemplate.opsForZSet().reverseRank(key, userCode);
+
+        // 점수(score)가 null인 경우, 사용자가 랭킹에 없는 것으로 간주하고 초기 값을 설정
+        int userRating= (rating != null) ? rating.intValue() : 0;
+        // 등수(rank)는 0부터 시작하므로 실제 등수를 얻기 위해 +1
+        int userRank = (rank != null) ? rank.intValue() + 1 : -1; // 랭킹에 없는 경우 -1로 설정
+
+        // userProfileDto 갱신(순위, 랭킹점수, 티어)
+        userProfileDto.setRank(userRank);
+        userProfileDto.setTier(tierCalculation(userRank,userRating));
+    }
 }

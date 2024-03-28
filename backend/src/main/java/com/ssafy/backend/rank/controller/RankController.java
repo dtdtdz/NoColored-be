@@ -3,6 +3,8 @@ package com.ssafy.backend.rank.controller;
 
 import com.ssafy.backend.rank.dto.RankDto;
 import com.ssafy.backend.rank.service.RankService;
+import com.ssafy.backend.user.util.JwtUtil;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 public class RankController {
 
     private final RankService rankService;
-    public RankController(RankService rankService){
+    private final JwtUtil jwtUtil;
+    public RankController(RankService rankService, JwtUtil jwtUtil){
         this.rankService = rankService;
+        this.jwtUtil = jwtUtil;
     }
 
     // dataNumber만큼 더미데이터 넣기
@@ -24,7 +28,8 @@ public class RankController {
     // 내 랭크 보기
     @GetMapping
     public ResponseEntity<?> getRank(@RequestHeader("Authorization") String token){
-        return ResponseEntity.ok(rankService.getRank(token));
+        UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
+        return ResponseEntity.ok(rankService.getRank(user));
     }
 
     // 최대 상위 100명 랭크 가져오기
