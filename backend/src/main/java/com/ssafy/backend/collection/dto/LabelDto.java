@@ -7,10 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TitleDto {
+public class LabelDto {
     private int id;
     private String name;
-    private String condition;
     private boolean isOwn;
     private boolean isEquipped;
 }

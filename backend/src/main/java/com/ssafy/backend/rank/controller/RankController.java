@@ -2,13 +2,9 @@ package com.ssafy.backend.rank.controller;
 
 
 import com.ssafy.backend.rank.dto.RankDto;
-import com.ssafy.backend.rank.dto.RankInfoDto;
 import com.ssafy.backend.rank.service.RankService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/rank")
@@ -19,10 +15,15 @@ public class RankController {
         this.rankService = rankService;
     }
 
+    // dataNumber만큼 더미데이터 넣기
+    @PostMapping("/{dataNumber}")
+    public ResponseEntity<?> putRank(@PathVariable int dataNumber){
+        return rankService.putRank(dataNumber);
+    }
+
     // 내 랭크 보기
     @GetMapping
     public ResponseEntity<RankDto> getRank(@RequestHeader("Authorization") String token){
-
         return ResponseEntity.ok(rankService.getRank(token));
     }
 
@@ -32,7 +33,10 @@ public class RankController {
         return ResponseEntity.ok(rankService.getRankList());
     }
 
-//    @GetMapping("/rank")
-//    public ResponseEntity<String>
+    // redis 초기화
+    @DeleteMapping("/clear")
+    public ResponseEntity<?> clearRedis(){
+        return ResponseEntity.ok(rankService.clearRedis());
+    }
 
 }
