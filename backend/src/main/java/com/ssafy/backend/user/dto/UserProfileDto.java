@@ -19,7 +19,7 @@ public class UserProfileDto {
     String tier;
     int rank;
     String skin;
-    String title;
+    String label;
     public UserProfileDto(UserProfile userProfile){
         this.userCode = userProfile.getUserCode();
         this.nickname = userProfile.getUserNickname();
@@ -28,6 +28,6 @@ public class UserProfileDto {
         this.rating = userProfile.getUserRating();
         this.tier = "nocolored"; //로직
         this.skin = userProfile.getUserSkin();
-        this.title = userProfile.getUserTitle();
+        this.label = userProfile.getUserLabel();
     }
 }

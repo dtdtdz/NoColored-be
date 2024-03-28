@@ -4,6 +4,7 @@ import com.ssafy.backend.collection.dao.UserCollection;
 import com.ssafy.backend.collection.repository.UserCollectionRepository;
 import com.ssafy.backend.rank.dao.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
+import com.ssafy.backend.rank.util.RankUtil;
 import com.ssafy.backend.user.dao.UserInfoRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.dto.UserSignDto;
@@ -20,6 +21,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Service
@@ -34,11 +38,12 @@ public class UserServiceImpl implements UserService {
     private final RedisTemplate<String,Object> redisTemplate;
     private final UserCollectionRepository userCollectionRepository;
     private final RankRepository rankRepository;
+    private final RankUtil rankUtil;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
                            @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
-                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository, RankRepository rankRepository
+                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository, RankRepository rankRepository, RankUtil rankUtil
     ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
@@ -48,6 +53,7 @@ public class UserServiceImpl implements UserService {
         this.redisTemplate = redisTemplate;
         this.userCollectionRepository = userCollectionRepository;
         this.rankRepository = rankRepository;
+        this.rankUtil = rankUtil;
     }
 
     private String getUserCode() {
@@ -79,9 +85,9 @@ public class UserServiceImpl implements UserService {
                     .userNickname(RandomNickname.makeNickname())
                     .userCode(userCode)
                     .userExp(0L)
-                    .userRating(1000)
-                    .userSkin("")
-                    .userTitle("")
+                    .userRating(defaultRating)
+                    .userSkin("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue.png")
+                    .userLabel("손님")
                     .isGuest(true)
                     .build();
             userProfileRepository.save(userProfile);
@@ -89,8 +95,8 @@ public class UserServiceImpl implements UserService {
             // usercollection 생성
             UserCollection userCollection=UserCollection.builder()
                     .userCode(userCode)
-                    .skinIds(new ArrayList<>())
-                    .titleIds(new ArrayList<>())
+                    .skinIds(new ArrayList<>(Arrays.asList(1,2,3,4,27)))
+                    .labelIds(new ArrayList<>(Arrays.asList(92)))
                     .achievementIds(new ArrayList<>())
                     .build();
             userCollectionRepository.save(userCollection);
@@ -98,7 +104,7 @@ public class UserServiceImpl implements UserService {
             // mongodb에 넣을 rank정보
             RankMongo rankMongo=RankMongo.builder()
                     .userCode(userCode)
-                    .rating(-1)
+                    .rating(defaultRating)
                     .build();
             rankRepository.save(rankMongo);
 
@@ -117,11 +123,23 @@ public class UserServiceImpl implements UserService {
         if (userProfile==null) return null;
         userProfile.setGuest(false);
         userProfile.setUserNickname(userSignDto.getNickname());
-
+        userProfile.setUserLabel("파릇파릇 새싹");
         userProfileRepository.save(userProfile);
         userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
 
-        // usercollection은 처리 안해도 될듯
+        // 파릇파릇 새싹 칭호 얻었다고 처리
+        UserProfile tempUserProfile = userProfile;
+        Optional<UserCollection> userCollectionOptional=userCollectionRepository.findById(tempUserProfile.getUserCode());
+        UserCollection userCollection=userCollectionOptional.orElseThrow(() ->
+                new NoSuchElementException("해당 사용자의 UserCollection이 존재하지 않습니다: " + tempUserProfile.getUserCode()));
+        userCollection.getLabelIds().add(93);
+        userCollectionRepository.save(userCollection);
+
+//        // rankMongo에 기본 레이팅 값 주기
+//        Optional<RankMongo> rankMongoOptional=rankRepository.findById(userProfile.getUserCode());
+//        RankMongo rankMongo=rankMongoOptional.get();
+//        rankMongo.setRating(defaultRating);
+//        rankRepository.save(rankMongo);
         
         UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
@@ -131,6 +149,10 @@ public class UserServiceImpl implements UserService {
                 .isDeleted(false)
                 .build();
         userInfoRepository.save(userInfo);
+
+        // redis에 넣기
+        rankUtil.createUserRankRedis(userProfile);
+
         return token;
     }
 
@@ -144,19 +166,18 @@ public class UserServiceImpl implements UserService {
                     .userNickname(nickname)
                     .userCode(userCode)
                     .userExp(0L)
-                    .userRating(1000)
-                    .userSkin("")
-                    .userTitle("")
+                    .userRating(defaultRating)
+                    .userSkin("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue.png")
+                    .userLabel("파릇파릇 새싹")
                     .isGuest(false)
                     .build();
-
             userProfileRepository.save(userProfile);
 
             // usercollection 생성
             UserCollection userCollection=UserCollection.builder()
                     .userCode(userCode)
-                    .skinIds(new ArrayList<>())
-                    .titleIds(new ArrayList<>())
+                    .skinIds(new ArrayList<>(Arrays.asList(1,2,3,4,27)))
+                    .labelIds(new ArrayList<>(Arrays.asList(93)))
                     .achievementIds(new ArrayList<>())
                     .build();
             userCollectionRepository.save(userCollection);
@@ -168,6 +189,10 @@ public class UserServiceImpl implements UserService {
                     .build();
             rankRepository.save(rankMongo);
 
+            // redis에 넣기
+            rankUtil.createUserRankRedis(userProfile);
+
+
 //        System.out.println(userProfile.getId());
             UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
@@ -176,7 +201,6 @@ public class UserServiceImpl implements UserService {
                     .userProfile(userProfile)
                     .isDeleted(false)
                     .build();
-
             userInfoRepository.save(userInfo);
             return userProfile;
 

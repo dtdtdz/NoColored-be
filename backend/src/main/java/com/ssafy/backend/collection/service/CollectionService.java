@@ -7,12 +7,16 @@ public interface CollectionService {
 
     ResponseEntity<?> getCollections(UserAccessInfo userAccessInfo);
     ResponseEntity<?> changeSkin(UserAccessInfo userAccessInfo, int skinId);
-    ResponseEntity<?> changeTitle(UserAccessInfo userAccessInfo, int titleId);
+    ResponseEntity<?> changeLabel(UserAccessInfo userAccessInfo, int labelId);
     ResponseEntity<?> putSkin();
-    ResponseEntity<?> putTitle();
+    ResponseEntity<?> putLabel();
     ResponseEntity<?> putAchievement();
     ResponseEntity<?> addSkin(UserAccessInfo userAccessInfo, int skinId);
-    ResponseEntity<?> addTitle();
-    ResponseEntity<?> addAchievement();
+    ResponseEntity<?> addLabel(UserAccessInfo userAccessInfo, int labelId);
+    ResponseEntity<?> addAchievement(UserAccessInfo userAccessInfo, int achievementId);
+
+    ResponseEntity<?> deleteSkin();
+    ResponseEntity<?> deleteLabel();
+    ResponseEntity<?> deleteAchievement();
 
 }

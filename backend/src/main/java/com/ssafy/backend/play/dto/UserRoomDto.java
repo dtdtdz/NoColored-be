@@ -16,7 +16,7 @@ public class UserRoomDto {
     String nickname;
     String tier;
     String skin;
-    String title;
+    String label;
     boolean isReady;
 
     public void setEmptyUser(){
@@ -27,7 +27,7 @@ public class UserRoomDto {
         nickname = userProfileDto.getNickname();
         tier = userProfileDto.getTier();
         skin = userProfileDto.getSkin();
-        title = userProfileDto.getTitle();
+        label = userProfileDto.getLabel();
         isReady = false;
     }
 
