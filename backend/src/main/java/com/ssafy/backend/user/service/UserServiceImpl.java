@@ -300,4 +300,9 @@ public class UserServiceImpl implements UserService {
         if (userProfile==null) return null;
         return new UserProfileDto(userProfile);
     }
+
+    @Override
+    public void logout(String token) {
+        
+    }
 }
