@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -125,7 +126,12 @@ public class UserServiceImpl implements UserService {
         userProfile.setUserNickname(userSignDto.getNickname());
         userProfile.setUserLabel("파릇파릇 새싹");
         userProfileRepository.save(userProfile);
-        userAccessInfo.setUserProfileDto(new UserProfileDto(userProfile));
+        UserProfileDto userProfileDto=new UserProfileDto(userProfile);
+        calcLevelExp(userProfileDto);
+        userAccessInfo.setUserProfileDto(userProfileDto);
+//        userAccessInfo.getUserProfileDto().setTier(tierCalculation());
+        // 순위, 티어 계산해주기
+        
 
         // 파릇파릇 새싹 칭호 얻었다고 처리
         UserProfile tempUserProfile = userProfile;
@@ -271,7 +277,7 @@ public class UserServiceImpl implements UserService {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
         userProfileRepository.updateNickname(user.getUserProfile().getId(), nickname);
         user.getUserProfile().setUserNickname(nickname);
-        user.setUserProfileDto(new UserProfileDto(user.getUserProfile()));
+        user.getUserProfileDto().setNickname(nickname);
     }
 
     @Override
@@ -301,8 +307,28 @@ public class UserServiceImpl implements UserService {
         return new UserProfileDto(userProfile);
     }
 
-    @Override
-    public void logout(String token) {
-        
+    private void calcLevelExp(UserProfileDto userProfileDto){
+        long currentExp=userProfileDto.getExp();
+        int level=0;
+        long reqExp=50;
+        while(currentExp>=reqExp){
+            currentExp-=reqExp;
+            level++;
+            if(level<=10){
+                reqExp=500;
+            }else if(level<=30) {
+                reqExp=1000;
+            }else if(level<=50) {
+                reqExp=1500;
+            }else if(level<=75) {
+                reqExp=2000;
+            }else{
+                reqExp=3000;
+            }
+        }
+        userProfileDto.setLevel(level);
+        userProfileDto.setExp(currentExp);
+        userProfileDto.setExpRequire(reqExp);
     }
+
 }

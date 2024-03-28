@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
-import com.ssafy.backend.play.domain.MatchingInfo;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.websocket.domain.ReceiveBinaryMessageType;
@@ -92,8 +91,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         if (binaryMessageType==null) return;
 //        System.out.println(binaryMessageType);
         switch (binaryMessageType){
-            case LEFT -> applyLeft(session);
-            case RIGHT -> applyRight(session);
+            case DIRECTION_CHANGE -> applyDirectionChange(session);
             case JUMP -> applyJump(session);
             case TEST_START2 -> testStart2(session);
             case TEST_START -> testStart(session);
@@ -121,17 +119,16 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         return jwtUtil.getUserAccessInfoRedis(node.asText());
     }
 
-    private void applyLeft(WebSocketSession session){
+    private void applyDirectionChange(WebSocketSession session){
         GameInfo gameInfo = sessionCollection.userWebsocketMap.get(session).getGameInfo();
         int idx = gameInfo.getUsers().get(session).getCharacterNum();
-        gameInfo.toLeft(idx);
+        int dir = gameInfo.getCharacterInfoArr()[idx].getDir();
+        if (dir<0){
+            gameInfo.toRight(idx);
+        }else {
+            gameInfo.toLeft(idx);
+        }
 //        System.out.println(0);
-    }
-    private void applyRight(WebSocketSession session){
-        GameInfo gameInfo = sessionCollection.userWebsocketMap.get(session).getGameInfo();
-        int idx = gameInfo.getUsers().get(session).getCharacterNum();
-        gameInfo.toRight(idx);
-//        System.out.println(1);
     }
 
     private void applyJump(WebSocketSession session){

@@ -30,7 +30,7 @@ public class FriendlyServiceImpl implements FriendlyService {
     private final InGameCollection inGameCollection;
     public FriendlyServiceImpl(InGameCollection inGameCollection){
         this.inGameCollection = inGameCollection;
-        roomInfoMap = Collections.synchronizedMap(new HashMap<>());
+        roomInfoMap = Collections.synchronizedMap(new LinkedHashMap<>()); // LinkedHashMap으로 바꿈
         uuidRoomInfoMap = Collections.synchronizedMap(new HashMap<>());;
     }
 
@@ -71,7 +71,7 @@ public class FriendlyServiceImpl implements FriendlyService {
         players[0].setUser(userAccessInfo.getUserProfileDto());
 
         roomDto.setPlayers(players);
-        roomDto.setMapId(1); // 이거 고쳐야할듯
+        roomDto.setMapId(mapId); // 이거 고쳐야할듯
 
         // roominfo 세팅
         roomInfo.setUserAccessInfos(new UserAccessInfo[] {userAccessInfo,null,null,null});
@@ -109,7 +109,8 @@ public class FriendlyServiceImpl implements FriendlyService {
             // roomInfoMap에서 RoomInfo 객체들을 방 코드 순서로 정렬
             // LinkedHashMap 안되나? 만든 순서대로 정렬되는디
             List<RoomInfo> sortedRooms = new ArrayList<>(roomInfoMap.values());
-            sortedRooms.sort(Comparator.comparingInt(RoomInfo::getRoomCodeInt));
+//            sortedRooms.sort(Comparator.comparingInt(RoomInfo::getRoomCodeInt));
+            Collections.reverse(sortedRooms);
 
             // 페이징을 위한 계산
             int totalRooms = sortedRooms.size();

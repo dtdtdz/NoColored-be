@@ -24,6 +24,7 @@ public class UserController {
         if (userProfileDto==null){
             return ResponseEntity.badRequest().body("Token is invalid");
         } else {
+            System.out.println(userProfileDto.isGuest());
             return ResponseEntity.ok(userProfileDto);
         }
     }
