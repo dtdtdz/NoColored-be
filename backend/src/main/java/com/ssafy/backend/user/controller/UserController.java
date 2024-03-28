@@ -125,4 +125,9 @@ public class UserController {
         if (userProfileDto==null) return ResponseEntity.badRequest().body("Can't find user");
         return ResponseEntity.ok(userProfileDto);
     }
+
+    @GetMapping("/logout")
+    private ResponseEntity<?> logout(@RequestHeader("Authorization") String token){
+        return ResponseEntity.ok("logout Success");
+    }
 }
