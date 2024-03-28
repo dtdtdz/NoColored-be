@@ -10,6 +10,7 @@ import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,15 +38,41 @@ public class RankServiceImpl implements RankService{
         this.rankRepository = rankRepository;
     }
 
+    // userRank 레디스 요소 다 삭제
+    @Override
+    public ResponseEntity<?> clearRedis(){
+        String key="userRank";
+        redisTemplate.delete(key);
+        return ResponseEntity.ok("userRank 초기화 완료");
+    }
+
+    // 더미데이터 넣기
+    @Override
+    public ResponseEntity<?> putRank(int dataNumber){
+        String key="userRank";
+        for(int i=1;i<=dataNumber;i++){
+            String userCode=Integer.toString(i);
+            double rating=(double) i;
+            redisTemplate.opsForZSet().add(key,userCode,rating);
+        }
+        return ResponseEntity.ok(dataNumber+" 만큼 더미 데이터 레디스에 넣기 성공");
+    }
+
+
     // 상위 100명 랭크 보기
     @Override
     public RankInfoDto getRankList(){
         LocalDateTime refreshTime = LocalDateTime.now();
         List<RankDto> rankDtoList = new ArrayList<>();
 
-        // Redis에서 상위 100명의 유저 정보 가져오기
+        // Redis에서 최대 상위 100명의 유저 정보 가져오기
         // 반환 타입을 Set<String>으로 안전하게 변환
-        Set<Object> topRankObjects = redisTemplate.opsForZSet().reverseRange("userRank", 0, 99);
+        // Redis에서 전체 요소 수 가져오기
+        Long totalElements = redisTemplate.opsForZSet().size("userRank");
+        if(totalElements>100){
+            totalElements= 100L;
+        }
+        Set<Object> topRankObjects = redisTemplate.opsForZSet().reverseRange("userRank", 0, totalElements);
         Set<String> topRanks = topRankObjects.stream()
                 .map(Object::toString)
                 .collect(Collectors.toSet());
@@ -58,7 +85,7 @@ public class RankServiceImpl implements RankService{
             rankDto.setUserCode(userCode);
             rankDto.setNickname(userProfile.get().getUserNickname());
             rankDto.setSkin(userProfile.get().getUserSkin());
-            rankDto.setLabel(userProfile.get().getUserTitle());
+            rankDto.setLabel(userProfile.get().getUserLabel());
             int rating=userProfile.get().getUserRating();
             rankDto.setRating(rating);
             rankDto.setTier(rankUtil.tierCalculation(rank,rating));
@@ -102,7 +129,7 @@ public class RankServiceImpl implements RankService{
                 .nickname(userProfile.getUserNickname())
                 .rating(userScore)
                 .skin(userProfile.getUserSkin())
-                .label(userProfile.getUserTitle())
+                .label(userProfile.getUserLabel())
                 .tier(rankUtil.tierCalculation(userRank,userScore))
                 .build();
     }

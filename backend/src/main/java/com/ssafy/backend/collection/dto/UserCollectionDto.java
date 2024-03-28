@@ -8,6 +8,6 @@ import java.util.List;
 @Setter
 public class UserCollectionDto {
     private List<SkinDto> skins;
-    private List<TitleDto> labels;
+    private List<LabelDto> labels;
     private List<AchievementDto> achievements;
 }

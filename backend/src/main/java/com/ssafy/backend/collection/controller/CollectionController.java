@@ -25,29 +25,43 @@ public class CollectionController {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         return collectionService.addSkin(userAccessInfo,skinId);
     }
-    @PostMapping("/add/title")
-    public ResponseEntity<?> addTitleCollection(@RequestHeader("Authorization") String token){
+    @PostMapping("/add/label/{labelId}")
+    public ResponseEntity<?> addLabelCollection(@RequestHeader("Authorization") String token, @PathVariable int labelId){
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        return collectionService.addTitle();
+        return collectionService.addLabel(userAccessInfo,labelId);
     }
-    @PostMapping("/add/achievement")
-    public ResponseEntity<?> addAchievementCollection(@RequestHeader("Authorization") String token){
+    @PostMapping("/add/achievement/{achievementId}")
+    public ResponseEntity<?> addAchievementCollection(@RequestHeader("Authorization") String token, @PathVariable int achievementId){
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        return collectionService.addAchievement();
+        return collectionService.addAchievement(userAccessInfo, achievementId);
     }
     
-    // 테스트용 더미 데이터 넣기
+    // 몽고에 데이터 넣기
     @PostMapping("/put/skin")
     public ResponseEntity<?> putSkinCollection(){
         return collectionService.putSkin();
     }
-    @PostMapping("/put/title")
-    public ResponseEntity<?> putTitleCollection(){
-        return collectionService.putTitle();
+    @PostMapping("/put/label")
+    public ResponseEntity<?> putLabelCollection(){
+        return collectionService.putLabel();
     }
     @PostMapping("/put/achievement")
     public ResponseEntity<?> putAchievementCollection(){
         return collectionService.putAchievement();
+    }
+    
+    // 몽고에 있는 데이터 삭제
+    @DeleteMapping("/delete/skin")
+    public ResponseEntity<?> deleteSkinCollection(){
+        return collectionService.deleteSkin();
+    }
+    @DeleteMapping("/delete/label")
+    public ResponseEntity<?> deleteLabelCollection(){
+        return collectionService.deleteLabel();
+    }
+    @DeleteMapping("/delete/achievement")
+    public ResponseEntity<?> deleteAchievementCollection(){
+        return collectionService.deleteAchievement();
     }
 
     @GetMapping
@@ -63,11 +77,11 @@ public class CollectionController {
         return collectionService.changeSkin(userAccessInfo,skinId);
     }
 
-    @PatchMapping("/title")
-    public ResponseEntity<?> changeTitle(@RequestHeader("Authorization") String token, @RequestBody Map<String, Integer> requestBody){
+    @PatchMapping("/label")
+    public ResponseEntity<?> changeLabel(@RequestHeader("Authorization") String token, @RequestBody Map<String, Integer> requestBody){
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        Integer titleId=requestBody.get("titleId");
-        return collectionService.changeTitle(userAccessInfo,titleId);
+        Integer labelId=requestBody.get("labelId");
+        return collectionService.changeLabel(userAccessInfo,labelId);
     }
 
 
