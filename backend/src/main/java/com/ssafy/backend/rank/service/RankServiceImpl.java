@@ -6,6 +6,7 @@ import com.ssafy.backend.rank.dto.RankInfoDto;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.rank.util.RankUtil;
 import com.ssafy.backend.user.dao.UserProfileRepository;
+import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
@@ -97,10 +98,14 @@ public class RankServiceImpl implements RankService{
 
     // 내 랭크 보기
     @Override
-    public RankDto getRank(String token) {
+    public UserProfileDto getRank(String token) {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
         UserProfile userProfile=user.getUserProfile();
         String userCode=userProfile.getUserCode();
+        // 게스트는 랭킹 조회 안됌
+        if(userProfile.isGuest()){
+            return null;
+        }
         // 레디스에서 사용자의 점수(score)와 등수(rank) 조회
         String key = "userRank";
         Double score = redisTemplate.opsForZSet().score(key, userCode);
@@ -123,15 +128,16 @@ public class RankServiceImpl implements RankService{
 //        }
 
         // UserProfile에서 나머지 필요한 정보를 가져와 RankDto 객체 생성
-        return RankDto.builder()
-                .rank(userRank)
-                .userCode(userCode)
-                .nickname(userProfile.getUserNickname())
-                .rating(userScore)
-                .skin(userProfile.getUserSkin())
-                .label(userProfile.getUserLabel())
-                .tier(rankUtil.tierCalculation(userRank,userScore))
-                .build();
+//        return RankDto.builder()
+//                .rank(userRank)
+//                .userCode(userCode)
+//                .nickname(userProfile.getUserNickname())
+//                .rating(userScore)
+//                .skin(userProfile.getUserSkin())
+//                .label(userProfile.getUserLabel())
+//                .tier(rankUtil.tierCalculation(userRank,userScore))
+//                .build();
+        return null;
     }
 
 }
