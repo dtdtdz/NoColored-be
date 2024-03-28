@@ -39,8 +39,8 @@ public class MatchingCollection {
         synchronized (addQueue){
             addQueue.offer(userAccessInfo);
         }
-
     }
+
     public void setDelMatching(UserAccessInfo userAccessInfo){
         synchronized (delQueue){
             delQueue.offer(userAccessInfo);

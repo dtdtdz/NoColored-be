@@ -1,8 +1,11 @@
 package com.ssafy.backend.play.service;
 
+import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.play.util.MatchingCollection;
 import com.ssafy.backend.user.util.JwtUtil;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,7 +22,19 @@ public class RankingServiceImpl implements RankingService{
     @Override
     public void addMatchingList(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        matchingCollection.setAddMatching(userAccessInfo);
+        try {
+            matchingCollection.setAddMatching(userAccessInfo);
+        } catch (Exception e){
+            if (userAccessInfo.getPosition() instanceof RoomInfo){
+                throw new RuntimeException("Position conflict: "
+                        +userAccessInfo.getRoomInfo().getClass()+":"
+                        +userAccessInfo.getRoomInfo().getRoomDto().getRoomCode());
+            } else {
+                throw new RuntimeException("Position conflict: "
+                        +userAccessInfo.getRoomInfo().getClass());
+            }
+        }
+
 //        return false;
     }
 
