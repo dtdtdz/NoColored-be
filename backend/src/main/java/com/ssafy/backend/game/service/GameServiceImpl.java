@@ -47,7 +47,7 @@ public class GameServiceImpl implements GameService {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         GameInfo gameInfo = userAccessInfo.getGameInfo();
         if (gameInfo==null) return null;
-        gameInfo.getUsers().get(userAccessInfo.getSession()).setAccess(true);
+//        gameInfo.getUsers().get(userAccessInfo.getSession()).setAccess(true);
         return gameInfo.getGameRoomDto();
     }
 
