@@ -275,13 +275,15 @@ public class GameInfo {
 
     public void applyStep(){ //변경
         if (stepList.isEmpty()) return;
-        for (int i=0; i<users.size(); i++){
-            byte characterNum = stepList.get(i)[2];
+        for (byte[] bytes : stepList) {
+            byte characterNum = bytes[2];
+            byte playerNum = bytes[0];
             effectList.add(new Effect(EffectType.STEP,
                     characterInfoArr[characterNum].getX(),
-                    characterInfoArr[characterNum].getY()+CHARACTER_SIZE/2f));
-            userGameInfoList.get(i).getUserPlayInfo()
-                    .setStep(userGameInfoList.get(i).getUserPlayInfo().getStep()+1);
+                    characterInfoArr[characterNum].getY() + CHARACTER_SIZE / 2f));
+            userGameInfoList.get(playerNum).getUserPlayInfo()
+                    .setStep(userGameInfoList.get(playerNum).getUserPlayInfo().getStep() + 1);
+//            userGameInfoList.get(playerNum).ge
 //            userGameInfoList.get
         }
         stepList.clear();
