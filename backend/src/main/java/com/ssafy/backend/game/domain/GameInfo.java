@@ -232,10 +232,11 @@ public class GameInfo {
     }
 
     public void putSetCharacter(){
-        for (Map.Entry<WebSocketSession,UserGameInfo> entry:users.entrySet()){
-            buffer[entry.getValue().getPlayerNum()]
+        for (UserGameInfo userGameInfo: userGameInfoList){
+            buffer[userGameInfo.getPlayerNum()]
+                    .put(userGameInfo.getPlayerNum())
                     .put(SendBinaryMessageType.SET_CHARACTER.getValue())
-                    .put(entry.getValue().getCharacterNum());
+                    .put(userGameInfo.getCharacterNum());
 
         }
     }
