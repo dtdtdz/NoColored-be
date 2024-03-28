@@ -23,7 +23,7 @@ public class UserGameInfo {
     private byte score;
 
     private UserPlayInfo userPlayInfo;
-    private Map<GameUserState, Float> states;
+    private Map<GameUserState, Long> states;//milliSecond
 
     public UserGameInfo(WebSocketSession webSocketSession,
                         byte characterNum,

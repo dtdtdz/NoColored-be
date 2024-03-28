@@ -30,7 +30,8 @@ public class GameInfo {
 
     private List<byte[]> stepList;
     private List<Effect> effectList;
-    private List<byte[]> skinList;
+    private List<byte[]> displaySkinList;
+    private GameItemType type;
 
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
@@ -98,7 +99,7 @@ public class GameInfo {
 
         stepList = new ArrayList<>();
         effectList = new LinkedList<>();
-        skinList = new LinkedList<>();
+        displaySkinList = new LinkedList<>();
         //캐릭터 위치 랜덤배치
         List<int[]> floorPos = new LinkedList<>();
         //유저 캐릭터 번호 랜덤 매핑
@@ -196,6 +197,16 @@ public class GameInfo {
         long result = now - time;
         time = now;
 
+        for (UserGameInfo userGameInfo:userGameInfoList){
+            for (Map.Entry<GameUserState,Long> entry:userGameInfo.getStates().entrySet()){
+                long leftTime = entry.getValue()-result;
+                if (leftTime>0){
+                    userGameInfo.getStates().put(entry.getKey(), leftTime);
+                } else {
+                    userGameInfo.getStates().remove(entry.getKey());
+                }
+            }
+        }
         return result;
     }
 
@@ -298,14 +309,16 @@ public class GameInfo {
     public void putSkin(){
         for (UserGameInfo userGameInfo:userGameInfoList){
             if (userGameInfo.getStates().containsKey(GameUserState.DISPLAY_SKIN))
-                skinList.add(new byte[]{userGameInfo.getPlayerNum(),userGameInfo.getCharacterNum()});
+                displaySkinList.add(new byte[]{userGameInfo.getPlayerNum(),userGameInfo.getCharacterNum()});
         }
         for (int i=0; i<userGameInfoList.size(); i++){
-            buffer[i].put(SendBinaryMessageType.SKIN.getValue());
-            for (int j=0; j<skinList.size(); j++){
-                buffer[i].put(skinList.get(j));
+            buffer[i].put(SendBinaryMessageType.SKIN.getValue())
+                    .put((byte) displaySkinList.size());
+            for (byte[] bytes : displaySkinList) {
+                buffer[i].put(bytes);
             }
         }
+        displaySkinList.clear();
     }
     public void putTestMap(){
         for (int i=0; i< users.size(); i++){
