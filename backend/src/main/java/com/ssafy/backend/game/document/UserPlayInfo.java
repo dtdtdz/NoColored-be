@@ -17,8 +17,8 @@ import java.util.*;
 @AllArgsConstructor
 public class UserPlayInfo {
     int rank;
-    long step;
-    long itemCount;
+    int step;
+    int itemCount;
     LocalDateTime startDate;
     LocalDateTime endDate;
     String gameType;
