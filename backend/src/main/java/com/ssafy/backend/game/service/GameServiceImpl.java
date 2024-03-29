@@ -1,6 +1,7 @@
 package com.ssafy.backend.game.service;
 
 import com.ssafy.backend.game.domain.ResultInfo;
+import com.ssafy.backend.game.dto.ResultDto;
 import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.game.util.InGameLogic;
@@ -51,10 +52,14 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public UserResultDto getResult(String token) {
+    public ResultDto getResult(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        UserResultDto userResultDto = userAccessInfo.getResultInfo().getPlayers().get(userAccessInfo);
-        userAccessInfo.clearPosition();
+        ResultDto userResultDto = new ResultDto(userAccessInfo.getResultInfo());
+        if (userAccessInfo.getResultInfo().getRoom()==null){
+            userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getRoom());
+        } else {
+            userAccessInfo.clearPosition();
+        }
         return userResultDto;
     }
 
