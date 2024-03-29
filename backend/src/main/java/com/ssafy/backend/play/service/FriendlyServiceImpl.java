@@ -274,6 +274,8 @@ public class FriendlyServiceImpl implements FriendlyService {
                             }
                             // 리턴
                             return ResponseEntity.ok("Game started.");
+                        } else {
+                            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Not all players are ready.");
                         }
                     }
                 }else{
