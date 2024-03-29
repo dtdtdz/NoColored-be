@@ -93,8 +93,8 @@ public class GameInfo {
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
         random = new Random();
         gameCycle = GameCycle.CREATE;
-        if (mapId==0){
-            mapInfo = new MapInfo(random.nextInt(2)+1);
+        if (mapId>0 && mapId<=2){
+            mapInfo = new MapInfo(mapId);
         } else {
             mapInfo = new MapInfo(random.nextInt(2)+1);
         }
