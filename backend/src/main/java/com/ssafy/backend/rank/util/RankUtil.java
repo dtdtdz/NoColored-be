@@ -122,6 +122,16 @@ public class RankUtil {
         }
     }
 
+    // 게스트용
+    public void getMyRankGuest(UserProfileDto userProfileDto){
+        String userCode=userProfileDto.getUserCode();
+        // userProfileDto 갱신(순위, 랭킹점수, 티어)
+        userProfileDto.setRank(-1);
+        // 경험치로 못해서 레벨로 처리함
+        userProfileDto.setTier(tierCalculation(-1, userProfileDto.getRating(), userProfileDto.getLevel()));
+    }
+    
+
     // 서버 시작하면 mongo에 있는 usercode, rating을 userRank로 보낸다
     @EventListener(ApplicationReadyEvent.class)
     public void mongoToRedis(){

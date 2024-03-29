@@ -316,10 +316,10 @@ public class UserServiceImpl implements UserService {
         if(!userProfileDto.isGuest()){
             rankUtil.createUserRankRedis(userProfileDto); // redis에 넣기
             rankUtil.getMyRank(userProfileDto); // 순위, 티어 계산
+        }else{
+            rankUtil.getMyRankGuest(userProfileDto);
         }
+
     }
-
-
-
 
 }
