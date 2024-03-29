@@ -30,7 +30,13 @@ public class InGameCollection {
 //        for (UserAccessInfo user:roomDto.getUserArr())
 //    }
     public void addGame(RoomInfo roomInfo){
-        List<UserAccessInfo> users = Arrays.asList(roomInfo.getUserAccessInfos());
+        List<UserAccessInfo> users = new LinkedList<>();
+        for (UserAccessInfo user:roomInfo.getUserAccessInfos()){
+            if (user != null) {
+                users.add(user); // null이 아닐 경우에만 리스트에 추가
+            }
+        }
+
         users.removeIf(Objects::isNull);//null값 제거
 
         GameInfo gameInfo = new GameInfo(users, roomInfo.getRoomDto().getRoomId());

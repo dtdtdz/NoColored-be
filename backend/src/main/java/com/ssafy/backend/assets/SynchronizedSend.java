@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 public class SynchronizedSend {
     public static void binarySend(WebSocketSession session, ByteBuffer buffer){
         if (session==null) {
-            System.out.println("세션 없음");
+            System.out.println("Can't find session.");
             return;
         }
         synchronized (session){
@@ -24,7 +24,7 @@ public class SynchronizedSend {
                 buffer.clear();
             } catch (Exception e) {
                 buffer.clear();
-                throw new RuntimeException("전송 실패");
+                throw new RuntimeException("Fail to send.");
             }
 
         }
@@ -35,7 +35,7 @@ public class SynchronizedSend {
 
     public static void textSend(WebSocketSession session, String action, Object data){
         if (session==null) {
-            System.out.println("세션 없음");
+            System.out.println("Can't find session.");
             return;
         }
         try {
