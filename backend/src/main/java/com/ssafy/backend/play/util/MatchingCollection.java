@@ -113,9 +113,11 @@ public class MatchingCollection {
         //높은 점수대부터 매칭 시도
         //7초 3인, 12초 2인 매칭가능
         for (int i=matchingQueue.size()-1; i>=0; i--){
-            while (!matchingQueue.get(i).isEmpty()&&matchingQueue.get(i).size() >= getMatchingSize(matchingQueue.get(i),now)){
+
+            while (!matchingQueue.get(i).isEmpty() && matchingQueue.get(i).size() >= getMatchingSize(matchingQueue.get(i),now)){
                 List<UserAccessInfo> list = new ArrayList<>();
-                for (int j=0; j<getMatchingSize(matchingQueue.get(i),now); j++){
+                int size = getMatchingSize(matchingQueue.get(i),now);
+                for (int j=0; j<size; j++){
                     try {
                         list.add(matchingQueue.get(i).get(0));
                     } catch (Exception e){
