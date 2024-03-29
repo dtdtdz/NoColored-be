@@ -111,16 +111,13 @@ public class MatchingCollection {
         delMatchingList();
 
         //높은 점수대부터 매칭 시도
+        //7초 3인, 12초 2인 매칭가능
         for (int i=matchingQueue.size()-1; i>=0; i--){
-            while (matchingQueue.get(i).size() >= GameInfo.MAX_PLAYER){
+            while (matchingQueue.get(i).size() >= getMatchingSize(matchingQueue.get(i),now)){
                 List<UserAccessInfo> list = new ArrayList<>();
-                for (int j=0; j<GameInfo.MAX_PLAYER; j++){
+                for (int j=0; j<getMatchingSize(matchingQueue.get(i),now); j++){
                     try {
                         list.add(matchingQueue.get(i).get(0));
-
-                        //매칭 정보 추가:맵, 인원
-//                        list.get(i).getSession().sendMessage(new TextMessage("matching success"));
-
                     } catch (Exception e){
                         e.printStackTrace();
                     }
@@ -135,5 +132,15 @@ public class MatchingCollection {
 //                System.out.println(SendTextMessageType.MATCHING.getValue());
             }
         }
+    }
+
+    private int getMatchingSize(List<UserAccessInfo> userAccessInfos, long now){
+        MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfos.get(0));
+        long start = matchingInfo.getStartTime();
+        if (now-start<7000){
+            return GameInfo.MAX_PLAYER;
+        } else if (now-start<12000){
+            return 3;
+        } else return 2;
     }
 }
