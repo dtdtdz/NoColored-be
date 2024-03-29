@@ -19,8 +19,8 @@ public class GameInfo {
     private long targetTime;
     private long time;
     private int second;
-    private Map<UserAccessInfo, UserGameInfo> users = new LinkedHashMap<>();
-    private List<UserGameInfo> userGameInfoList = new LinkedList<>();
+    private Map<UserAccessInfo, UserGameInfo> users;
+    private List<UserGameInfo> userGameInfoList;
     private MapInfo mapInfo;
     private CharacterInfo[] characterInfoArr;
     private boolean[][] floor;
@@ -88,6 +88,7 @@ public class GameInfo {
     private GameCycle gameCycle;
     public GameInfo(List<UserAccessInfo> userList, UUID roomUuid, int mapId){
         users = new LinkedHashMap<>();
+        userGameInfoList = new LinkedList<>();
         startDate = LocalDateTime.now();
         setSecond(3);
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
@@ -336,8 +337,8 @@ public class GameInfo {
     }
 
     public void putScore(){
-        for (int i=0; i<users.size(); i++){
-            buffer[i].put(SendBinaryMessageType.SCORE.getValue()).put((byte) users.size());
+        for (int i=0; i<userGameInfoList.size(); i++){
+            buffer[i].put(SendBinaryMessageType.SCORE.getValue()).put((byte) userGameInfoList.size());
             for (UserGameInfo user:userGameInfoList){
                 buffer[i].put(user.getScore());
             }
@@ -397,9 +398,9 @@ public class GameInfo {
     }
 
     //사용 안하나?
-    public void delSession(WebSocketSession session){
-        users.remove(session);
-    }
+//    public void delSession(WebSocketSession session){
+//        users.remove(session);
+//    }
 
     public void goToNextCycle(){
         gameCycle = gameCycle.next();

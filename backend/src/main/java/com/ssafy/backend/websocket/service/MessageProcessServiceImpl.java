@@ -124,7 +124,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
 
     private void applyReady(WebSocketSession session) {
         GameInfo gameInfo = sessionCollection.userWebsocketMap.get(session).getGameInfo();
-        gameInfo.getUsers().get(session).setAccess(true);
+        gameInfo.getUsers().get(sessionCollection.userWebsocketMap.get(session)).setAccess(true);
     }
     private void applyDirectionChange(WebSocketSession session){
         GameInfo gameInfo = sessionCollection.userWebsocketMap.get(session).getGameInfo();
@@ -133,7 +133,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             return;
         }
 
-        int idx = gameInfo.getUsers().get(session).getCharacterNum();
+        int idx = gameInfo.getUsers().get(sessionCollection.userWebsocketMap.get(session)).getCharacterNum();
         int dir = gameInfo.getCharacterInfoArr()[idx].getDir();
         if (dir<0){
             gameInfo.toRight(idx);
@@ -150,7 +150,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             System.out.println("can't find game");
             return;
         }
-        int idx = gameInfo.getUsers().get(session).getCharacterNum();
+        int idx = gameInfo.getUsers().get(sessionCollection.userWebsocketMap.get(session)).getCharacterNum();
         gameInfo.jump(idx);
     }
 
