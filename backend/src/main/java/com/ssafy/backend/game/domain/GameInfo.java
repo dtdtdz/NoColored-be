@@ -87,6 +87,7 @@ public class GameInfo {
 
     private GameCycle gameCycle;
     public GameInfo(List<UserAccessInfo> userList, UUID roomUuid, int mapId){
+        users = new LinkedHashMap<>();
         startDate = LocalDateTime.now();
         setSecond(3);
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
