@@ -113,6 +113,12 @@ public class FriendlyServiceImpl implements FriendlyService {
 //            sortedRooms.sort(Comparator.comparingInt(RoomInfo::getRoomCodeInt));
             Collections.reverse(sortedRooms);
 
+            // 비었으면 하나만 만들어서 줌
+            if(sortedRooms.isEmpty()){
+                paginatedFriendlyRooms.add(new FriendlyRoomDto());
+                return ResponseEntity.ok(paginatedFriendlyRooms);
+            }
+
             // 페이징을 위한 계산
             int totalRooms = sortedRooms.size();
             int startIndex = (offset - 1) * maxRooms;
