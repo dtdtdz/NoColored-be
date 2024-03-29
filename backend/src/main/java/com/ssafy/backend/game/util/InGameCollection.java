@@ -64,10 +64,11 @@ public class InGameCollection {
         user.setGameInfo(gameInfo);
     }
 
+    // 게임 종료
     public void removeGame(GameInfo gameInfo){
-        delQueue.offer(gameInfo);
-
+        delQueue.offer(gameInfo); // 없어질 게임을 담는 큐에 gameinfo를 추가
     }
+
     public void updateGameList() throws Exception{
         while (!delQueue.isEmpty()){
             inGameList.remove(delQueue.poll());
