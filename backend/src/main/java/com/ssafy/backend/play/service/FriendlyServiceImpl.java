@@ -115,7 +115,6 @@ public class FriendlyServiceImpl implements FriendlyService {
 
             // 비었으면 하나만 만들어서 줌
             if(sortedRooms.isEmpty()){
-                paginatedFriendlyRooms.add(new FriendlyRoomDto());
                 return ResponseEntity.ok(paginatedFriendlyRooms);
             }
 
@@ -320,6 +319,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                 RoomDto roomDto = roomInfo.getRoomDto();
                 // 방장이면
                 if (i == roomDto.getMasterIndex()) {
+                    roomDto.setMapId(mapId);
                     roomDto.setRoomTitle(title);
                     roomDto.setRoomPassword(password);
                     roomInfo.setRoomDto(roomDto);
