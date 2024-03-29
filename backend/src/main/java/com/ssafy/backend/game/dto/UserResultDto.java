@@ -17,7 +17,7 @@ public class UserResultDto {
     int index;
     String skin;
     int rank;
-    int step;
+    int score;
 
     public UserResultDto(UserAccessInfo userAccessInfo){
         nickname = userAccessInfo.getUserProfile().getUserNickname();
@@ -25,7 +25,7 @@ public class UserResultDto {
         skin = userAccessInfo.getUserProfile().getUserSkin();
         index = userAccessInfo.getGameInfo().getUsers().get(userAccessInfo).getPlayerNum();
         rank = userAccessInfo.getGameInfo().getUsers().get(userAccessInfo).getUserPlayInfo().getRank();
-        step = userAccessInfo.getGameInfo().getUsers().get(userAccessInfo).getUserPlayInfo().getStep();
+        score = userAccessInfo.getGameInfo().getUsers().get(userAccessInfo).getScore();
     }
 
 }
