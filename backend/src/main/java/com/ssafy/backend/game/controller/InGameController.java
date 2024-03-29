@@ -1,8 +1,7 @@
 package com.ssafy.backend.game.controller;
 
-import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.game.domain.GameRoomDto;
-import com.ssafy.backend.game.dto.ResultDto;
+import com.ssafy.backend.game.domain.ResultInfo;
 import com.ssafy.backend.game.service.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,9 +61,9 @@ public class InGameController {
 
     // 플레이어마다 다른 resultdto
     @GetMapping
-    public ResultDto getGameResultData(@RequestHeader("Authorization") String token){
+    public ResponseEntity<?> getGameResultData(@RequestHeader("Authorization") String token){
 
-        return null;
+        return ResponseEntity.ok(gameService.getResult(token));
     }
 
 }

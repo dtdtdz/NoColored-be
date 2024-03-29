@@ -50,6 +50,8 @@ public class MapInfo {
         list2.add(new int[]{3,13,6});
         list2.add(new int[]{13,13,6});
         list2.add(new int[]{24,13,6});
+
+        list2.add(new int[] {9,17,15});
         MapList.add(list2);
     }
 

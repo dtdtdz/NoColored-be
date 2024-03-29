@@ -1,19 +1,28 @@
 package com.ssafy.backend.game.domain;
 
-import java.util.UUID;
+import com.ssafy.backend.game.domain.GameInfo;
+import com.ssafy.backend.game.dto.Reward;
+import com.ssafy.backend.game.dto.UserResultDto;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class ResultInfo {
-    // 유저마다 resultinfo를 만드는 function 만들기
-    // gameinfo를 resultinfo로 만든다
-    // 생성자로 gameinfo받는다
-    // 게임이 끝날떄 reward 생성해야함
-    // 게임 끝날떄 resultdto를 list로 만들기
+    private Map<UserAccessInfo,UserResultDto> results;
+    Reward reward;
+    UUID roomUuid;
+    public ResultInfo(GameInfo gameInfo){
+        results = new LinkedHashMap<>();
+        roomUuid = gameInfo.getRoomUuid();
+        for (UserAccessInfo userAccessInfo:gameInfo.getUsers().keySet()){
+            results.put(userAccessInfo ,new UserResultDto(userAccessInfo));
+        }
 
-
-    UUID roomUUID;
-
-
-
-
-
+    }
 }
