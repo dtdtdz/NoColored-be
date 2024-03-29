@@ -44,7 +44,8 @@ public class GameInfo {
     public static final int WALL_WIDTH = 3;
     public static final int DEFAULT_TIME = 120;
     public static final int CHARACTER_NUM = 10;
-    public static final int JUMP_HEIGHT = -280;
+    public static final int JUMP_VEL_Y = -280;
+    public static final int STEP_VEL_Y = -230;
 
     public static final ByteBuffer[] buffer = new ByteBuffer[4];
     static {

@@ -26,6 +26,7 @@ public class JwtUtil {
             RedisTemplate<String,Object> redisTemplate){
         this.sessionCollection = sessionCollection;
         this.redisTemplate = redisTemplate;
+        redisTemplate.opsForValue().set("test",1,10,TimeUnit.SECONDS);
     }
 
     public String generateToken(String code) {
@@ -37,7 +38,7 @@ public class JwtUtil {
         String token = JWT.create()
                 .withPayload(claims)
                 .withIssuedAt(new Date(now))
-                .withExpiresAt(new Date(now+3600*1000))
+                .withExpiresAt(new Date(now+1800*1000))
                 .sign(Algorithm.HMAC256(secretKey));
 
         return token;
