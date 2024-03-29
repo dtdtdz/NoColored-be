@@ -18,9 +18,10 @@ public class MapInfo {
     private final int right;
 
     private final List<int[]> floorList;
-    private static List<List<int[]>> MapList;
+    private static final List<List<int[]>> MapList;
 
     static {
+        MapList = new LinkedList<>();
         List<int[]> list1 = new LinkedList<>();
         list1.add(new int[] {5,5,6});
         list1.add(new int[] {15,5,5});
