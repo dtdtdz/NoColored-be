@@ -166,23 +166,6 @@ public class GameInfo {
         this(userList, null, 0);
     }
 
-//    private GameInfo(int num){ //리팩토링 필요
-//        startDate = LocalDateTime.now();
-//        startTime = System.currentTimeMillis();
-//        time = startTime;
-//        second = DEFAULT_TIME;
-//        characterInfoArr = new CharacterInfo[CHARACTER_NUM];
-//        for (int i=0; i<characterInfoArr.length; i++){
-//            characterInfoArr[i] = new CharacterInfo();
-//            characterInfoArr[i].setX((1+i)*100);
-//            characterInfoArr[i].setY(0);
-//            characterInfoArr[i].setVelX(DEFAULT_SPEED);
-//        }
-//
-//        mapInfo = new MapInfo();//num
-//        floor = new boolean[MAP_HEIGHT][MAP_WIDTH];
-//    }
-
     public boolean isAllReady(){
         for (UserGameInfo userGameInfo:userGameInfoList){
             if (!userGameInfo.isAccess()) return false;
@@ -302,7 +285,7 @@ public class GameInfo {
             applyState(user2, GameUserState.DISPLAY_SKIN, 2000L);
             applyState(user2, GameUserState.STEPED, 2000L);
             applyState(user2, GameUserState.STOP, 2000L);
-            characterInfoArr[user2.getCharacterNum()].setX(0);
+            characterInfoArr[user2.getCharacterNum()].setVelX(0);
         }
         stepList.clear();
     }
@@ -320,7 +303,7 @@ public class GameInfo {
                 if (time < 0) {
                     it.remove(); // 안전하게 원소 제거
                     if (entry.getKey().equals(GameUserState.STOP)) {
-                        characterInfoArr[userGameInfo.getCharacterNum()].setX(DEFAULT_SPEED);
+                        characterInfoArr[userGameInfo.getCharacterNum()].setVelX(DEFAULT_SPEED);
                     } else if (entry.getKey().equals(GameUserState.STEPED)){
                         int val;
                         do {
@@ -345,11 +328,11 @@ public class GameInfo {
             }
         }
 
-        StringBuilder str = new StringBuilder();
-        for (UserGameInfo user:userGameInfoList){
-            str.append(user.getScore()).append(" ");
-        }
-        System.out.println(str);
+//        StringBuilder str = new StringBuilder();
+//        for (UserGameInfo user:userGameInfoList){
+//            str.append(user.getScore()).append(" ");
+//        }
+//        System.out.println(str);
     }
 
     public void putEffect(){
