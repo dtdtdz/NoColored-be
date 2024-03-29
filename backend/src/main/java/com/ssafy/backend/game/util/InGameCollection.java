@@ -65,6 +65,7 @@ public class InGameCollection {
 
     public void removeGame(GameInfo gameInfo){
         delQueue.offer(gameInfo);
+
     }
     public void updateGameList() throws Exception{
         while (!delQueue.isEmpty()){

@@ -27,6 +27,7 @@ public class JwtUtil {
         this.sessionCollection = sessionCollection;
         this.redisTemplate = redisTemplate;
         redisTemplate.opsForValue().set("test",1,10,TimeUnit.SECONDS);
+        redisTemplate.expire("test",5,TimeUnit.SECONDS);
     }
 
     public String generateToken(String code) {
