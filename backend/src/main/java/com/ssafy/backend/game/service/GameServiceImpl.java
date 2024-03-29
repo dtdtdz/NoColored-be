@@ -53,7 +53,9 @@ public class GameServiceImpl implements GameService {
     @Override
     public UserResultDto getResult(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        return userAccessInfo.getResultInfo().getResults().get(userAccessInfo);
+        UserResultDto userResultDto = userAccessInfo.getResultInfo().getResults().get(userAccessInfo);
+        userAccessInfo.clearPosition();
+        return userResultDto;
     }
 
     @EventListener(ApplicationReadyEvent.class)

@@ -41,21 +41,25 @@ public class UserAccessInfo {
     }
 
     public void setGameInfo(GameInfo gameInfo){
-        if (!(position instanceof RoomInfo || position instanceof MatchingInfo || position instanceof GameInfo)) throw new RuntimeException("Position conflict");
+        if (!(position instanceof RoomInfo || position instanceof MatchingInfo || position instanceof GameInfo))
+            throw new RuntimeException("Position conflict"+position.getClass());
         position = gameInfo;
     }
 
     public void setMatchingInfo(MatchingInfo matchingInfo){
-        if (position instanceof GameInfo || position instanceof MatchingInfo || position instanceof RoomInfo) throw new RuntimeException("Position conflict");
+        if (position instanceof GameInfo || position instanceof MatchingInfo || position instanceof RoomInfo)
+            throw new RuntimeException("Position conflict"+position.getClass());
         position = matchingInfo;
     }
     public void setRoomInfo(RoomInfo roomInfo){
-        if (position instanceof MatchingInfo || position instanceof RoomInfo) throw new RuntimeException("Position conflict");
+        if (position instanceof MatchingInfo || position instanceof RoomInfo)
+            throw new RuntimeException("Position conflict"+position.getClass());
         position = roomInfo;
     }
 
     public void  setResultInfo(ResultInfo resultInfo){
-        if (position instanceof GameInfo) throw new RuntimeException("Position conflict");
+        if (!(position instanceof GameInfo))
+            throw new RuntimeException("Position conflict"+position.getClass());
         position = resultInfo;
     }
 
