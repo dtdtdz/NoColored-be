@@ -19,7 +19,7 @@ public class GameInfo {
     private long targetTime;
     private long time;
     private int second;
-    private Map<WebSocketSession, UserGameInfo> users = new LinkedHashMap<>();
+    private Map<UserAccessInfo, UserGameInfo> users = new LinkedHashMap<>();
     private List<UserGameInfo> userGameInfoList = new LinkedList<>();
     private MapInfo mapInfo;
     private CharacterInfo[] characterInfoArr;
@@ -32,7 +32,7 @@ public class GameInfo {
     private List<Effect> effectList;
     private List<byte[]> displaySkinList;
     private GameItemType type;
-
+    private byte stepOrder;
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_SPEED = 160;
@@ -93,6 +93,7 @@ public class GameInfo {
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
         random = new Random();
         gameCycle = GameCycle.CREATE;
+        stepOrder = 1;
         if (mapId>0 && mapId<=2){
             mapInfo = new MapInfo(mapId-1);
         } else {
@@ -132,7 +133,7 @@ public class GameInfo {
             characterInfo.setVelY(0);
 
             characterInfoArr[idxs.get(i)] = characterInfo;
-            users.put(userList.get(i).getSession(), userGameInfo);
+            users.put(userList.get(i), userGameInfo);
             userGameInfoList.add(userGameInfo);
         }
 
@@ -180,8 +181,8 @@ public class GameInfo {
 //    }
 
     public boolean isAllReady(){
-        for (Map.Entry<WebSocketSession, UserGameInfo> entry:users.entrySet()){
-            if (!entry.getValue().isAccess()) return false;
+        for (UserGameInfo userGameInfo:userGameInfoList){
+            if (!userGameInfo.isAccess()) return false;
         }
         return true;
     }
@@ -285,6 +286,10 @@ public class GameInfo {
             UserGameInfo user1 = userGameInfoList.get(bytes[0]);
             UserGameInfo user2 = userGameInfoList.get(bytes[1]);
 
+            if (user1.getStepOrder()==null){
+                user1.setStepOrder(stepOrder++);
+            }
+
             effectList.add(new Effect(EffectType.STEP,
                     characterInfoArr[characterNum].getX(),
                     characterInfoArr[characterNum].getY() + CHARACTER_SIZE / 2f));
@@ -312,7 +317,7 @@ public class GameInfo {
                 if (time < 0) {
                     it.remove(); // 안전하게 원소 제거
                     if (entry.getKey().equals(GameUserState.STOP)) {
-                        characterInfoArr[userGameInfo.getCharacterNum()].setX(DEFAULT_SPEED);
+                        characterInfoArr[userGameInfo.getCharacterNum()].setX(0);
                     } else if (entry.getKey().equals(GameUserState.STEPED)){
                         int val;
                         do {
@@ -382,12 +387,12 @@ public class GameInfo {
     }
 
     //세션과 캐릭터를 매핑한다.
-    public void insertSession(WebSocketSession session){
+    public void insertUser(UserAccessInfo user){
         byte num = 0;
         while (characterInfoArr[num].getUserGameInfo()==null) num++;
-        UserGameInfo user = new UserGameInfo(session, (byte) users.size(), num);
-        users.put(session, user);
-        characterInfoArr[num].setUserGameInfo(user);
+        UserGameInfo userInfo = new UserGameInfo(user.getSession(), (byte) users.size(), num);
+        users.put(user, userInfo);
+        characterInfoArr[num].setUserGameInfo(userInfo);
     }
 
     //사용 안하나?
@@ -400,14 +405,15 @@ public class GameInfo {
     }
 
     public void sendBuffer(){
-        for (Map.Entry<WebSocketSession,UserGameInfo> entry: getUsers().entrySet()){
-            int bufferNum = entry.getValue().getPlayerNum();
+        for (int i=0; i<userGameInfoList.size(); i++){
             try {
-                SynchronizedSend.binarySend(entry.getKey(), buffer[bufferNum]);
+                SynchronizedSend.binarySend(userGameInfoList.get(i).getWebSocketSession(),
+                        buffer[i]);
             } catch (Exception e){
-                buffer[bufferNum].clear();
+                buffer[i].clear();
 //                e.printStackTrace();
             }
         }
+
     }
 }

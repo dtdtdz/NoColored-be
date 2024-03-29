@@ -21,6 +21,7 @@ public class UserGameInfo {
     private byte playerNum;
     private boolean isAccess;
     private byte score;
+    private Byte stepOrder;
 
     private UserPlayInfo userPlayInfo;
     private Map<GameUserState, Long> states;//milliSecond
@@ -35,6 +36,7 @@ public class UserGameInfo {
         score = 0;
         userPlayInfo = new UserPlayInfo();
         states = new LinkedHashMap<>();
+        stepOrder = null;
     }
 
 }

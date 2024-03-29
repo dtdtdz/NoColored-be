@@ -1,7 +1,6 @@
 package com.ssafy.backend.game.util;
 
 import com.ssafy.backend.game.domain.*;
-import com.ssafy.backend.game.service.GameService;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.stereotype.Component;
@@ -58,7 +57,7 @@ public class InGameCollection {
     public void insertUser(WebSocketSession session, UserAccessInfo user){
         if (inGameList.isEmpty()) return;
         GameInfo gameInfo = inGameList.get((inGameList.size())-1);
-        gameInfo.insertSession(session);
+        gameInfo.insertUser(user);
 
         user.setSession(session);
         user.setGameInfo(gameInfo);

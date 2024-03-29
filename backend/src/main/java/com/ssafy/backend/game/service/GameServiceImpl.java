@@ -1,5 +1,7 @@
 package com.ssafy.backend.game.service;
 
+import com.ssafy.backend.game.domain.ResultInfo;
+import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.game.util.InGameLogic;
 import com.ssafy.backend.user.util.JwtUtil;
@@ -10,10 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketSession;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -49,6 +48,12 @@ public class GameServiceImpl implements GameService {
         if (gameInfo==null) return null;
 //        gameInfo.getUsers().get(userAccessInfo.getSession()).setAccess(true);
         return gameInfo.getGameRoomDto();
+    }
+
+    @Override
+    public UserResultDto getResult(String token) {
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        return userAccessInfo.getResultInfo().getResults().get(userAccessInfo);
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -100,21 +105,34 @@ public class GameServiceImpl implements GameService {
         System.out.println("game close");
 
 
+        PriorityQueue<UserGameInfo> pq = new PriorityQueue<UserGameInfo>((x,y)->{
+            if (x.getScore()==y.getScore()){
+                return x.getStepOrder()-y.getStepOrder();
+            } else return y.getScore()-x.getScore();
+        });
+
+        for (UserGameInfo userGameInfo:gameInfo.getUserGameInfoList()){
+            if (userGameInfo.getStepOrder()==null){
+                userGameInfo.getUserPlayInfo().setRank(4);
+            } else pq.add(userGameInfo);
+        }
+
+        int rank = 1;
+        while (!pq.isEmpty()){
+            UserGameInfo cur = pq.poll();
+            cur.getUserPlayInfo().setRank(rank++);
+        }
+
+        ResultInfo resultInfo = new ResultInfo(gameInfo);
 
         // userinfo마다 처리한다
-        for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
-            UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(entry.getKey());
+        for (Map.Entry<UserAccessInfo, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
+            UserAccessInfo userAccessInfo = entry.getKey();
 
-            // 친선전
-            if (gameInfo.getRoomUuid()!=null){
-//                의성 해줘
-//                userAccessInfo.setRoomInfo();
-            } else {
-                // 매칭
-                
-                userAccessInfo.clearPosition();
-            }
+            userAccessInfo.setResultInfo(resultInfo);
         }
+
+
         inGameCollection.removeGame(gameInfo);
     }
 
