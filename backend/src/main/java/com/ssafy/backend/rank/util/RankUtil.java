@@ -7,8 +7,10 @@ import com.ssafy.backend.user.entity.UserProfile;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -77,9 +79,9 @@ public class RankUtil {
         }
         if(rank>0&&rank<2){
             return "origin";
-        }else if(rank<=5){
+        }else if(rank<=6){
             return "rgb";
-        }else if(rank<=10){
+        }else if(rank<=26){
             return "colored";
         }else{
             if(rating<=2000){
@@ -141,7 +143,46 @@ public class RankUtil {
                 zSetOperations.add(key, userCode, rating.doubleValue());
             }
         }
-        System.out.println("MongoDB 데이터를 Redis로 성공적으로 이동했습니다.");
+
+        // 현재 시간을 "yyyy-MM-dd HH:mm:ss" 형식으로 포매팅
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedNow = now.format(formatter);
+
+        System.out.println("서버 시작 후 MongoDB->Redis 데이터 이동 완료. 완료 시간: " + formattedNow);
     }
+
+    // 12시간마다 mongo에 있는 데이터를 userRank로 보낸다
+    @Scheduled(fixedRate = 43200000)
+    public void updateMongoToRedis(){
+        List<RankMongo> rankList = rankRepository.findAll();
+        ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
+        String key = "userRank";
+
+        // Redis의 userRank를 업데이트하기 전에 기존 데이터를 삭제할 수도 있습니다.
+        // 이렇게 하면 항상 최신 상태의 데이터만 유지됩니다.
+        // redisTemplate.delete(key);
+
+        for (RankMongo rankMongo : rankList) {
+            String userCode = rankMongo.getUserCode();
+            Integer rating = rankMongo.getRating();
+
+            // 사용자의 rating이 null이 아닌 경우에만 Redis에 저장
+            if (rating != null) {
+                // MongoDB에서 조회한 사용자 정보를 Redis의 userRank Sorted Set에 저장
+                zSetOperations.add(key, userCode, rating.doubleValue());
+            }
+        }
+
+        // 현재 시간을 "yyyy-MM-dd HH:mm:ss" 형식으로 포매팅
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedNow = now.format(formatter);
+
+        System.out.println("정기적 MongoDB->Redis 업데이트 완료. 업데이트 시간: " + formattedNow);
+    }
+
+
+
 
 }

@@ -14,5 +14,5 @@ import java.util.List;
 @AllArgsConstructor
 public class RankInfoDto {
     private LocalDateTime refreshTime;
-    private List<RankDto> rankDtoList;
+    private List<RankDto> players;
 }
