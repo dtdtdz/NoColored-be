@@ -312,8 +312,8 @@ public class UserServiceImpl implements UserService {
     }
 
     public void doUserProfileDto(UserProfileDto userProfileDto){
+        calcLevelExp(userProfileDto); // exp, expRequire, level 계산
         if(!userProfileDto.isGuest()){
-            calcLevelExp(userProfileDto); // exp, expRequire, level 계산
             rankUtil.createUserRankRedis(userProfileDto); // redis에 넣기
             rankUtil.getMyRank(userProfileDto); // 순위, 티어 계산
         }
