@@ -86,18 +86,18 @@ public class GameInfo {
     }
 
     private GameCycle gameCycle;
-    public GameInfo(List<UserAccessInfo> userList, UUID roomUuid){
-        this(userList);
-        this.roomUuid = roomUuid;
-    }
-    public GameInfo(List<UserAccessInfo> userList){
+    public GameInfo(List<UserAccessInfo> userList, UUID roomUuid, int mapId){
         startDate = LocalDateTime.now();
         setSecond(3);
-        mapInfo = new MapInfo();
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
         random = new Random();
         gameCycle = GameCycle.CREATE;
+        if (mapId==0){
+            mapInfo = new MapInfo(random.nextInt(2)+1);
+        } else {
+            mapInfo = new MapInfo(random.nextInt(2)+1);
+        }
 
         stepList = new ArrayList<>();
         effectList = new LinkedList<>();
@@ -156,6 +156,10 @@ public class GameInfo {
         gameRoomDto.setSkins(skins);
         gameRoomDto.setFloorList(mapInfo.getFloorList());
         gameRoomDto.setMapId(mapInfo.getMapId());
+        this.roomUuid = roomUuid;
+    }
+    public GameInfo(List<UserAccessInfo> userList){
+        this(userList, null, 0);
     }
 
 //    private GameInfo(int num){ //리팩토링 필요
