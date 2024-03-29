@@ -4,9 +4,14 @@ import com.ssafy.backend.rank.dao.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -64,8 +69,13 @@ public class RankUtil {
     }
 
     // 등수랑 레이팅 가지고 티어 계산
-    public static String tierCalculation(int rank, int rating){
-        if(rank<2){
+    public static String tierCalculation(int rank, int rating, long exp){
+        // 경험치가 0이면=한판도 안했으면 nocolored
+        // rank=-1-> 랭킹에 없는 경우니까 이떄도 nocolored
+        if(exp==0||rank==-1){
+            return "nocolored";
+        }
+        if(rank>0&&rank<2){
             return "origin";
         }else if(rank<=5){
             return "rgb";
@@ -88,21 +98,50 @@ public class RankUtil {
         }
     }
 
-
+    // 순위, 티어 세팅해주는 코드
     public void getMyRank(UserProfileDto userProfileDto){
         String userCode=userProfileDto.getUserCode();
         // 레디스에서 사용자의 점수(rating)와 등수(rank) 조회
         String key = "userRank";
-        Double rating = redisTemplate.opsForZSet().score(key, userCode);
-        Long rank = redisTemplate.opsForZSet().reverseRank(key, userCode);
+        try {
+            Double rating = redisTemplate.opsForZSet().score(key, userCode);
+            Long rank = redisTemplate.opsForZSet().reverseRank(key, userCode);
 
-        // 점수(score)가 null인 경우, 사용자가 랭킹에 없는 것으로 간주하고 초기 값을 설정
-        int userRating= (rating != null) ? rating.intValue() : 0;
-        // 등수(rank)는 0부터 시작하므로 실제 등수를 얻기 위해 +1
-        int userRank = (rank != null) ? rank.intValue() + 1 : -1; // 랭킹에 없는 경우 -1로 설정
+            // 점수가 null인 경우 사용자가 랭킹에 없다고 가정하고 초기값 설정
+            int userRating = rating != null ? rating.intValue() : 0;
+            // 등수는 0부터 시작하므로 실제 등수를 얻기 위해 +1. 랭킹에 없는 경우 -1로 설정
+            int userRank = rank != null ? rank.intValue() + 1 : -1;
 
-        // userProfileDto 갱신(순위, 랭킹점수, 티어)
-        userProfileDto.setRank(userRank);
-        userProfileDto.setTier(tierCalculation(userRank,userRating));
+            // userProfileDto 갱신(순위, 랭킹점수, 티어)
+            userProfileDto.setRank(userRank);
+            // 경험치로 못해서 레벨로 처리함
+            userProfileDto.setTier(tierCalculation(userRank, userRating, userProfileDto.getLevel()));
+        } catch (Exception e) {
+            // Redis 접근 실패 또는 기타 예외 처리. 적절한 예외 처리 로직 추가
+            System.err.println("랭킹 정보 조회 중 오류 발생: " + e.getMessage());
+        }
     }
+
+    // 서버 시작하면 mongo에 있는 usercode, rating을 userRank로 보낸다
+    @EventListener(ApplicationReadyEvent.class)
+    public void mongoToRedis(){
+        // RankRepository를 사용하여 MongoDB에서 모든 RankMongo 객체를 조회
+        List<RankMongo> rankList = rankRepository.findAll();
+
+        ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
+        String key = "userRank";
+
+        for (RankMongo rankMongo : rankList) {
+            String userCode = rankMongo.getUserCode();
+            Integer rating = rankMongo.getRating();
+
+            // 사용자의 rating이 null이 아닌 경우에만 Redis에 저장
+            if (rating != null) {
+                // MongoDB에서 조회한 사용자 정보를 Redis의 userRank Sorted Set에 저장
+                zSetOperations.add(key, userCode, rating.doubleValue());
+            }
+        }
+        System.out.println("MongoDB 데이터를 Redis로 성공적으로 이동했습니다.");
+    }
+
 }
