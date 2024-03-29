@@ -97,19 +97,24 @@ public class GameServiceImpl implements GameService {
 
     private void gameClose(GameInfo gameInfo){
 //        roomUuid있으면 해당 룸으로 보낸다.
-
         System.out.println("game close");
+
+
+
+        // userinfo마다 처리한다
         for (Map.Entry<WebSocketSession, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
             UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(entry.getKey());
+
+            // 친선전
             if (gameInfo.getRoomUuid()!=null){
 //                의성 해줘
 //                userAccessInfo.setRoomInfo();
             } else {
+                // 매칭
+                
                 userAccessInfo.clearPosition();
             }
-
         }
-
         inGameCollection.removeGame(gameInfo);
     }
 
