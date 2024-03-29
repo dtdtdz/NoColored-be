@@ -155,6 +155,7 @@ public class GameInfo {
         List<String> skins = new LinkedList<>();
         for (UserAccessInfo userAccessInfo:userList){
             skins.add(userAccessInfo.getUserProfile().getUserSkin());
+            System.out.println(skins+" "+userList.size());
         }
         gameRoomDto.setSkins(skins);
         gameRoomDto.setFloorList(mapInfo.getFloorList());
@@ -319,7 +320,7 @@ public class GameInfo {
                 if (time < 0) {
                     it.remove(); // 안전하게 원소 제거
                     if (entry.getKey().equals(GameUserState.STOP)) {
-                        characterInfoArr[userGameInfo.getCharacterNum()].setX(0);
+                        characterInfoArr[userGameInfo.getCharacterNum()].setX(DEFAULT_SPEED);
                     } else if (entry.getKey().equals(GameUserState.STEPED)){
                         int val;
                         do {
