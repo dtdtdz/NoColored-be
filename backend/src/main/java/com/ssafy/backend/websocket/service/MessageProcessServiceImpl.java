@@ -137,11 +137,10 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             System.out.println("can't find game");
             return;
         }
-        System.out.println(sessionCollection.userWebsocketMap==null);
-        System.out.println(sessionCollection.userWebsocketMap.get(session)==null);
-        System.out.println(sessionCollection.userWebsocketMap.get(session));
-        System.out.println(gameInfo.getUsers()==null);
-        System.out.println(gameInfo.getUsers().get(sessionCollection.userWebsocketMap.get(session))==null);
+//        System.out.println(sessionCollection.userWebsocketMap==null);
+//        System.out.println(sessionCollection.userWebsocketMap.get(session)==null);
+//        System.out.println(gameInfo.getUsers()==null);
+//        System.out.println(gameInfo.getUsers().get(sessionCollection.userWebsocketMap.get(session))==null);
         int idx = gameInfo.getUsers().get(sessionCollection.userWebsocketMap.get(session)).getCharacterNum();
         int dir = gameInfo.getCharacterInfoArr()[idx].getDir();
         if (dir<0){
