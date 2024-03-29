@@ -84,9 +84,7 @@ public class RankUtil {
         }else if(rank<=26){
             return "colored";
         }else{
-            if(rating<=2000){
-                return "nocolored";
-            }else if(rating<=2500){
+            if(rating<=2500){
                 return "bronze";
             }else if(rating<=3000){
                 return "silver";
@@ -152,8 +150,12 @@ public class RankUtil {
         System.out.println("서버 시작 후 MongoDB->Redis 데이터 이동 완료. 완료 시간: " + formattedNow);
     }
 
+
     // 12시간마다 mongo에 있는 데이터를 userRank로 보낸다
-    @Scheduled(fixedRate = 43200000)
+    //@Scheduled(fixedRate = 43200000)
+
+    // 매일 자정과 정오에 실행
+    @Scheduled(cron = "0 0 0,12 * * ?")
     public void updateMongoToRedis(){
         List<RankMongo> rankList = rankRepository.findAll();
         ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
@@ -181,8 +183,5 @@ public class RankUtil {
 
         System.out.println("정기적 MongoDB->Redis 업데이트 완료. 업데이트 시간: " + formattedNow);
     }
-
-
-
 
 }
