@@ -336,6 +336,7 @@ public class GameInfo {
         String str = "";
         for (UserGameInfo user:userGameInfoList){
             str+=user.getScore()+" ";
+            System.out.println(str);
         }
     }
 
