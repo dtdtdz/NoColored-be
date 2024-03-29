@@ -43,7 +43,7 @@ public class RedisConfig {
     RedisMessageListenerContainer keyExpirationListenerContainer(RedisConnectionFactory connectionFactory, RedisKeyExpirationListener listener) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listener, new ChannelTopic("__keyevent@0__:expired"));
+        container.addMessageListener(listener, new ChannelTopic("__keyevent@*:expired"));
         return container;
     }
 
