@@ -94,9 +94,9 @@ public class GameInfo {
         random = new Random();
         gameCycle = GameCycle.CREATE;
         if (mapId>0 && mapId<=2){
-            mapInfo = new MapInfo(mapId);
+            mapInfo = new MapInfo(mapId-1);
         } else {
-            mapInfo = new MapInfo(random.nextInt(2)+1);
+            mapInfo = new MapInfo(random.nextInt(2));
         }
 
         stepList = new ArrayList<>();
