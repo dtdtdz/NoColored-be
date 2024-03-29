@@ -285,10 +285,10 @@ public class GameInfo {
                     characterInfoArr[characterNum].getY() + CHARACTER_SIZE / 2f));
             user1.getUserPlayInfo()
                     .setStep(user1.getUserPlayInfo().getStep() + 1);
-            applyState(user1, GameUserState.DISPLAY_SKIN, 3000L);
-            applyState(user2, GameUserState.DISPLAY_SKIN, 1000L);
-            applyState(user2, GameUserState.STEPED, 1000L);
-            applyState(user2, GameUserState.STOP, 1000L);
+            applyState(user1, GameUserState.DISPLAY_SKIN, 4000L);
+            applyState(user2, GameUserState.DISPLAY_SKIN, 2000L);
+            applyState(user2, GameUserState.STEPED, 2000L);
+            applyState(user2, GameUserState.STOP, 2000L);
             characterInfoArr[user2.getCharacterNum()].setX(0);
         }
         stepList.clear();
@@ -329,6 +329,7 @@ public class GameInfo {
             buffer[i].put(SendBinaryMessageType.SCORE.getValue()).put((byte) users.size());
             for (UserGameInfo user:userGameInfoList){
                 buffer[i].put(user.getScore());
+                System.out.println(user.getScore());
             }
         }
     }
