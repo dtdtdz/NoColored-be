@@ -142,7 +142,7 @@ public class InGameLogic {
 //                    System.out.print(3+":"+i+":2 ");
             if (isPlatForm) {
                 if (cInfo.isJump()){
-                    velY = GameInfo.JUMP_HEIGHT;
+                    velY = GameInfo.JUMP_VEL_Y;
                     cInfo.setJump(false);
                 } else {
                     velY = 0;
@@ -173,7 +173,7 @@ public class InGameLogic {
                 ){
 //                            y좌표 캐릭터 크기에 대해 0.5<차이<1일때, 캐릭터 x축 겹치는가?
 //                            속도 위에있는게 아래 밟을 수 있나?
-                    listC.setVelY(-100);
+                    listC.setVelY(GameInfo.STEP_VEL_Y);
                     flag = true;
 
                     if (curC.getUserGameInfo()!=null){
