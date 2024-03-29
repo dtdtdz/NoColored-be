@@ -23,6 +23,7 @@ public class InGameController {
 
     @GetMapping("/ready")
     private ResponseEntity<?> ready(@RequestHeader("Authorization") String token){
+        System.out.println("ready");
         GameRoomDto gameRoomDto = gameService.ready(token);
         if (gameRoomDto==null){
             return ResponseEntity.internalServerError().body("Game containing the player not found");
@@ -33,6 +34,7 @@ public class InGameController {
 
     @GetMapping("/ready/dummy")
     private ResponseEntity<?> readyDummy(@RequestHeader("Authorization") String token){
+        System.out.println("dummy");
         GameRoomDto gameRoomDto = new GameRoomDto();
         gameRoomDto.setMapId(1);
         List<String> list = new LinkedList<>();
