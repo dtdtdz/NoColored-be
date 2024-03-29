@@ -74,7 +74,7 @@ public class RankUtil {
     public static String tierCalculation(int rank, int rating, long exp){
         // 경험치가 0이면=한판도 안했으면 nocolored
         // rank=-1-> 랭킹에 없는 경우니까 이떄도 nocolored
-        if(exp==0||rank==-1){
+        if(exp==0){
             return "nocolored";
         }
         if(rank>0&&rank<2){
