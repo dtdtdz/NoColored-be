@@ -3,6 +3,8 @@ package com.ssafy.backend.game.controller;
 import com.ssafy.backend.game.domain.GameRoomDto;
 import com.ssafy.backend.game.domain.ResultInfo;
 import com.ssafy.backend.game.dto.ResultDto;
+import com.ssafy.backend.game.dto.RewardDto;
+import com.ssafy.backend.game.dto.TierDto;
 import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.game.service.GameService;
 import org.springframework.http.ResponseEntity;
@@ -87,6 +89,17 @@ public class InGameController {
             list.add(userResultDto);
         }
         resultDto.setPlayers(list);
+        RewardDto reward = new RewardDto();
+        List<String> skins = new LinkedList<>();
+        skins.add("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-butterfly.png");
+        reward.setSkins(skins);
+        TierDto tierDto = new TierDto();
+        tierDto.setOldtier("nocolored");
+        tierDto.setNewtier("bronze");
+        tierDto.setUpgrade(true);
+        reward.setTier(tierDto);
+
+        resultDto.setReward(reward);
         return ResponseEntity.ok(resultDto);
 
 

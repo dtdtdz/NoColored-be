@@ -15,9 +15,11 @@ import java.util.UUID;
 public class ResultDto {
     UUID roomUuid;
     List<UserResultDto> players;
+    RewardDto reward;
     public ResultDto(ResultInfo resultInfo){
         players = new LinkedList<>();
         roomUuid = resultInfo.getRoom().getRoomDto().getRoomId();
         players.addAll(resultInfo.getPlayers().values());
+        reward = new RewardDto();
     }
 }

@@ -1,6 +1,6 @@
 package com.ssafy.backend.game.domain;
 
-import com.ssafy.backend.game.dto.Reward;
+import com.ssafy.backend.game.dto.RewardDto;
 import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
@@ -15,7 +15,7 @@ import java.util.*;
 @NoArgsConstructor
 public class ResultInfo {
     private Map<UserAccessInfo,UserResultDto> players;
-    Reward reward;
+    RewardDto reward;
     RoomInfo room;
     public ResultInfo(GameInfo gameInfo){
         players = new LinkedHashMap<>();
