@@ -156,8 +156,8 @@ public class GameInfo {
         List<String> skins = new LinkedList<>();
         for (UserAccessInfo userAccessInfo:userList){
             skins.add(userAccessInfo.getUserProfile().getUserSkin());
-            System.out.println(skins+" "+userList.size());
         }
+        System.out.println(skins+" "+userList.size());
         gameRoomDto.setSkins(skins);
         gameRoomDto.setFloorList(mapInfo.getFloorList());
         gameRoomDto.setMapId(mapInfo.getMapId());

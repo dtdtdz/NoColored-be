@@ -20,6 +20,7 @@ public class ResultInfo {
     public ResultInfo(GameInfo gameInfo){
         players = new LinkedHashMap<>();
         room = gameInfo.getRoom();
+        if (room!=null) room.setGameStart(false);
         for (UserAccessInfo userAccessInfo:gameInfo.getUsers().keySet()){
             players.put(userAccessInfo ,new UserResultDto(userAccessInfo));
         }
