@@ -2,6 +2,8 @@ package com.ssafy.backend.game.controller;
 
 import com.ssafy.backend.game.domain.GameRoomDto;
 import com.ssafy.backend.game.domain.ResultInfo;
+import com.ssafy.backend.game.dto.ResultDto;
+import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.game.service.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,10 +65,31 @@ public class InGameController {
 
 
     // 플레이어마다 다른 resultdto
-    @GetMapping
+//    @GetMapping
     public ResponseEntity<?> getGameResultData(@RequestHeader("Authorization") String token){
 
         return ResponseEntity.ok(gameService.getResult(token));
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getGameResultDummy(){
+
+        ResultDto resultDto = new ResultDto();
+        List<UserResultDto> list = new LinkedList<>();
+        for (int i=1; i<=3; i++){
+            UserResultDto userResultDto = new UserResultDto();
+            userResultDto.setSkin("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-magichat.png");
+            userResultDto.setIndex(i-1);
+            userResultDto.setRank(i);
+            userResultDto.setNickname("유저"+i);
+            userResultDto.setScore(i*3);
+            userResultDto.setLabel("칭호"+i);
+            list.add(userResultDto);
+        }
+        resultDto.setPlayers(list);
+        return ResponseEntity.ok(resultDto);
+
+
     }
 
 }
