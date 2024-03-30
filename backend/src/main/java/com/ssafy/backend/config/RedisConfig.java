@@ -23,8 +23,8 @@ public class RedisConfig {
     @Value("${spring.redis.port}")
     private int port;
 
-//    @Value("${spring.redis.password}")
-//    private String password;
+    @Value("${spring.redis.password}")
+    private String password;
 
     @Bean(name = "redisMessageTaskExecutor")
     public Executor redisMessageTaskExecutor() {
@@ -37,7 +37,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(host, port);
-//        config.setPassword(password);
+        config.setPassword(password);
         return new LettuceConnectionFactory(config);
     }
 
