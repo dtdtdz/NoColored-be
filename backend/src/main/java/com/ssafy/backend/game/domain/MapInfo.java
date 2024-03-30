@@ -38,7 +38,7 @@ public class MapInfo {
         MapList.add(list1);
 
         List<int[]> list2 = new LinkedList<>();
-        list2.add(new int[]{3,5,6});
+        list2.add(new int[]{3,5,3});
         list2.add(new int[]{10,5,4});
         list2.add(new int[]{17,5,6});
         list2.add(new int[]{26,5,4});

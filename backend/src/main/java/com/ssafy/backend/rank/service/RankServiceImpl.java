@@ -4,7 +4,7 @@ import com.ssafy.backend.rank.dto.RankDto;
 import com.ssafy.backend.rank.dto.RankInfoDto;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.rank.util.RankUtil;
-import com.ssafy.backend.user.dao.UserProfileRepository;
+import com.ssafy.backend.user.repository.UserProfileRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.util.JwtUtil;

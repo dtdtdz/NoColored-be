@@ -1,6 +1,7 @@
 package com.ssafy.backend.game.domain;
 
 import com.ssafy.backend.assets.SynchronizedSend;
+import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.AllArgsConstructor;
@@ -26,7 +27,7 @@ public class GameInfo {
     private boolean[][] floor;
     private Random random;
     private GameRoomDto gameRoomDto;
-    private UUID roomUuid;
+    private RoomInfo room;
 
     private List<byte[]> stepList;
     private List<Effect> effectList;
@@ -86,7 +87,7 @@ public class GameInfo {
     }
 
     private GameCycle gameCycle;
-    public GameInfo(List<UserAccessInfo> userList, UUID roomUuid, int mapId){
+    public GameInfo(List<UserAccessInfo> userList, RoomInfo room) {
         users = new LinkedHashMap<>();
         userGameInfoList = new LinkedList<>();
         startDate = LocalDateTime.now();
@@ -96,8 +97,8 @@ public class GameInfo {
         random = new Random();
         gameCycle = GameCycle.CREATE;
         stepOrder = 1;
-        if (mapId>0 && mapId<=2){
-            mapInfo = new MapInfo(mapId-1);
+        if (room!=null && room.getRoomDto().getMapId()>0 && room.getRoomDto().getMapId()<=2){
+            mapInfo = new MapInfo(room.getRoomDto().getMapId()-1);
         } else {
             mapInfo = new MapInfo(random.nextInt(2));
         }
@@ -155,15 +156,15 @@ public class GameInfo {
         List<String> skins = new LinkedList<>();
         for (UserAccessInfo userAccessInfo:userList){
             skins.add(userAccessInfo.getUserProfile().getUserSkin());
-            System.out.println(skins+" "+userList.size());
         }
+        System.out.println(skins+" "+userList.size());
         gameRoomDto.setSkins(skins);
         gameRoomDto.setFloorList(mapInfo.getFloorList());
         gameRoomDto.setMapId(mapInfo.getMapId());
-        this.roomUuid = roomUuid;
+        this.room = room;
     }
     public GameInfo(List<UserAccessInfo> userList){
-        this(userList, null, 0);
+        this(userList, null);
     }
 
     public boolean isAllReady(){
