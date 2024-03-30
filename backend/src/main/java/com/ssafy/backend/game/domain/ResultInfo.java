@@ -2,6 +2,7 @@ package com.ssafy.backend.game.domain;
 
 import com.ssafy.backend.game.dto.Reward;
 import com.ssafy.backend.game.dto.UserResultDto;
+import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +16,11 @@ import java.util.*;
 public class ResultInfo {
     private Map<UserAccessInfo,UserResultDto> players;
     Reward reward;
-    UUID roomUuid;
+    RoomInfo room;
     public ResultInfo(GameInfo gameInfo){
         players = new LinkedHashMap<>();
-        roomUuid = gameInfo.getRoomUuid();
+        room = gameInfo.getRoom();
+        if (room!=null) room.setGameStart(false);
         for (UserAccessInfo userAccessInfo:gameInfo.getUsers().keySet()){
             players.put(userAccessInfo ,new UserResultDto(userAccessInfo));
         }

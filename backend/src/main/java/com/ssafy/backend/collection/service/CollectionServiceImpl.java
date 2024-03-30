@@ -12,7 +12,7 @@ import com.ssafy.backend.collection.repository.AchievementRepository;
 import com.ssafy.backend.collection.repository.SkinRepository;
 import com.ssafy.backend.collection.repository.LabelRepository;
 import com.ssafy.backend.collection.repository.UserCollectionRepository;
-import com.ssafy.backend.user.dao.UserProfileRepository;
+import com.ssafy.backend.user.repository.UserProfileRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;

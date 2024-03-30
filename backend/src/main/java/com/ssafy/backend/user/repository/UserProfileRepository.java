@@ -1,4 +1,4 @@
-package com.ssafy.backend.user.dao;
+package com.ssafy.backend.user.repository;
 
 import com.ssafy.backend.user.entity.UserProfile;
 import jakarta.transaction.Transactional;
