@@ -355,6 +355,7 @@ public class CollectionServiceImpl implements CollectionService {
             UserProfileDto userProfileDto=userAccessInfo.getUserProfileDto();
             userProfileDto.setLabel(changeLabel.get().getName());
             userAccessInfo.setUserProfileDto(userProfileDto);
+            userAccessInfo.setUserProfile(userProfile);
             return ResponseEntity.ok().body("칭호 변경 완료!");
         }else{
             return ResponseEntity.badRequest().body(Map.of("error", "칭호가 없습니다."));
@@ -370,6 +371,7 @@ public class CollectionServiceImpl implements CollectionService {
             UserProfileDto userProfileDto=userAccessInfo.getUserProfileDto();
             userProfileDto.setSkin(changeSkin.get().getLink());
             userAccessInfo.setUserProfileDto(userProfileDto);
+            userAccessInfo.setUserProfile(userProfile);
             return ResponseEntity.ok().body("스킨 변경 완료!");
         }else{
             return ResponseEntity.badRequest().body(Map.of("error", "스킨이 없습니다."));
