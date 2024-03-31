@@ -1,7 +1,7 @@
 package com.ssafy.backend.game.util;
 
 import com.ssafy.backend.game.domain.*;
-import com.ssafy.backend.game.type.GameUserState;
+import com.ssafy.backend.game.type.GameCharacterState;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -140,7 +140,7 @@ public class InGameLogic {
 
 //                    System.out.print(3+":"+i+":2 ");
             if (cInfo.getUserGameInfo()!=null &&
-                    cInfo.getStates().containsKey(GameUserState.STOP)){
+                    cInfo.getStates().containsKey(GameCharacterState.STOP)){
                 cInfo.setJump(false);
             }
 
@@ -169,7 +169,7 @@ public class InGameLogic {
             CharacterInfo curC = characterQueue.poll();
             gameInfo.itemUse(curC);
             if (curC.getUserGameInfo()!=null &&
-            curC.getStates().containsKey(GameUserState.STEPED)) continue;
+            curC.getStates().containsKey(GameCharacterState.STEPED)) continue;
             boolean flag = false;
             for (CharacterInfo listC:validCharacter){
                 if (listC.getY()+cSize<=curC.getY()){
