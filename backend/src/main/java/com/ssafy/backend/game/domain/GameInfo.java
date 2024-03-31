@@ -63,7 +63,7 @@ public class GameInfo {
     public static final ByteBuffer[] buffer = new ByteBuffer[4];
     static {
         for (int i=0; i<buffer.length; i++){
-            buffer[i] = ByteBuffer.allocate(2048);
+            buffer[i] = ByteBuffer.allocate(4096);
         }
     }
 
