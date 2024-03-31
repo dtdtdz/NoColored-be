@@ -2,6 +2,7 @@ package com.ssafy.backend.game.domain;
 
 
 import com.ssafy.backend.game.document.UserPlayInfo;
+import com.ssafy.backend.game.type.GameUserState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

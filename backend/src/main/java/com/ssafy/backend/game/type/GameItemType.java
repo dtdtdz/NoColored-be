@@ -1,4 +1,4 @@
-package com.ssafy.backend.game.domain;
+package com.ssafy.backend.game.type;
 
 import lombok.Getter;
 
