@@ -25,7 +25,6 @@ public class UserGameInfo {
     private Byte stepOrder;
 
     private UserPlayInfo userPlayInfo;
-    private Map<GameUserState, Long> states;//milliSecond
 
     public UserGameInfo(WebSocketSession webSocketSession,
                         byte characterNum,
@@ -36,7 +35,7 @@ public class UserGameInfo {
         isAccess = false;
         score = 0;
         userPlayInfo = new UserPlayInfo();
-        states = new LinkedHashMap<>();
+
         stepOrder = null;
     }
 
