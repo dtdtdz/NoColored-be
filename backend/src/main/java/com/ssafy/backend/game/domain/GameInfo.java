@@ -124,7 +124,7 @@ public class GameInfo {
             userGameInfoList.add(userGameInfo);
         }
 
-        for (int i= userList.size(); i<characterInfoArr.length ; i++){
+        for (int i= userList.size(); i<CHARACTER_NUM ; i++){
             CharacterInfo characterInfo = new CharacterInfo();
 
             characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
@@ -135,6 +135,10 @@ public class GameInfo {
             characterInfo.setStates(new LinkedHashMap<>());
 
             characterInfoArr[idxs.get(i)] = characterInfo;
+        }
+        for (CharacterInfo characterInfo: characterInfoArr){
+            if (characterInfo.getStates()==null)
+                System.out.println("왜 이럼");
         }
 
         gameRoomDto = new GameRoomDto();
@@ -244,6 +248,16 @@ public class GameInfo {
                         effectList.add(new Effect(EffectType.ITEM_STOP, characterInfo.getX(), characterInfo.getY()));
                     }
                 }
+            }
+            case RANDOM_BOX -> {
+                int num = random.nextInt(users.size());
+                CharacterInfo characterInfo = characterInfoArr[userGameInfoList.get(num).getCharacterNum()];
+                applyState(characterInfo, GameCharacterState.DISPLAY_SKIN, 3000L);
+                effectList.add(new Effect(EffectType.SKIN_APPEAR, characterInfo.getX(), characterInfo.getY()));
+
+            }
+            case REBEL -> {
+                effectList.add(new Effect(EffectType.REBEL, ITEM_X, ITEM_Y));
             }
             case STOP_PLAYER -> {
                 for (UserGameInfo userGameInfo: userGameInfoList) {
