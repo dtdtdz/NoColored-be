@@ -137,7 +137,8 @@ public class InGameLogic {
             }
 
 //                    System.out.print(3+":"+i+":2 ");
-            if (isPlatForm || cInfo.getUserGameInfo().getStates().containsKey(GameUserState.STOP)) {
+            if (isPlatForm || (cInfo.getUserGameInfo()!=null &&
+                    cInfo.getUserGameInfo().getStates().containsKey(GameUserState.STOP))) {
                 if (cInfo.isJump()){
                     velY = GameInfo.JUMP_VEL_Y;
                     cInfo.setJump(false);
