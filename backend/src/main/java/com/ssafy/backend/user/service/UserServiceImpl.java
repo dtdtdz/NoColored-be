@@ -120,12 +120,12 @@ public class UserServiceImpl implements UserService {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         UserProfile userProfile = userAccessInfo.getUserProfile();
         //userProfile 을 managed 상태로 만들어준다.
-        userProfile = userProfileRepository.findById(userProfile.getId()).orElse(null);
-        if (userProfile==null) return null;
-        userProfile.setGuest(false);
-        userProfile.setUserNickname(userSignDto.getNickname());
-        userProfile.setUserLabel("파릇파릇 새싹");
-        userProfileRepository.save(userProfile);
+        UserProfile newUserProfile = userProfileRepository.findById(userProfile.getId()).orElse(null);
+        if (newUserProfile==null) return null;
+        newUserProfile.setGuest(false);
+        newUserProfile.setUserNickname(userSignDto.getNickname());
+        newUserProfile.setUserLabel("파릇파릇 새싹");
+        userProfileRepository.save(newUserProfile);
 
 
         UserProfileDto userProfileDto=userAccessInfo.getUserProfileDto();
@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
         userAccessInfo.setUserProfileDto(userProfileDto);
 
         // 파릇파릇 새싹 칭호 얻었다고 처리
-        UserProfile tempUserProfile = userProfile;
+        UserProfile tempUserProfile = newUserProfile;
         Optional<UserCollection> userCollectionOptional=userCollectionRepository.findById(tempUserProfile.getUserCode());
         UserCollection userCollection=userCollectionOptional.orElseThrow(() ->
                 new NoSuchElementException("해당 사용자의 UserCollection이 존재하지 않습니다: " + tempUserProfile.getUserCode()));
@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
 //                .id(userProfile.getId()) 넣으면 안된다.
                 .userId(userSignDto.getId())
                 .userPwd(userSignDto.getPassword())
-                .userProfile(userProfile)
+                .userProfile(newUserProfile)
                 .isDeleted(false)
                 .build();
         userInfoRepository.save(userInfo);
