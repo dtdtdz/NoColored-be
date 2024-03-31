@@ -109,15 +109,12 @@ public class GameInfo {
         for (byte i=0; i<userList.size(); i++){
             UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
                     idxs.get(i),i);
-            CharacterInfo characterInfo = new CharacterInfo();
-
-            characterInfo.setUserGameInfo(userGameInfo);
-            characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
-            characterInfo.setY(floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f);
-            characterInfo.setDir((int) ((random.nextInt(2)-0.5f)*2));
-            characterInfo.setVelX(0);
-            characterInfo.setVelY(0);
-            characterInfo.setStates(new LinkedHashMap<>());
+            CharacterInfo characterInfo = new CharacterInfo(
+                    (floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE,
+                    floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
+                    (int) ((random.nextInt(2)-0.5f)*2),
+                    userGameInfo
+            );
 
             characterInfoArr[idxs.get(i)] = characterInfo;
             users.put(userList.get(i), userGameInfo);
@@ -125,14 +122,12 @@ public class GameInfo {
         }
 
         for (int i= userList.size(); i<CHARACTER_NUM ; i++){
-            CharacterInfo characterInfo = new CharacterInfo();
-
-            characterInfo.setX((floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE);
-            characterInfo.setY(floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f);
-            characterInfo.setDir((int) ((random.nextInt(2)-0.5f)*2));
-            characterInfo.setVelX(0);
-            characterInfo.setVelY(0);
-            characterInfo.setStates(new LinkedHashMap<>());
+            CharacterInfo characterInfo = new CharacterInfo(
+                    (floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE,
+                    floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
+                    (int) ((random.nextInt(2)-0.5f)*2),
+                    null
+            );
 
             characterInfoArr[idxs.get(i)] = characterInfo;
         }
