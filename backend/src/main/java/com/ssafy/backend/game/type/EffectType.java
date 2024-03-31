@@ -9,8 +9,9 @@ import java.util.Map;
 public enum EffectType {
     SKIN_APPEAR((byte) 0),
     ITEM_STOP((byte) 1),
-    ITEM_TIME_OUT((byte) 2),
-    ITEM_USE((byte) 3);
+    REBEL((byte) 2),
+    ITEM_TIME_OUT((byte) 3),
+    ITEM_USE((byte) 4);
 
 
     private final byte value;
