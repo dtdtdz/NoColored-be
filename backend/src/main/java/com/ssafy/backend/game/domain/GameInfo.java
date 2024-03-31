@@ -284,8 +284,8 @@ public class GameInfo {
                     .setStep(user1.getUserPlayInfo().getStep() + 1);
             applyState(user1, GameUserState.DISPLAY_SKIN, 4000L);
             applyState(user2, GameUserState.DISPLAY_SKIN, 2000L);
-            applyState(user2, GameUserState.STEPED, 2000L);
             applyState(user2, GameUserState.STOP, 2000L);
+            applyState(user2, GameUserState.STEPED, 2000L);
             characterInfoArr[user2.getCharacterNum()].setVelX(0);
         }
         stepList.clear();

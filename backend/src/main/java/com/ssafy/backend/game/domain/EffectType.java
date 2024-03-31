@@ -9,6 +9,7 @@ import java.util.Map;
 public enum EffectType {
     STEP((byte) 0);
 
+
     private final byte value;
     private static final Map<Byte, EffectType> map = new HashMap<>();
 
