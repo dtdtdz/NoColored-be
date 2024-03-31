@@ -1,4 +1,4 @@
-package com.ssafy.backend.collection.dao;
+package com.ssafy.backend.collection.document;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,10 +11,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "label")
-public class Label {
+@Document(collection = "skin")
+public class Skin {
 
     @Id
     private int id;
     private String name;
+    private String link;
 }

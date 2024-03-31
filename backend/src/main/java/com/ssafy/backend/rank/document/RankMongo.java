@@ -1,4 +1,4 @@
-package com.ssafy.backend.rank.dao;
+package com.ssafy.backend.rank.document;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;

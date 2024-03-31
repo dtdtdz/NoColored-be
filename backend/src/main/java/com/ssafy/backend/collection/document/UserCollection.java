@@ -1,4 +1,4 @@
-package com.ssafy.backend.collection.dao;
+package com.ssafy.backend.collection.document;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
