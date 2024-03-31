@@ -6,7 +6,6 @@ import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.web.socket.WebSocketSession;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
@@ -19,6 +18,7 @@ public class GameInfo {
     private LocalDateTime startDate;
     private long targetTime;
     private long time;
+    private long itemTime;
     private int second;
     private Map<UserAccessInfo, UserGameInfo> users;
     private List<UserGameInfo> userGameInfoList;
@@ -34,19 +34,22 @@ public class GameInfo {
     private List<byte[]> displaySkinList;
     private GameItemType type;
     private byte stepOrder;
+    private GameItemType curItem;
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
-    public static final float DEFAULT_SPEED = 160;
+    public static final float DEFAULT_VEL_X = 160;
     public static final int MAX_PLAYER = 4;
     public static final float GRAVITY = 500;
     public static final int BLOCK_SIZE = 18;
     public static final int MAP_HEIGHT = 19;
     public static final int MAP_WIDTH = 27;
     public static final int WALL_WIDTH = 3;
-    public static final int DEFAULT_TIME = 60;
+    public static final int GAME_TIME = 60;
     public static final int CHARACTER_NUM = 10;
     public static final int JUMP_VEL_Y = -300;
     public static final int STEP_VEL_Y = -200;
+    public static final int ITEM_CREATE_INTERVAL = 15;
+    public static final int ITEM_REMOVE_INTERVAL = 5;
 
     public static final ByteBuffer[] buffer = new ByteBuffer[4];
     static {
@@ -201,6 +204,16 @@ public class GameInfo {
         this.second = second;
     }
 
+    public void setItemTime(int second){
+        itemTime = time + 1000L*second;
+    }
+
+    public void createItem(){
+        if (itemTime>time) return;
+        curItem = GameItemType.valueOf((byte)random.nextInt(5));
+//        setItemTime(ITEM_CREATE_INTERVAL);
+    }
+
     public boolean checkSecond(){
         int newSecond = (int)Math.ceil((targetTime-time)/1000f);
         if (newSecond<second){
@@ -305,7 +318,7 @@ public class GameInfo {
                     it.remove(); // 안전하게 원소 제거
                     if (entry.getKey().equals(GameUserState.STOP)) {
                         System.out.println("속도 복귀");
-                        characterInfoArr[userGameInfo.getCharacterNum()].setVelX(DEFAULT_SPEED);
+                        characterInfoArr[userGameInfo.getCharacterNum()].setVelX(DEFAULT_VEL_X);
                     } else if (entry.getKey().equals(GameUserState.STEPED)){
                         int val;
                         do {

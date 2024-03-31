@@ -11,7 +11,8 @@ public enum GameItemType {
     STOP_NPC((byte) 1),
     RANDOM_BOX((byte) 2),
     REBEL((byte) 3),
-    STOP_PLAYER((byte) 4);
+    STOP_PLAYER((byte) 4),
+    COLOR_LESS((byte) 255);
 //    INVINCIBLE,
 //    NINJA,
 //    FIREWORKS,
