@@ -1,12 +1,11 @@
 package com.ssafy.backend.game.domain;
 
-import com.ssafy.backend.game.type.GameUserState;
+import com.ssafy.backend.game.type.GameCharacterState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
@@ -21,7 +20,7 @@ public class CharacterInfo {
     private int dir;//방향
     private UserGameInfo userGameInfo;
     private boolean jump;
-    private Map<GameUserState, Long> states;//milliSecond
+    private Map<GameCharacterState, Long> states;//milliSecond
 
     //속도와 방향을 따로 설정할까?
 //    public CharacterInfo(float x, float y){
