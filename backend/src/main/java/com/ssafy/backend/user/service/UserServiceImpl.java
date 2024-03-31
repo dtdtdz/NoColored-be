@@ -91,7 +91,8 @@ public class UserServiceImpl implements UserService {
                     .userLabel("손님")
                     .isGuest(true)
                     .build();
-            userProfileRepository.save(userProfile);
+            if (userProfileRepository.save(userProfile)==null) throw new RuntimeException("게스트 생성 실패.");
+
 
             // usercollection 생성
             UserCollection userCollection=UserCollection.builder()
@@ -100,7 +101,7 @@ public class UserServiceImpl implements UserService {
                     .labelIds(new ArrayList<>(Arrays.asList(71)))
                     .achievementIds(new ArrayList<>())
                     .build();
-            userCollectionRepository.save(userCollection);
+            if (userCollectionRepository.save(userCollection)==null) throw new RuntimeException("게스트 생성 실패.");
 
             // mongodb에 넣을 rank정보
             RankMongo rankMongo=RankMongo.builder()
@@ -125,8 +126,8 @@ public class UserServiceImpl implements UserService {
         newUserProfile.setGuest(false);
         newUserProfile.setUserNickname(userSignDto.getNickname());
         newUserProfile.setUserLabel("파릇파릇 새싹");
-        userProfileRepository.save(newUserProfile);
-
+        if (userProfileRepository.save(newUserProfile)==null) throw new RuntimeException("이미 있는 id 입니다..");
+        userAccessInfo.setUserProfile(newUserProfile);
 
         UserProfileDto userProfileDto=userAccessInfo.getUserProfileDto();
         userProfileDto.setGuest(false);
@@ -173,7 +174,7 @@ public class UserServiceImpl implements UserService {
                     .userLabel("파릇파릇 새싹")
                     .isGuest(false)
                     .build();
-            userProfileRepository.save(userProfile);
+            if (userProfileRepository.save(userProfile)==null) throw new RuntimeException("회원 가입 실패.");
 
             // usercollection 생성
             UserCollection userCollection=UserCollection.builder()

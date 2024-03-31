@@ -39,6 +39,8 @@ public class GameInfo {
     private GameItemType type;
     private byte stepOrder;
     private GameItemType curItem;
+    private byte[] useItem;
+
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
     public static final float DEFAULT_VEL_X = 160;
@@ -56,7 +58,7 @@ public class GameInfo {
     public static final int ITEM_REMOVE_INTERVAL = 5;
     public static final int ITEM_SIZE = 32;
     public static final float ITEM_X = (WALL_WIDTH+MAP_WIDTH/2f)*BLOCK_SIZE;
-    public static final float ITEM_Y = (MAP_HEIGHT/2f)*BLOCK_SIZE;
+    public static final float ITEM_Y = (3)*BLOCK_SIZE;
 
     public static final ByteBuffer[] buffer = new ByteBuffer[4];
     static {
@@ -86,6 +88,7 @@ public class GameInfo {
         effectList = new LinkedList<>();
         displaySkinList = new LinkedList<>();
         curItem = GameItemType.NO_ITEM;
+        useItem = null;
         //캐릭터 위치 랜덤배치
         List<int[]> floorPos = new LinkedList<>();
         //유저 캐릭터 번호 랜덤 매핑
@@ -171,6 +174,7 @@ public class GameInfo {
         long result = now - time;
         time = now;
 
+        itemManageProcess();
         applyTimeAtState(result);
         return result;
     }
@@ -185,7 +189,7 @@ public class GameInfo {
         itemTime = time + 1000L*ITEM_CREATE_INTERVAL;
     }
 
-    public void ItemProcess(){
+    public void itemManageProcess(){
         if (curItem.equals(GameItemType.NO_ITEM)){
             if (itemTime>time){
                 curItem = GameItemType.valueOf((byte)(random.nextInt(6)+1));
@@ -199,6 +203,15 @@ public class GameInfo {
         if (itemTime>time) return;
         curItem = GameItemType.valueOf((byte)random.nextInt(5));
         setItemTime();
+    }
+
+    public void itemUse(CharacterInfo cInfo){
+        float interval = (ITEM_SIZE+CHARACTER_SIZE)/2f;
+        if ((Math.abs(cInfo.getX()-ITEM_X)<interval)
+                && (Math.abs(cInfo.getY()-ITEM_Y)<interval)){
+            effectList.add(new Effect(EffectType.ITEM_USE, ITEM_X, ITEM_Y));
+            curItem = GameItemType.NO_ITEM;
+        }
     }
 
     public boolean checkSecond(){
