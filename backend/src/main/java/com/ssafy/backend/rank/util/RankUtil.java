@@ -1,6 +1,6 @@
 package com.ssafy.backend.rank.util;
 
-import com.ssafy.backend.rank.dao.RankMongo;
+import com.ssafy.backend.rank.document.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;

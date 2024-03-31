@@ -1,8 +1,8 @@
 package com.ssafy.backend.user.service;
 
-import com.ssafy.backend.collection.dao.UserCollection;
+import com.ssafy.backend.collection.document.UserCollection;
 import com.ssafy.backend.collection.repository.UserCollectionRepository;
-import com.ssafy.backend.rank.dao.RankMongo;
+import com.ssafy.backend.rank.document.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.rank.util.RankUtil;
 import com.ssafy.backend.user.repository.UserInfoRepository;
@@ -96,8 +96,8 @@ public class UserServiceImpl implements UserService {
             // usercollection 생성
             UserCollection userCollection=UserCollection.builder()
                     .userCode(userCode)
-                    .skinIds(new ArrayList<>(Arrays.asList(1,2,3,4,27)))
-                    .labelIds(new ArrayList<>(Arrays.asList(92)))
+                    .skinIds(new ArrayList<>(Arrays.asList(11,15,19,23,27)))
+                    .labelIds(new ArrayList<>(Arrays.asList(71)))
                     .achievementIds(new ArrayList<>())
                     .build();
             userCollectionRepository.save(userCollection);
@@ -137,7 +137,9 @@ public class UserServiceImpl implements UserService {
         Optional<UserCollection> userCollectionOptional=userCollectionRepository.findById(tempUserProfile.getUserCode());
         UserCollection userCollection=userCollectionOptional.orElseThrow(() ->
                 new NoSuchElementException("해당 사용자의 UserCollection이 존재하지 않습니다: " + tempUserProfile.getUserCode()));
-        userCollection.getLabelIds().add(93);
+        userCollection.getLabelIds().add(72);
+        userCollection.getLabelIds().add(64); // 게스트 로그인 회원 전환
+        userCollection.getSkinIds().add(28);
         userCollectionRepository.save(userCollection);
         
         UserInfo userInfo = UserInfo.builder()
@@ -171,8 +173,8 @@ public class UserServiceImpl implements UserService {
             // usercollection 생성
             UserCollection userCollection=UserCollection.builder()
                     .userCode(userCode)
-                    .skinIds(new ArrayList<>(Arrays.asList(1,2,3,4,27)))
-                    .labelIds(new ArrayList<>(Arrays.asList(93)))
+                    .skinIds(new ArrayList<>(Arrays.asList(11,15,19,23,27,28))) // 게스트->회원전환할때 보상도 다 포함
+                    .labelIds(new ArrayList<>(Arrays.asList(64,71,72)))
                     .achievementIds(new ArrayList<>())
                     .build();
             userCollectionRepository.save(userCollection);
