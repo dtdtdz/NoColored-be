@@ -85,6 +85,7 @@ public class GameInfo {
         stepList = new ArrayList<>();
         effectList = new LinkedList<>();
         displaySkinList = new LinkedList<>();
+        curItem = GameItemType.NO_ITEM;
         //캐릭터 위치 랜덤배치
         List<int[]> floorPos = new LinkedList<>();
         //유저 캐릭터 번호 랜덤 매핑
