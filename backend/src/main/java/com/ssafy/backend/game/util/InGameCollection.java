@@ -36,7 +36,7 @@ public class InGameCollection {
             }
         }
 
-        users.removeIf(Objects::isNull);//null값 제거
+//        users.removeIf(Objects::isNull);//null값 제거
 
         GameInfo gameInfo = new GameInfo(users, roomInfo);
         for (UserAccessInfo user:users){

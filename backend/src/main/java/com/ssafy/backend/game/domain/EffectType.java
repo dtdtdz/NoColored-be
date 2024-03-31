@@ -7,7 +7,10 @@ import java.util.Map;
 
 @Getter
 public enum EffectType {
-    STEP((byte) 0);
+    SKIN_APPEAR((byte) 0),
+    NPC_STOP((byte) 1),
+    ITEM_TIME_OUT((byte) 2),
+    ITEM_USE((byte) 3);
 
 
     private final byte value;
