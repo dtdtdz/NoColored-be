@@ -304,6 +304,7 @@ public class GameInfo {
                 if (time < 0) {
                     it.remove(); // 안전하게 원소 제거
                     if (entry.getKey().equals(GameUserState.STOP)) {
+                        System.out.println("속도 복귀");
                         characterInfoArr[userGameInfo.getCharacterNum()].setVelX(DEFAULT_SPEED);
                     } else if (entry.getKey().equals(GameUserState.STEPED)){
                         int val;
