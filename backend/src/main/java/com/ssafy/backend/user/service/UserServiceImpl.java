@@ -5,6 +5,8 @@ import com.ssafy.backend.collection.repository.UserCollectionRepository;
 import com.ssafy.backend.rank.document.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.rank.util.RankUtil;
+import com.ssafy.backend.user.entity.UserAchievements;
+import com.ssafy.backend.user.repository.UserAchievementsRepository;
 import com.ssafy.backend.user.repository.UserInfoRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.dto.UserSignDto;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
@@ -40,11 +43,12 @@ public class UserServiceImpl implements UserService {
     private final UserCollectionRepository userCollectionRepository;
     private final RankRepository rankRepository;
     private final RankUtil rankUtil;
+    private final UserAchievementsRepository userAchievementsRepository;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
                            @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
-                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository, RankRepository rankRepository, RankUtil rankUtil
+                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository, RankRepository rankRepository, RankUtil rankUtil, UserAchievementsRepository userAchievementsRepository
     ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
@@ -55,6 +59,7 @@ public class UserServiceImpl implements UserService {
         this.userCollectionRepository = userCollectionRepository;
         this.rankRepository = rankRepository;
         this.rankUtil = rankUtil;
+        this.userAchievementsRepository = userAchievementsRepository;
     }
 
     private String getUserCode() {
@@ -93,12 +98,27 @@ public class UserServiceImpl implements UserService {
                     .build();
             userProfileRepository.save(userProfile);
 
+            // userachievements
+            UserAchievements userAchievements=UserAchievements.builder()
+                    .userCode(userCode)
+                    .lastLoginDate(LocalDateTime.now())
+                    .consecutiveLoginDays(1)
+                    .cumulativeLoginDays(1)
+                    .isConsecutiveLogin(true)
+                    .cumulativePlayCount(0)
+                    .cumulativeWinCount(0)
+                    .cumulativeLoseCount(0)
+                    .playtime(0L)
+                    .userProfile(userProfile)
+                    .build();
+            userAchievementsRepository.save(userAchievements);
+
 
             // usercollection 생성
             UserCollection userCollection=UserCollection.builder()
                     .userCode(userCode)
-                    .skinIds(new ArrayList<>(Arrays.asList(11,15,19,23,27)))
-                    .labelIds(new ArrayList<>(Arrays.asList(71)))
+                    .skinIds(new ArrayList<>(Arrays.asList(11,15,19,21,23,27,29)))
+                    .labelIds(new ArrayList<>(Arrays.asList(1,10,71)))
                     .achievementIds(new ArrayList<>())
                     .build();
             userCollectionRepository.save(userCollection);
@@ -109,6 +129,8 @@ public class UserServiceImpl implements UserService {
                     .rating(defaultRating)
                     .build();
             rankRepository.save(rankMongo);
+
+
 
             return userProfile;
         } catch (Exception e){
@@ -178,11 +200,27 @@ public class UserServiceImpl implements UserService {
                     .isGuest(false)
                     .build();
             userProfileRepository.save(userProfile);
+
+            // userachievements
+            UserAchievements userAchievements=UserAchievements.builder()
+                    .userCode(userCode)
+                    .lastLoginDate(LocalDateTime.now())
+                    .consecutiveLoginDays(1)
+                    .cumulativeLoginDays(1)
+                    .isConsecutiveLogin(true)
+                    .cumulativePlayCount(0)
+                    .cumulativeWinCount(0)
+                    .cumulativeLoseCount(0)
+                    .playtime(0L)
+                    .userProfile(userProfile)
+                    .build();
+            userAchievementsRepository.save(userAchievements);
+
             // usercollection 생성
             UserCollection userCollection=UserCollection.builder()
                     .userCode(userCode)
-                    .skinIds(new ArrayList<>(Arrays.asList(11,15,19,23,27,28))) // 게스트->회원전환할때 보상도 다 포함
-                    .labelIds(new ArrayList<>(Arrays.asList(64,71,72)))
+                    .skinIds(new ArrayList<>(Arrays.asList(11,15,19,21,23,27,28,29))) // 게스트->회원전환할때 보상도 다 포함
+                    .labelIds(new ArrayList<>(Arrays.asList(1,10,64,71,72)))
                     .achievementIds(new ArrayList<>())
                     .build();
             userCollectionRepository.save(userCollection);
@@ -207,6 +245,9 @@ public class UserServiceImpl implements UserService {
                     .isDeleted(false)
                     .build();
             userInfoRepository.save(userInfo);
+
+
+
             return userProfile;
 
         } catch (Exception e){
@@ -241,6 +282,84 @@ public class UserServiceImpl implements UserService {
     public String login(String id, String password) {
         UserProfile userProfile = userInfoRepository.findByUser(id, password);
         if (userProfile==null) return null;
+
+        UserCollection userCollection=userCollectionRepository.findByUserCode(userProfile.getUserCode());
+
+        // 누적, 연속접속 확인
+        UserAchievements userAchievements=userAchievementsRepository.findByUserCode(userProfile.getUserCode());
+        LocalDateTime today=LocalDateTime.now();
+        LocalDateTime lastLoginDate=userAchievements.getLastLoginDate();
+        // 누적접속 +1
+        userAchievements.setCumulativeLoginDays(userAchievements.getCumulativeLoginDays()+1);
+        
+        // 연속접속
+        if(lastLoginDate.equals(today.minusDays(1))){
+            userAchievements.setConsecutiveLoginDays(userAchievements.getConsecutiveLoginDays()+1);
+            userAchievements.setConsecutiveLogin(true);
+        }else if(!lastLoginDate.equals(today)){
+            userAchievements.setConsecutiveLogin(false);
+            userAchievements.setConsecutiveLoginDays(1);
+            userCollection.getLabelIds().add(68);
+        }
+        userAchievements.setLastLoginDate(today);
+
+        // 누적 접속
+        if(userAchievements.getCumulativeLoginDays()==2){
+            userCollection.getLabelIds().add(2);
+            userCollection.getSkinIds().add(30);
+        }else if(userAchievements.getCumulativeLoginDays()==3){
+            userCollection.getLabelIds().add(3);
+            userCollection.getSkinIds().add(25);
+        }else if(userAchievements.getCumulativeLoginDays()==4){
+            userCollection.getLabelIds().add(4);
+            userCollection.getSkinIds().add(26);
+        }else if(userAchievements.getCumulativeLoginDays()==5){
+            userCollection.getLabelIds().add(5);
+        }else if(userAchievements.getCumulativeLoginDays()==7){
+            userCollection.getLabelIds().add(6);
+        }else if(userAchievements.getCumulativeLoginDays()==10){
+            userCollection.getLabelIds().add(7);
+        }else if(userAchievements.getCumulativeLoginDays()==15){
+            userCollection.getLabelIds().add(8);
+        }else if(userAchievements.getCumulativeLoginDays()==30){
+            userCollection.getLabelIds().add(9);
+        }
+        // 연속 접속
+        if(userAchievements.getConsecutiveLoginDays()==2){
+            userCollection.getLabelIds().add(11);
+            userCollection.getSkinIds().add(22);
+        }else if(userAchievements.getConsecutiveLoginDays()==3){
+            userCollection.getLabelIds().add(12);
+            userCollection.getSkinIds().add(13);
+        }else if(userAchievements.getConsecutiveLoginDays()==4){
+            userCollection.getLabelIds().add(13);
+            userCollection.getSkinIds().add(14);
+        }else if(userAchievements.getConsecutiveLoginDays()==5){
+            userCollection.getLabelIds().add(14);
+        }else if(userAchievements.getConsecutiveLoginDays()==6){
+            userCollection.getLabelIds().add(15);
+        }else if(userAchievements.getConsecutiveLoginDays()==7){
+            userCollection.getLabelIds().add(16);
+        }else if(userAchievements.getConsecutiveLoginDays()==8){
+            userCollection.getLabelIds().add(17);
+        }else if(userAchievements.getConsecutiveLoginDays()==9){
+            userCollection.getLabelIds().add(18);
+        }else if(userAchievements.getConsecutiveLoginDays()==10){
+            userCollection.getLabelIds().add(19);
+        }else if(userAchievements.getConsecutiveLoginDays()==12){
+            userCollection.getLabelIds().add(20);
+        }else if(userAchievements.getConsecutiveLoginDays()==14){
+            userCollection.getLabelIds().add(21);
+        }else if(userAchievements.getConsecutiveLoginDays()==16){
+            userCollection.getLabelIds().add(22);
+        }else if(userAchievements.getConsecutiveLoginDays()==18){
+            userCollection.getLabelIds().add(23);
+        }else if(userAchievements.getConsecutiveLoginDays()==20){
+            userCollection.getLabelIds().add(24);
+        }
+
+        userAchievementsRepository.save(userAchievements);
+        userCollectionRepository.save(userCollection);
 
         return generateToken(userProfile);
     }

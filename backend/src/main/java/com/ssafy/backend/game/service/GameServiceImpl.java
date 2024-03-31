@@ -62,11 +62,11 @@ public class GameServiceImpl implements GameService {
         return gameInfo.getGameRoomDto();
     }
 
+    // resultdto를 만들어줌 그래서 그거 가지고 유저 업적을 할 수 있음
     @Override
     public ResultDto getResult(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         ResultDto userResultDto = new ResultDto(userAccessInfo.getResultInfo());
-        System.out.println("getR");
         if (userAccessInfo.getResultInfo().getRoom()!=null){
             System.out.println(userAccessInfo.getResultInfo().getRoom().getRoomDto().getRoomTitle());
             userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getRoom());
