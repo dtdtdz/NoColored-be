@@ -129,13 +129,12 @@ public class GameServiceImpl implements GameService {
                     int rank = entry.getValue().getUserPlayInfo().getRank();
                     userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
                     userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
+                    userProfileRepository.save(userProfile);
                 }
             } catch (Exception e){
                 System.out.println("ResultSaveError");
                 e.printStackTrace();
             }
-
-
         },0, TimeUnit.SECONDS);
 
     }
@@ -175,14 +174,9 @@ public class GameServiceImpl implements GameService {
     }
 
 
-    private void setSave(GameInfo gameInfo){
-
-    }
-
     private void gameClose(GameInfo gameInfo){
 //        roomUuid있으면 해당 룸으로 보낸다.
         System.out.println("game close");
-
 
         PriorityQueue<UserGameInfo> pq = new PriorityQueue<UserGameInfo>((x,y)->{
             if (x.getScore()==y.getScore()){
@@ -211,7 +205,7 @@ public class GameServiceImpl implements GameService {
             userAccessInfo.setResultInfo(resultInfo);
         }
 
-
+        dataSave(gameInfo);
         inGameCollection.removeGame(gameInfo);
     }
 
