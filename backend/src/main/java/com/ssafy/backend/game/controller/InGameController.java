@@ -67,13 +67,13 @@ public class InGameController {
 
 
     // 플레이어마다 다른 resultdto
-//    @GetMapping
+    @GetMapping
     public ResponseEntity<?> getGameResultData(@RequestHeader("Authorization") String token){
 
         return ResponseEntity.ok(gameService.getResult(token));
     }
 
-    @GetMapping
+//    @GetMapping
     public ResponseEntity<?> getGameResultDummy(){
 
         ResultDto resultDto = new ResultDto();
