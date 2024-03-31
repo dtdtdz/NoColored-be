@@ -217,18 +217,7 @@ public class FriendlyServiceImpl implements FriendlyService {
 
 
                 // 입장했다고 세션 뿌리기
-                for(int j=0;j<4;j++){
-                    UserAccessInfo tempUserAccessInfo = roomInfo.getUserAccessInfos()[j];
-                    // if(tempUserAccessInfo != null && userRoomDtos[j]!=null)
-                    if(tempUserAccessInfo != null){
-                        try {
-                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),
-                                    SendTextMessageType.ROOM_INFO.getValue(), roomDto);
-                        } catch (Exception e){
-                            System.out.println(e.getMessage());
-                        }
-                    }
-                }
+                sendRoomDto(roomInfo);
                 return ResponseEntity.ok(roomDto);
             }
         }
@@ -379,13 +368,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                                 userAccessInfos[i]=null;
                                 userAccessInfo.clearPosition();
                                 // 변경했다고 세션 뿌리기
-                                for(int k=0;k<4;k++){
-                                    UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[k];
-                                    if(tempUserAccessInfo!=null){
-                                        SynchronizedSend.textSend(tempUserAccessInfo.getSession(),
-                                                SendTextMessageType.ROOM_INFO.getValue(), roomDto);
-                                    }
-                                }
+                                sendRoomDto(roomInfo);
                                 return ResponseEntity.ok(roomDto);
                             }else{
                                 startIndex++;
@@ -400,15 +383,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                     // roomInfo 반영
                     userAccessInfos[i]=null;
                     userAccessInfo.clearPosition();
-
-                    // 변경했다고 세션 뿌리기
-                    for(int j=0;j<4;j++){
-                        UserAccessInfo tempUserAccessInfo=roomInfo.getUserAccessInfos()[j];
-                        if(tempUserAccessInfo!=null){
-                            SynchronizedSend.textSend(tempUserAccessInfo.getSession(),
-                                    SendTextMessageType.ROOM_INFO.getValue(), roomDto);
-                        }
-                    }
+                    sendRoomDto(roomInfo);
                 }
                 return ResponseEntity.ok(roomDto);
             }
@@ -418,9 +393,14 @@ public class FriendlyServiceImpl implements FriendlyService {
     }
     private void sendRoomDto(RoomInfo roomInfo){
         for (UserAccessInfo userAccessInfo:roomInfo.getUserAccessInfos()){
-            if (userAccessInfo!=null && userAccessInfo.getSession().isOpen()) {
-                SynchronizedSend.textSend(userAccessInfo.getSession(),SendTextMessageType.ROOM_INFO.getValue(),roomInfo.getRoomDto() );
+            try {
+                if (userAccessInfo!=null && userAccessInfo.getSession().isOpen()) {
+                    SynchronizedSend.textSend(userAccessInfo.getSession(),SendTextMessageType.ROOM_INFO.getValue(),roomInfo.getRoomDto() );
+                }
+            } catch (Exception e){
+                System.out.println("방정보 전송 실패");
             }
+
         }
     }
 }
