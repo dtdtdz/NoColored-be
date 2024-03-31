@@ -37,9 +37,9 @@ public class InGameLogic {
                 gameInfo.putCountDown();
                 gameInfo.goToNextCycle();
                 for (CharacterInfo characterInfo: gameInfo.getCharacterInfoArr()){
-                    characterInfo.setVelX(GameInfo.DEFAULT_SPEED);
+                    characterInfo.setVelX(GameInfo.DEFAULT_VEL_X);
                 }
-                gameInfo.setSecond(GameInfo.DEFAULT_TIME);
+                gameInfo.setSecond(GameInfo.GAME_TIME);
             } else {
                 gameInfo.putCountDown();
             }

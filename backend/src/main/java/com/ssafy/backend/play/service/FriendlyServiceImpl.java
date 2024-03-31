@@ -165,6 +165,9 @@ public class FriendlyServiceImpl implements FriendlyService {
         if (!password.equals(roomInfo.getRoomDto().getRoomPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password.");
         }
+        if(roomInfo.isGameStart()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("The game in this room has already started.");
+        }
 
         return ResponseEntity.ok(roomInfo.getRoomDto().getRoomId());
     }
