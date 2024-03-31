@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 
 public class SynchronizedSend {
     public static void binarySend(WebSocketSession session, ByteBuffer buffer){
+        System.out.println(buffer.position());
         if (session==null) {
             System.out.println("Can't find session.");
             return;
