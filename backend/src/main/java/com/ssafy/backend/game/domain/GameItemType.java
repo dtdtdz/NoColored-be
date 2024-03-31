@@ -7,12 +7,12 @@ import java.util.Map;
 
 @Getter
 public enum GameItemType {
-    LIGHT_U_PALL((byte) 0),
-    STOP_NPC((byte) 1),
-    RANDOM_BOX((byte) 2),
-    REBEL((byte) 3),
-    STOP_PLAYER((byte) 4),
-    COLOR_LESS((byte) 255);
+    NO_ITEM((byte) 1),
+    LIGHT_U_PALL((byte) 2),
+    STOP_NPC((byte) 3),
+    RANDOM_BOX((byte) 4),
+    REBEL((byte) 5),
+    STOP_PLAYER((byte) 6);
 //    INVINCIBLE,
 //    NINJA,
 //    FIREWORKS,

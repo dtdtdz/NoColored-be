@@ -50,6 +50,9 @@ public class GameInfo {
     public static final int STEP_VEL_Y = -200;
     public static final int ITEM_CREATE_INTERVAL = 15;
     public static final int ITEM_REMOVE_INTERVAL = 5;
+    public static final int ITEM_SIZE = 32;
+    public static final float ITEM_X = (WALL_WIDTH+MAP_WIDTH/2f)*BLOCK_SIZE;
+    public static final float ITEM_Y = (MAP_HEIGHT/2f)*BLOCK_SIZE;
 
     public static final ByteBuffer[] buffer = new ByteBuffer[4];
     static {
@@ -101,7 +104,7 @@ public class GameInfo {
         gameCycle = GameCycle.CREATE;
         stepOrder = 1;
         if (room!=null && room.getRoomDto().getMapId()>0 && room.getRoomDto().getMapId()<=2){
-            mapInfo = new MapInfo(room.getRoomDto().getMapId()-1);
+            mapInfo = new MapInfo(room.getRoomDto().getMapId());
         } else {
             mapInfo = new MapInfo(random.nextInt(2));
         }
@@ -290,7 +293,7 @@ public class GameInfo {
                 user1.setStepOrder(stepOrder++);
             }
 
-            effectList.add(new Effect(EffectType.STEP,
+            effectList.add(new Effect(EffectType.SKIN_APPEAR,
                     characterInfoArr[characterNum].getX(),
                     characterInfoArr[characterNum].getY() + CHARACTER_SIZE / 2f));
             user1.getUserPlayInfo()
