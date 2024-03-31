@@ -127,7 +127,12 @@ public class UserServiceImpl implements UserService {
         userProfile.setUserLabel("파릇파릇 새싹");
         userProfileRepository.save(userProfile);
 
+
         UserProfileDto userProfileDto=userAccessInfo.getUserProfileDto();
+        userProfileDto.setGuest(false);
+        userProfileDto.setNickname(userSignDto.getNickname());
+        userProfileDto.setLabel("파릇파릇 새싹");
+
         doUserProfileDto(userProfileDto);
         // userAccessInfo에 반영
         userAccessInfo.setUserProfileDto(userProfileDto);

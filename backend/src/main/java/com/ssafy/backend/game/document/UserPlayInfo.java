@@ -1,7 +1,6 @@
 package com.ssafy.backend.game.document;
 
-import com.ssafy.backend.game.domain.GameItemType;
-import com.ssafy.backend.user.service.UserService;
+import com.ssafy.backend.game.type.GameItemType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
