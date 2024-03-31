@@ -40,6 +40,7 @@ public class GameInfo {
     private byte stepOrder;
     private GameItemType curItem;
     private byte[] useItem;
+    private long itemDuration;
 
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
@@ -89,6 +90,7 @@ public class GameInfo {
         displaySkinList = new LinkedList<>();
         curItem = GameItemType.NO_ITEM;
         useItem = null;
+        itemDuration = 0;
         //캐릭터 위치 랜덤배치
         List<int[]> floorPos = new LinkedList<>();
         //유저 캐릭터 번호 랜덤 매핑
@@ -171,12 +173,13 @@ public class GameInfo {
 
     public long tick(){
         long now = System.currentTimeMillis();
-        long result = now - time;
+        long dt = now - time;
         time = now;
 
-        itemManageProcess();
-        applyTimeAtState(result);
-        return result;
+        itemManageProcess(dt);
+        applyTimeAtState(dt);
+
+        return dt;
     }
 
     public void setSecond(int second){
@@ -189,10 +192,19 @@ public class GameInfo {
         itemTime = time + 1000L*ITEM_CREATE_INTERVAL;
     }
 
-    public void itemManageProcess(){
+    private void itemManageProcess(long dt){
+        //할당된 duration 전부 소친하면...
+        if (useItem!=null){
+            itemDuration-=dt;
+            if (itemDuration<=0){
+                useItem = null;
+            }
+        }
+
         if (curItem.equals(GameItemType.NO_ITEM)){
             if (itemTime>time){
-                curItem = GameItemType.valueOf((byte)(random.nextInt(6)+1));
+//                curItem = GameItemType.valueOf((byte)(random.nextInt(6)+1));
+                curItem = GameItemType.STOP_NPC;
                 setItemTime();
             }
         } else if (itemTime-(ITEM_CREATE_INTERVAL-ITEM_REMOVE_INTERVAL)*1000L>time){
@@ -210,8 +222,29 @@ public class GameInfo {
         if ((Math.abs(cInfo.getX()-ITEM_X)<interval)
                 && (Math.abs(cInfo.getY()-ITEM_Y)<interval)){
             effectList.add(new Effect(EffectType.ITEM_USE, ITEM_X, ITEM_Y));
+            useItem = new byte[]{curItem.getValue(), cInfo.getUserGameInfo().getPlayerNum()};
             curItem = GameItemType.NO_ITEM;
         }
+    }
+
+    public void applyItem(){
+        if (useItem==null) return;
+
+        //itemUse에서 useItem에 할당할경우 duration<=0이고 필요하다면 지정
+        if (itemDuration<=0){
+            if (useItem[0] == GameItemType.LIGHT_U_PALL.getValue()){
+
+                useItem = null;
+            } else if(useItem[0] == GameItemType.STOP_NPC.getValue()){
+                for (CharacterInfo characterInfo: characterInfoArr){
+                    if(characterInfo.getUserGameInfo()==null){
+
+                    }
+                }
+                itemDuration = 3000L;
+            }
+        }
+
     }
 
     public boolean checkSecond(){
@@ -291,7 +324,8 @@ public class GameInfo {
             byte characterNum = bytes[2];
             UserGameInfo user1 = userGameInfoList.get(bytes[0]);
             UserGameInfo user2 = userGameInfoList.get(bytes[1]);
-
+            CharacterInfo char1 = characterInfoArr[bytes[2]];
+            CharacterInfo char2 = characterInfoArr[bytes[3]];;
             if (user1.getStepOrder()==null){
                 user1.setStepOrder(stepOrder++);
             }
@@ -304,38 +338,42 @@ public class GameInfo {
                     characterInfoArr[characterNum].getY()));
             user1.getUserPlayInfo()
                     .setStep(user1.getUserPlayInfo().getStep() + 1);
-            applyState(user1, GameUserState.DISPLAY_SKIN, 4000L);
-            applyState(user2, GameUserState.DISPLAY_SKIN, 2000L);
-            applyState(user2, GameUserState.STOP, 2000L);
-            applyState(user2, GameUserState.STEPED, 2000L);
-            characterInfoArr[user2.getCharacterNum()].setVelX(0);
+            applyState(char1, GameUserState.DISPLAY_SKIN, 4000L);
+            applyState(char2, GameUserState.DISPLAY_SKIN, 2000L);
+            applyState(char2, GameUserState.STOP, 2000L);
+            applyState(char2, GameUserState.STEPED, 2000L);
+
         }
         stepList.clear();
     }
-    public void applyState(UserGameInfo userGameInfo, GameUserState state, long time){
-        userGameInfo.getStates().compute(state, (key, currentValue) ->
+    public void applyState(CharacterInfo characterInfo, GameUserState state, long time){
+        characterInfo.getStates().compute(state, (key, currentValue) ->
                 Math.max(currentValue == null ? 0L : currentValue, time));
+        if (state.equals(GameUserState.STOP) && time>0){
+            characterInfo.setVelX(0);
+        }
     }
 
     public void applyTimeAtState(long dt){
-        for (UserGameInfo userGameInfo : userGameInfoList) {
-            Iterator<Map.Entry<GameUserState, Long>> it = userGameInfo.getStates().entrySet().iterator();
+        for (CharacterInfo characterInfo : characterInfoArr) {
+            Iterator<Map.Entry<GameUserState, Long>> it = characterInfo.getStates().entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<GameUserState, Long> entry = it.next();
                 long time = entry.getValue() - dt;
                 if (time < 0) {
                     it.remove(); // 안전하게 원소 제거
                     if (entry.getKey().equals(GameUserState.STOP)) {
-                        System.out.println("속도 복귀");
-                        characterInfoArr[userGameInfo.getCharacterNum()].setVelX(DEFAULT_VEL_X);
+//                        System.out.println("속도 복귀");
+                        characterInfo.setVelX(DEFAULT_VEL_X);
                     } else if (entry.getKey().equals(GameUserState.STEPED)){
                         int val;
                         do {
                             val = random.nextInt(CHARACTER_NUM);
                         } while (characterInfoArr[val].getUserGameInfo()!=null);
-                        characterInfoArr[val].setUserGameInfo(userGameInfo);
-                        characterInfoArr[userGameInfo.getCharacterNum()].setUserGameInfo(null);
-                        userGameInfo.setCharacterNum((byte) val);
+                        CharacterInfo tmp = characterInfoArr[characterInfo.getUserGameInfo().getCharacterNum()];
+                        characterInfoArr[characterInfo.getUserGameInfo().getCharacterNum()] = characterInfoArr[val];
+                        characterInfoArr[val] = tmp;
+                        characterInfo.getUserGameInfo().setCharacterNum((byte) val);
                     }
                 } else {
                     entry.setValue(time); // 값을 직접 수정하는 것은 안전함
@@ -373,8 +411,10 @@ public class GameInfo {
     }
 
     public void putSkin(){
+
         for (UserGameInfo userGameInfo:userGameInfoList){
-            if (userGameInfo.getStates().containsKey(GameUserState.DISPLAY_SKIN))
+            if (characterInfoArr[userGameInfo.getCharacterNum()]
+                    .getStates().containsKey(GameUserState.DISPLAY_SKIN))
                 displaySkinList.add(new byte[]{userGameInfo.getPlayerNum(),userGameInfo.getCharacterNum()});
         }
         for (int i=0; i<userGameInfoList.size(); i++){
