@@ -36,7 +36,7 @@ public class GameInfo {
     private List<byte[]> stepList;
     private List<Effect> effectList;
     private List<byte[]> displaySkinList;
-    private GameItemType type;
+//    private GameItemType type;
     private byte stepOrder;
     private GameItemType curItem;
     private byte[] useItem;
@@ -133,6 +133,7 @@ public class GameInfo {
             characterInfo.setDir((int) ((random.nextInt(2)-0.5f)*2));
             characterInfo.setVelX(0);
             characterInfo.setVelY(0);
+            characterInfo.setStates(new LinkedHashMap<>());
 
             characterInfoArr[idxs.get(i)] = characterInfo;
         }
@@ -200,10 +201,10 @@ public class GameInfo {
                 useItem = null;
             }
         }
-
+        if (curItem==null) return;
         if (curItem.equals(GameItemType.NO_ITEM)){
             if (itemTime>time){
-//                curItem = GameItemType.valueOf((byte)(random.nextInt(6)+1));
+//                curItem = GameItemType.valueOf((byte)(random.nextInt(GameItemType.size()-1)+1));
                 curItem = GameItemType.STOP_NPC;
                 setItemTime();
             }
@@ -212,9 +213,6 @@ public class GameInfo {
             effectList.add(new Effect(EffectType.ITEM_TIME_OUT, ITEM_X, ITEM_Y));
         }
 
-        if (itemTime>time) return;
-        curItem = GameItemType.valueOf((byte)random.nextInt(5));
-        setItemTime();
     }
 
     public void itemUse(CharacterInfo cInfo){
