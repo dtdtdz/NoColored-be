@@ -24,14 +24,14 @@ public class CharacterInfo {
     private Map<GameUserState, Long> states;//milliSecond
 
     //속도와 방향을 따로 설정할까?
-    public CharacterInfo(float x, float y){
-        this.x = x;
-        this.y = y;
-        velX = 160f;
-        velY = 0;
-        userGameInfo = null;
-        jump = false;
-        states = new LinkedHashMap<>();
-    }
+//    public CharacterInfo(float x, float y){
+//        this.x = x;
+//        this.y = y;
+//        velX = 160f;
+//        velY = 0;
+//        userGameInfo = null;
+//        jump = false;
+//        states = new LinkedHashMap<>();
+//    }
 
 }

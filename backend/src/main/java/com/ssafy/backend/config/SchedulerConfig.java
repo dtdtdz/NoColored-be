@@ -2,6 +2,7 @@ package com.ssafy.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 
@@ -11,6 +12,12 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class SchedulerConfig {
+
+    @Bean
+    @Primary
+    public ScheduledExecutorService primaryScheduledExecutorService() {
+        return Executors.newScheduledThreadPool(5);
+    }
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {
         return Executors.newScheduledThreadPool(1); // 예: 스레드 풀 크기를 1로 설정
