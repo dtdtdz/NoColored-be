@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -107,33 +106,48 @@ public class FriendlyServiceImpl implements FriendlyService {
         final int maxRooms = roomsPerPage * maxPages;
         List<FriendlyRoomDto> paginatedFriendlyRooms = new ArrayList<>();
 
-        synchronized (roomInfoMap) {
-            // 방 코드 순으로 정렬된 RoomInfo 객체들의 리스트 생성
+
+        synchronized (roomInfoMap){
+            // roomInfoMap에서 RoomInfo 객체들을 방 코드 순서로 정렬
+            // LinkedHashMap 안되나? 만든 순서대로 정렬되는디
             List<RoomInfo> sortedRooms = new ArrayList<>(roomInfoMap.values());
-            // sortedRooms.sort(Comparator.comparingInt(RoomInfo::getRoomCodeInt)); // 필요에 따라 주석 해제
+//            sortedRooms.sort(Comparator.comparingInt(RoomInfo::getRoomCodeInt));
             Collections.reverse(sortedRooms);
 
-            // 게임이 시작되지 않은 방만 필터링
             List<RoomInfo> filteredRooms = sortedRooms.stream()
                     .filter(roomInfo -> !roomInfo.isGameStart())
                     .toList();
 
-            if (filteredRooms.isEmpty()) {
-                return ResponseEntity.ok(paginatedFriendlyRooms); // 비었을 경우 빈 목록 반환
-            }
+//            // 비었으면 하나만 만들어서 줌
+//            if(sortedRooms.isEmpty()){
+//                paginatedFriendlyRooms.add(new FriendlyRoomDto());
+//                return ResponseEntity.ok(paginatedFriendlyRooms);
+//            }
 
-            // 페이징 처리
+            // 페이징을 위한 계산
             int totalRooms = filteredRooms.size();
-            int startIndex = Math.max((offset - 1) * roomsPerPage, 0); // startIndex 계산 오류 수정
+            int startIndex = (offset - 1) * maxRooms;
             if (startIndex >= totalRooms) {
                 return ResponseEntity.ok(Collections.emptyList());
             }
-            int endIndex = Math.min(startIndex + roomsPerPage, totalRooms); // roomsPerPage 기준으로 수정
+            int endIndex = Math.min(startIndex + maxRooms, totalRooms);
 
+            // 페이징된 목록 생성
             for (int i = startIndex; i < endIndex; i++) {
                 RoomInfo roomInfo = filteredRooms.get(i);
+                // 게임 시작한 방은 안가져온다
+//                if(roomInfo.isGameStart()){
+//                    endIndex++;
+//                    continue;
+//                }
                 FriendlyRoomDto friendlyRoomDto = new FriendlyRoomDto();
-                // DTO 설정 생략
+                friendlyRoomDto.setRoomTitle(roomInfo.getRoomDto().getRoomTitle());
+                friendlyRoomDto.setRoomCode(roomInfo.getRoomDto().getRoomCode());
+                friendlyRoomDto.setMapId(roomInfo.getRoomDto().getMapId());
+                // 유저 수 계산
+                int userNumber = (int) Arrays.stream(roomInfo.getUserAccessInfos()).filter(Objects::nonNull).count();
+                friendlyRoomDto.setUserNumber(userNumber);
+
                 paginatedFriendlyRooms.add(friendlyRoomDto);
             }
         }
@@ -311,7 +325,6 @@ public class FriendlyServiceImpl implements FriendlyService {
                 RoomDto roomDto = roomInfo.getRoomDto();
                 // 방장이면
                 if (i == roomDto.getMasterIndex()) {
-                    roomDto.setMapId(mapId);
                     roomDto.setRoomTitle(title);
                     roomDto.setRoomPassword(password);
                     roomInfo.setRoomDto(roomDto);
