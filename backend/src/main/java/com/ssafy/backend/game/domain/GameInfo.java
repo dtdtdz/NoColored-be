@@ -48,7 +48,7 @@ public class GameInfo {
     public static final int CHARACTER_NUM = 10;
     public static final int JUMP_VEL_Y = -300;
     public static final int STEP_VEL_Y = -200;
-    public static final int ITEM_CREATE_INTERVAL = 15;
+    public static final int ITEM_CREATE_INTERVAL = 10;
     public static final int ITEM_REMOVE_INTERVAL = 5;
     public static final int ITEM_SIZE = 32;
     public static final float ITEM_X = (WALL_WIDTH+MAP_WIDTH/2f)*BLOCK_SIZE;
@@ -207,8 +207,8 @@ public class GameInfo {
         this.second = second;
     }
 
-    public void setItemTime(int second){
-        itemTime = time + 1000L*second;
+    public void setItemTime(){
+        itemTime = time + 1000L*ITEM_CREATE_INTERVAL;
     }
 
     public void createItem(){
@@ -261,6 +261,13 @@ public class GameInfo {
         for (int i=0; i< users.size(); i++){
             buffer[i].put(SendBinaryMessageType.COUNT_DOWN.getValue())
                     .put((byte) (Math.max(second, 0)));
+        }
+    }
+    public void putItem(){
+        for (int i=0; i<users.size(); i++){
+            buffer[i].put(SendBinaryMessageType.ITEM.getValue())
+                    .put(curItem.getValue())
+                    .putFloat(ITEM_X).putFloat(ITEM_Y);
         }
     }
     public void putEnd() {
