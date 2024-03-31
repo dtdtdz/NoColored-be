@@ -43,7 +43,7 @@ public class GameInfo {
     public static final int MAP_HEIGHT = 19;
     public static final int MAP_WIDTH = 27;
     public static final int WALL_WIDTH = 3;
-    public static final int DEFAULT_TIME = 120;
+    public static final int DEFAULT_TIME = 60;
     public static final int CHARACTER_NUM = 10;
     public static final int JUMP_VEL_Y = -300;
     public static final int STEP_VEL_Y = -200;

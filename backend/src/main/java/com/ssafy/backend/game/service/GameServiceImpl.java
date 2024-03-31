@@ -1,11 +1,15 @@
 package com.ssafy.backend.game.service;
 
+import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.ResultInfo;
 import com.ssafy.backend.game.dto.ResultDto;
 import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.game.util.InGameLogic;
+import com.ssafy.backend.user.entity.UserProfile;
+import com.ssafy.backend.user.repository.UserProfileRepository;
 import com.ssafy.backend.user.util.JwtUtil;
+import com.ssafy.backend.websocket.domain.SendTextMessageType;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.game.domain.*;
@@ -14,6 +18,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -24,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 public class GameServiceImpl implements GameService {
 
     private final ScheduledExecutorService scheduledExecutorService;
+    private final ScheduledExecutorService saveScheduledExecutorService;
+    private final UserProfileRepository userProfileRepository;
 //    private final ScheduledExecutorService
     private final SessionCollection sessionCollection;
     private final InGameCollection inGameCollection;
@@ -31,11 +38,15 @@ public class GameServiceImpl implements GameService {
     private final JwtUtil jwtUtil;
     private ScheduledFuture<?> future;
     GameServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
+                    @Qualifier("authScheduledExecutorService")ScheduledExecutorService saveScheduledExecutorService,
+                    UserProfileRepository userProfileRepository,
                     SessionCollection sessionRepository,
                     InGameCollection inGameRepository,
                     InGameLogic inGameLogic,
                     JwtUtil jwtUtil){
         this.scheduledExecutorService = scheduledExecutorService;
+        this.saveScheduledExecutorService = saveScheduledExecutorService;
+        this.userProfileRepository = userProfileRepository;
         this.sessionCollection = sessionRepository;
         this.inGameCollection = inGameRepository;
         this.inGameLogic = inGameLogic;
@@ -104,6 +115,67 @@ public class GameServiceImpl implements GameService {
         } catch (Exception e){
             e.printStackTrace();
         }
+
+    }
+    private void dataSave(GameInfo gameInfo){
+
+        saveScheduledExecutorService.schedule(()->{
+            try {
+                for (Map.Entry<UserAccessInfo, UserGameInfo> entry:gameInfo.getUsers().entrySet()){
+                    UserProfile userProfile = userProfileRepository.findById(
+                            entry.getKey().getUserProfile().getId()).orElse(null);
+                    if (userProfile==null) throw new RuntimeException("Can't find user");
+
+                    int rank = entry.getValue().getUserPlayInfo().getRank();
+                    userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
+                    userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
+                }
+            } catch (Exception e){
+                System.out.println("ResultSaveError");
+                e.printStackTrace();
+            }
+
+
+        },0, TimeUnit.SECONDS);
+
+    }
+
+    private long calExp(long exp, int rank, int size){
+        if (size==2){
+            if (rank==1) return 200;
+            return 100;
+        } else if (size==3){
+            if (rank==1) return 250;
+            else if (rank==2) return 175;
+            return 100;
+        } else {
+            if (rank==1) return 300;
+            else if (rank==2) return 200;
+            else if (rank==3) return 150;
+            return 100;
+        }
+    }
+    private int calRating(int rating, int rank, int size){
+        int tmp = rating;
+        if (size==2){
+            if (rank==1) tmp = 70;
+            else tmp = -30;
+        } else if (size==3){
+            if (rank==1) tmp = 80;
+            else if (rank==2) tmp = 20;
+            else tmp = -40;
+        } else {
+            if (rank==1) tmp = 100;
+            else if (rank==2) tmp = 200;
+            else if (rank==3) tmp = 150;
+            else tmp = 100;
+        }
+
+        return Math.max(0, tmp);
+    }
+
+
+    private void setSave(GameInfo gameInfo){
 
     }
 
