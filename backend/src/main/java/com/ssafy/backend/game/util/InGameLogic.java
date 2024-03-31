@@ -140,7 +140,7 @@ public class InGameLogic {
 
 //                    System.out.print(3+":"+i+":2 ");
             if (cInfo.getUserGameInfo()!=null &&
-                    cInfo.getUserGameInfo().getStates().containsKey(GameUserState.STOP)){
+                    cInfo.getStates().containsKey(GameUserState.STOP)){
                 cInfo.setJump(false);
             }
 
@@ -169,7 +169,7 @@ public class InGameLogic {
             CharacterInfo curC = characterQueue.poll();
             gameInfo.itemUse(curC);
             if (curC.getUserGameInfo()!=null &&
-            curC.getUserGameInfo().getStates().containsKey(GameUserState.STEPED)) continue;
+            curC.getStates().containsKey(GameUserState.STEPED)) continue;
             boolean flag = false;
             for (CharacterInfo listC:validCharacter){
                 if (listC.getY()+cSize<=curC.getY()){
@@ -208,10 +208,14 @@ public class InGameLogic {
 //                System.out.println(4);
 //                System.out.println("game logic");
 
+
+        gameInfo.applyStep();
+        gameInfo.applyItem();
+
         gameInfo.putCharacterMapping();
         gameInfo.putPhysicsState();
         gameInfo.putItem();
-        gameInfo.applyStep();
+
         gameInfo.putScore();
         gameInfo.putEffect();
         gameInfo.putSkin();

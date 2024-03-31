@@ -21,5 +21,4 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> 
     void updateNickname(@Param("id")UUID id, @Param("userNickname") String userNickname);
 
     Optional<UserProfile> findByUserCode(String userCode);
-
 }

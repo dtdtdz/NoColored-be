@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
                     .userLabel("손님")
                     .isGuest(true)
                     .build();
-            if (userProfileRepository.save(userProfile)==null) throw new RuntimeException("게스트 생성 실패.");
+            userProfileRepository.save(userProfile);
 
 
             // usercollection 생성
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
                     .labelIds(new ArrayList<>(Arrays.asList(71)))
                     .achievementIds(new ArrayList<>())
                     .build();
-            if (userCollectionRepository.save(userCollection)==null) throw new RuntimeException("게스트 생성 실패.");
+            userCollectionRepository.save(userCollection);
 
             // mongodb에 넣을 rank정보
             RankMongo rankMongo=RankMongo.builder()
@@ -121,14 +121,17 @@ public class UserServiceImpl implements UserService {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         UserProfile userProfile = userAccessInfo.getUserProfile();
         //userProfile 을 managed 상태로 만들어준다.
-        UserProfile newUserProfile = userProfileRepository.findById(userProfile.getId()).orElse(null);
-        if (newUserProfile==null) return null;
-        newUserProfile.setGuest(false);
-        newUserProfile.setUserNickname(userSignDto.getNickname());
-        newUserProfile.setUserLabel("파릇파릇 새싹");
-        if (userProfileRepository.save(newUserProfile)==null) throw new RuntimeException("이미 있는 id 입니다..");
-        userAccessInfo.setUserProfile(newUserProfile);
+        userProfile = userProfileRepository.findById(userProfile.getId()).orElse(null);
+        if (userProfile==null) return null;
+        if (userInfoRepository.existsByUserId(userSignDto.getId())){
+           throw new RuntimeException("이미 있는 id 입니다..");
+        };
 
+        userProfile.setGuest(false);
+        userProfile.setUserNickname(userSignDto.getNickname());
+        userProfile.setUserLabel("파릇파릇 새싹");
+
+        userProfileRepository.save(userProfile);
         UserProfileDto userProfileDto=userAccessInfo.getUserProfileDto();
         userProfileDto.setGuest(false);
         userProfileDto.setNickname(userSignDto.getNickname());
@@ -139,7 +142,7 @@ public class UserServiceImpl implements UserService {
         userAccessInfo.setUserProfileDto(userProfileDto);
 
         // 파릇파릇 새싹 칭호 얻었다고 처리
-        UserProfile tempUserProfile = newUserProfile;
+        UserProfile tempUserProfile = userProfile;
         Optional<UserCollection> userCollectionOptional=userCollectionRepository.findById(tempUserProfile.getUserCode());
         UserCollection userCollection=userCollectionOptional.orElseThrow(() ->
                 new NoSuchElementException("해당 사용자의 UserCollection이 존재하지 않습니다: " + tempUserProfile.getUserCode()));
@@ -152,7 +155,7 @@ public class UserServiceImpl implements UserService {
 //                .id(userProfile.getId()) 넣으면 안된다.
                 .userId(userSignDto.getId())
                 .userPwd(userSignDto.getPassword())
-                .userProfile(newUserProfile)
+                .userProfile(userProfile)
                 .isDeleted(false)
                 .build();
         userInfoRepository.save(userInfo);
@@ -174,8 +177,7 @@ public class UserServiceImpl implements UserService {
                     .userLabel("파릇파릇 새싹")
                     .isGuest(false)
                     .build();
-            if (userProfileRepository.save(userProfile)==null) throw new RuntimeException("회원 가입 실패.");
-
+            userProfileRepository.save(userProfile);
             // usercollection 생성
             UserCollection userCollection=UserCollection.builder()
                     .userCode(userCode)
