@@ -343,7 +343,7 @@ public class FriendlyServiceImpl implements FriendlyService {
             // 찾으면 해당하는 userRoomDto의 상태 변경
             if (userAccessInfos[i] != null && userAccessInfos[i].getUserProfile().getUserCode().equals(userAccessInfo.getUserProfile().getUserCode())) {
                 RoomDto roomDto = roomInfo.getRoomDto();
-                UserRoomDto[] players=roomDto.getPlayers();
+                UserRoomDto[] players = roomDto.getPlayers();
 
                 // 방장이면
                 if (i == roomDto.getMasterIndex()) {

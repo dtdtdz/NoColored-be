@@ -62,7 +62,7 @@ public class MapInfo {
         left = 54;
         right = 540;//594-54
 
-        floorList = MapList.get(mapId);
+        floorList = MapList.get(mapId-1);
     }
 
 
