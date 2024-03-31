@@ -167,6 +167,7 @@ public class InGameLogic {
         int cSize = GameInfo.CHARACTER_SIZE;
         while (!characterQueue.isEmpty()){
             CharacterInfo curC = characterQueue.poll();
+            gameInfo.itemUse(curC);
             if (curC.getUserGameInfo()!=null &&
             curC.getUserGameInfo().getStates().containsKey(GameUserState.STEPED)) continue;
             boolean flag = false;
