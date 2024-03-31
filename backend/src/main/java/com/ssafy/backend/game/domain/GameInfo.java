@@ -106,7 +106,7 @@ public class GameInfo {
         if (room!=null && room.getRoomDto().getMapId()>0 && room.getRoomDto().getMapId()<=2){
             mapInfo = new MapInfo(room.getRoomDto().getMapId());
         } else {
-            mapInfo = new MapInfo(random.nextInt(2));
+            mapInfo = new MapInfo((random.nextInt(2))+1);
         }
 
         stepList = new ArrayList<>();
@@ -295,7 +295,10 @@ public class GameInfo {
 
             effectList.add(new Effect(EffectType.SKIN_APPEAR,
                     characterInfoArr[characterNum].getX(),
-                    characterInfoArr[characterNum].getY() + CHARACTER_SIZE / 2f));
+                    characterInfoArr[characterNum].getY()));
+            effectList.add(new Effect(EffectType.SKIN_APPEAR,
+                    characterInfoArr[characterNum].getX(),
+                    characterInfoArr[characterNum].getY()));
             user1.getUserPlayInfo()
                     .setStep(user1.getUserPlayInfo().getStep() + 1);
             applyState(user1, GameUserState.DISPLAY_SKIN, 4000L);
