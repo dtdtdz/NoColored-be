@@ -1,9 +1,6 @@
 package com.ssafy.backend.game.util;
 
-import com.ssafy.backend.game.domain.CharacterInfo;
-import com.ssafy.backend.game.domain.GameInfo;
-import com.ssafy.backend.game.domain.MapInfo;
-import com.ssafy.backend.game.domain.UserGameInfo;
+import com.ssafy.backend.game.domain.*;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -163,6 +160,8 @@ public class InGameLogic {
         int cSize = GameInfo.CHARACTER_SIZE;
         while (!characterQueue.isEmpty()){
             CharacterInfo curC = characterQueue.poll();
+            if (curC.getUserGameInfo()!=null &&
+            curC.getUserGameInfo().getStates().containsKey(GameUserState.STEPED)) continue;
             boolean flag = false;
             for (CharacterInfo listC:validCharacter){
                 if (listC.getY()+cSize<=curC.getY()){
