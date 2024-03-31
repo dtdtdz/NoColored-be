@@ -202,8 +202,8 @@ public class GameInfo {
         if (curItem==null) return;
         if (curItem.equals(GameItemType.NO_ITEM)){
             if (itemTime>time){
-//                curItem = GameItemType.valueOf((byte)(random.nextInt(GameItemType.size()-1)+1));
-                curItem = GameItemType.STOP_NPC;
+                curItem = GameItemType.valueOf((byte)(random.nextInt(GameItemType.size()-1)+1));
+//                curItem = GameItemType.STOP_NPC;
                 setItemTime();
             }
         } else if (itemTime-(ITEM_CREATE_INTERVAL-ITEM_REMOVE_INTERVAL)*1000L>time){

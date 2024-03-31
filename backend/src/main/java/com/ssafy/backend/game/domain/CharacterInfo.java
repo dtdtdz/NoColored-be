@@ -26,7 +26,6 @@ public class CharacterInfo {
         this.states = new LinkedHashMap<>();
         this.x = x;
         this.y = y;
-        velX = GameInfo.DEFAULT_VEL_X;
         this.dir = dir;
         this.userGameInfo = userGameInfo;
 
