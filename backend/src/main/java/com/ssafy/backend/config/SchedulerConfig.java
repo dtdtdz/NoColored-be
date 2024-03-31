@@ -29,6 +29,9 @@ public class SchedulerConfig {
     // 스프링 컨텍스트가 종료될 때 이벤트 리스너
     @EventListener
     public void onApplicationEvent(ContextClosedEvent event) {
+        ScheduledExecutorService primaryScheduledExecutorService = event.getApplicationContext()
+                .getBean("primaryScheduledExecutorService", ScheduledExecutorService.class);
+        shutdownAndAwaitTermination(primaryScheduledExecutorService);
         ScheduledExecutorService executorService = event.getApplicationContext()
                 .getBean("scheduledExecutorService",ScheduledExecutorService.class);
         shutdownAndAwaitTermination(executorService);
@@ -38,7 +41,7 @@ public class SchedulerConfig {
     }
     // 스레드 풀 종료를 위한 메서드
     void shutdownAndAwaitTermination(ScheduledExecutorService pool) {
-        System.out.println("shut");
+//        System.out.println("shut");
         pool.shutdown(); // 스레드 풀 종료를 시도
         try {
             // 스레드 풀이 종료될 때까지 기다림
