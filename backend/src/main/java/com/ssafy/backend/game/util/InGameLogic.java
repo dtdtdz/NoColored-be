@@ -1,6 +1,7 @@
 package com.ssafy.backend.game.util;
 
 import com.ssafy.backend.game.domain.*;
+import com.ssafy.backend.game.type.GameUserState;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -40,6 +41,7 @@ public class InGameLogic {
                     characterInfo.setVelX(GameInfo.DEFAULT_VEL_X);
                 }
                 gameInfo.setSecond(GameInfo.GAME_TIME);
+                gameInfo.setItemTime();
             } else {
                 gameInfo.putCountDown();
             }
@@ -137,8 +139,12 @@ public class InGameLogic {
             }
 
 //                    System.out.print(3+":"+i+":2 ");
-            if (isPlatForm || (cInfo.getUserGameInfo()!=null &&
-                    cInfo.getUserGameInfo().getStates().containsKey(GameUserState.STOP))) {
+            if (cInfo.getUserGameInfo()!=null &&
+                    cInfo.getUserGameInfo().getStates().containsKey(GameUserState.STOP)){
+                cInfo.setJump(false);
+            }
+
+            if (isPlatForm) {
                 if (cInfo.isJump()){
                     velY = GameInfo.JUMP_VEL_Y;
                     cInfo.setJump(false);
@@ -203,6 +209,7 @@ public class InGameLogic {
 
         gameInfo.putCharacterMapping();
         gameInfo.putPhysicsState();
+        gameInfo.putItem();
         gameInfo.applyStep();
         gameInfo.putScore();
         gameInfo.putEffect();

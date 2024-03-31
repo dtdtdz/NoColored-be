@@ -1,6 +1,10 @@
 package com.ssafy.backend.game.domain;
 
 import com.ssafy.backend.assets.SynchronizedSend;
+import com.ssafy.backend.game.type.EffectType;
+import com.ssafy.backend.game.type.GameCycle;
+import com.ssafy.backend.game.type.GameItemType;
+import com.ssafy.backend.game.type.GameUserState;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.websocket.domain.SendBinaryMessageType;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
@@ -48,7 +52,7 @@ public class GameInfo {
     public static final int CHARACTER_NUM = 10;
     public static final int JUMP_VEL_Y = -300;
     public static final int STEP_VEL_Y = -200;
-    public static final int ITEM_CREATE_INTERVAL = 10;
+    public static final int ITEM_CREATE_INTERVAL = 15;
     public static final int ITEM_REMOVE_INTERVAL = 5;
     public static final int ITEM_SIZE = 32;
     public static final float ITEM_X = (WALL_WIDTH+MAP_WIDTH/2f)*BLOCK_SIZE;
@@ -59,37 +63,6 @@ public class GameInfo {
         for (int i=0; i<buffer.length; i++){
             buffer[i] = ByteBuffer.allocate(2048);
         }
-    }
-
-
-    public enum GameCycle {
-        CREATE {
-            @Override
-            public GameCycle next() {
-                return READY;
-            }
-        },
-        READY {
-            @Override
-            public GameCycle next() {
-                return PLAY;
-            }
-        },
-        PLAY {
-            @Override
-            public GameCycle next() {
-                return CLOSE;
-            }
-        },
-        CLOSE {
-            @Override
-            public GameCycle next() {
-                return CLOSE;
-            }
-        };
-
-        // 모든 열거형 상수가 구현해야 하는 추상 메서드
-        public abstract GameCycle next();
     }
 
     private GameCycle gameCycle;
@@ -211,10 +184,20 @@ public class GameInfo {
         itemTime = time + 1000L*ITEM_CREATE_INTERVAL;
     }
 
-    public void createItem(){
+    public void ItemProcess(){
+        if (curItem.equals(GameItemType.NO_ITEM)){
+            if (itemTime>time){
+                curItem = GameItemType.valueOf((byte)(random.nextInt(6)+1));
+                setItemTime();
+            }
+        } else if (itemTime-(ITEM_CREATE_INTERVAL-ITEM_REMOVE_INTERVAL)*1000L>time){
+            curItem = GameItemType.NO_ITEM;
+            effectList.add(new Effect(EffectType.ITEM_TIME_OUT, ITEM_X, ITEM_Y));
+        }
+
         if (itemTime>time) return;
         curItem = GameItemType.valueOf((byte)random.nextInt(5));
-//        setItemTime(ITEM_CREATE_INTERVAL);
+        setItemTime();
     }
 
     public boolean checkSecond(){
@@ -246,7 +229,6 @@ public class GameInfo {
                     .put(SendBinaryMessageType.CHARACTER_MAPPING.getValue())
                     .put(userGameInfo.getPlayerNum())
                     .put(userGameInfo.getCharacterNum());
-
         }
     }
 
