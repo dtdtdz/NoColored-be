@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
@@ -21,7 +22,15 @@ public class CharacterInfo {
     private UserGameInfo userGameInfo;
     private boolean jump;
     private Map<GameCharacterState, Long> states;//milliSecond
+    public CharacterInfo(float x, float y, int dir, UserGameInfo userGameInfo){
+        this.states = new LinkedHashMap<>();
+        this.x = x;
+        this.y = y;
+        velX = GameInfo.DEFAULT_VEL_X;
+        this.dir = dir;
+        this.userGameInfo = userGameInfo;
 
+    }
     //속도와 방향을 따로 설정할까?
 //    public CharacterInfo(float x, float y){
 //        this.x = x;
