@@ -198,7 +198,7 @@ public class GameServiceImpl implements GameService {
                         userCollection.getLabelIds().add(29);
                     }else if(userAchievements.getCumulativePlayCount()==50){
                         userCollection.getLabelIds().add(30);
-                    }else if(userAchievements.getCumulativePlayCount()==100){
+                    }else if(userAchievements.getCumulativePlayCount()==100) {
                         userCollection.getLabelIds().add(31);
                     }
 
@@ -232,7 +232,7 @@ public class GameServiceImpl implements GameService {
 //                        reward.getSkins().add("googleblue");
                     }else if(userAchievements.getCumulativeWinCount()==10){
                         userCollection.getLabelIds().add(37);
-                        userCollection.getSkinIds().add(12);
+                        userCollection.getSkinIds().add(28);
 //                        reward.getSkins().add("basicyellow-sunglass");
                     }else if(userAchievements.getCumulativeWinCount()==20){
                         userCollection.getLabelIds().add(38);
