@@ -130,10 +130,8 @@ public class UserServiceImpl implements UserService {
                     .build();
             rankRepository.save(rankMongo);
 
-
-
             return userProfile;
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("게스트 생성 실패.");
         }
     }

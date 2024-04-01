@@ -30,8 +30,9 @@ public class RankingServiceImpl implements RankingService{
                         +userAccessInfo.getRoomInfo().getClass()+":"
                         +userAccessInfo.getRoomInfo().getRoomDto().getRoomCode());
             } else {
+                e.printStackTrace();
                 throw new RuntimeException("Position conflict: "
-                        +userAccessInfo.getRoomInfo().getClass());
+                        +userAccessInfo.getPosition().getClass());
             }
         }
 
