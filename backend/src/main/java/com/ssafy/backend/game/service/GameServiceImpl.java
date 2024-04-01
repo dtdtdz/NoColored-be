@@ -109,7 +109,7 @@ public class GameServiceImpl implements GameService {
                     resultDto.getReward().getTier().setUpgrade(tierUpgrade);
                 }
             }
-            resultDto.getReward().setSkins(null);
+            resultDto.getReward().setSkins(new ArrayList<>());
         } else {
             userAccessInfo.clearPosition();
         }
