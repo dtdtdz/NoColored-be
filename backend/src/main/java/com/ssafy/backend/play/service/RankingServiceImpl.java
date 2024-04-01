@@ -22,6 +22,7 @@ public class RankingServiceImpl implements RankingService{
     @Override
     public void addMatchingList(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        if (userAccessInfo==null) throw new RuntimeException("Token is invalid");
         try {
             System.out.print("매칭시도..:");
             matchingCollection.setAddMatching(userAccessInfo);
