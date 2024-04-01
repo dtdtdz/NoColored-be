@@ -63,7 +63,7 @@ public class GameServiceImpl implements GameService {
     public ResultDto getResult(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         ResultDto userResultDto = new ResultDto(userAccessInfo.getResultInfo());
-        if (userAccessInfo.getResultInfo().getGameInfo()!=null){
+        if (userAccessInfo.getResultInfo().getGameInfo().getRoom()!=null){
             System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
             userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
         } else {
