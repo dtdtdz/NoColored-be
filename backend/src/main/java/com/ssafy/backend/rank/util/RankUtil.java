@@ -39,11 +39,10 @@ public class RankUtil {
     }
 
     // 게임 끝나고 호출함!
-    // userprofile의 rating은 로그아웃할때 갱신
     // userprofile을 가지고 몽고 안에 있는 레이팅도 갱신함
     // 그 후 회원이면 레디스 안에 있는 rating을 갱신한다
     // plus 점수를 받았다고 가정함
-    public void updateUserRankRedis(UserProfile userProfile, int plusRating){
+    public void updateUserRankRedis(UserProfile userProfile){
         String key="userRank";
         String userCode=userProfile.getUserCode();
         int currentRating=userProfile.getUserRating();
@@ -51,7 +50,7 @@ public class RankUtil {
         Optional<RankMongo> rankMongoOptional=rankRepository.findById(userCode);
         if(rankMongoOptional.isPresent()){
             RankMongo rankMongo=rankMongoOptional.get();
-            rankMongo.setRating(rankMongo.getRating()+plusRating);
+            rankMongo.setRating(userProfile.getUserRating());
             rankRepository.save(rankMongo);
         }
         // 게스트면 데이터 갱신 안함
@@ -67,7 +66,7 @@ public class RankUtil {
         // 현재 시간(밀리세컨드)의 역수를 점수에 반영
         long currentTimeMillis = System.currentTimeMillis();
         // 시간 역수를 스코어에 적용하여 유니크한 스코어 생성
-        double newRating= currentScore+(double) plusRating;
+        double newRating= currentScore;
         double timeFactor = 1.0 / currentTimeMillis;
         newRating+=timeFactor;
         redisTemplate.opsForZSet().add(key,userCode,newRating);
