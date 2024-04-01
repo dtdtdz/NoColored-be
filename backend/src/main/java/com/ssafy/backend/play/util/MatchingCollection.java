@@ -88,8 +88,10 @@ public class MatchingCollection {
 
         long now = System.currentTimeMillis();
         //접속중인 유저를 매칭 리스트에 추가한다.
+        if (!matchingInfoMap.isEmpty())
+            System.out.println("matching size:"+ matchingInfoMap.size());
         for (MatchingInfo matchingInfo: matchingInfoMap.values()){
-
+;
             if (matchingInfo.getUserAccessInfo().getSession()==null || !matchingInfo.getUserAccessInfo().getSession().isOpen()) {
                 setDelMatching(matchingInfo.getUserAccessInfo());
                 continue;
@@ -98,7 +100,7 @@ public class MatchingCollection {
             int ratingLevel = matchingInfo.getRatingLevel();
             int timeDiff = (int)((now - matchingInfo.getStartTime())/500);
             //매칭 리스트에 추가
-            while (timeDiff < expandLevel&&expandLevel<matchingQueue.size()){
+            while (timeDiff < expandLevel && expandLevel<matchingQueue.size()){
                 expandLevel++;
                 if (ratingLevel-expandLevel>=0){
                     matchingQueue.get(ratingLevel-expandLevel).add(matchingInfo.getUserAccessInfo());
@@ -114,9 +116,12 @@ public class MatchingCollection {
         //7초 3인, 12초 2인 매칭가능
         for (int i=matchingQueue.size()-1; i>=0; i--){
 
+            if (!matchingQueue.get(i).isEmpty())
+                System.out.println(i+":"+matchingQueue.get(i).size());
             while (!matchingQueue.get(i).isEmpty() && matchingQueue.get(i).size() >= getMatchingSize(matchingQueue.get(i),now)){
                 List<UserAccessInfo> list = new ArrayList<>();
                 int size = getMatchingSize(matchingQueue.get(i),now);
+
                 for (int j=0; j<size; j++){
                     try {
                         list.add(matchingQueue.get(i).get(0));

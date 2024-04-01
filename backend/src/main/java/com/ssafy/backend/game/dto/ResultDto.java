@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -22,6 +20,8 @@ public class ResultDto {
             roomUuid = resultInfo.getGameInfo().getRoom().getRoomDto().getRoomId();
         }
         players.addAll(resultInfo.getPlayers().values());
+        players.sort(Comparator.comparingInt(o -> o.rank));
+
         reward = new RewardDto();
     }
 }

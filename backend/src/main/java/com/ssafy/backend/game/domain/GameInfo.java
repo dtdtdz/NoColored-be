@@ -50,7 +50,7 @@ public class GameInfo {
     public static final int MAP_HEIGHT = 19;
     public static final int MAP_WIDTH = 27;
     public static final int WALL_WIDTH = 3;
-    public static final int GAME_TIME = 60;
+    public static final int GAME_TIME = 90;
     public static final int CHARACTER_NUM = 10;
     public static final int JUMP_VEL_Y = -300;
     public static final int STEP_VEL_Y = -200;
@@ -130,10 +130,6 @@ public class GameInfo {
             );
 
             characterInfoArr[idxs.get(i)] = characterInfo;
-        }
-        for (CharacterInfo characterInfo: characterInfoArr){
-            if (characterInfo.getStates()==null)
-                System.out.println("왜 이럼");
         }
 
         gameRoomDto = new GameRoomDto();
@@ -215,7 +211,8 @@ public class GameInfo {
 
     public void itemUse(CharacterInfo cInfo){
         float interval = (ITEM_SIZE+CHARACTER_SIZE)/2f;
-        if ((Math.abs(cInfo.getX()-ITEM_X)<interval)
+        if (cInfo.getUserGameInfo()==null) return;
+        if ((Math.abs(cInfo.getX()-ITEM_X)<interval && (!curItem.equals(GameItemType.NO_ITEM)))
                 && (Math.abs(cInfo.getY()-ITEM_Y)<interval)){
             effectList.add(new Effect(EffectType.ITEM_USE, ITEM_X, ITEM_Y));
             useItem = new byte[]{curItem.getValue(), cInfo.getUserGameInfo().getPlayerNum()};
@@ -326,7 +323,6 @@ public class GameInfo {
     }
     public void putPhysicsState() {
         for (int i = 0; i < users.size(); i++) {
-//            System.out.println(buffer[i].position());
             buffer[i].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
                     .put((byte) characterInfoArr.length);
             for (CharacterInfo cInfo:characterInfoArr){
@@ -383,16 +379,14 @@ public class GameInfo {
                 if (time < 0) {
                     it.remove(); // 안전하게 원소 제거
                     if (entry.getKey().equals(GameCharacterState.STOP)) {
-//                        System.out.println("속도 복귀");
                         characterInfo.setVelX(DEFAULT_VEL_X);
                     } else if (entry.getKey().equals(GameCharacterState.STEPED)){
                         int val;
                         do {
                             val = random.nextInt(CHARACTER_NUM);
                         } while (characterInfoArr[val].getUserGameInfo()!=null);
-                        CharacterInfo tmp = characterInfoArr[characterInfo.getUserGameInfo().getCharacterNum()];
                         characterInfoArr[characterInfo.getUserGameInfo().getCharacterNum()] = characterInfoArr[val];
-                        characterInfoArr[val] = tmp;
+                        characterInfoArr[val] = characterInfo;
                         characterInfo.getUserGameInfo().setCharacterNum((byte) val);
                     }
                 } else {
@@ -410,11 +404,6 @@ public class GameInfo {
             }
         }
 
-//        StringBuilder str = new StringBuilder();
-//        for (UserGameInfo user:userGameInfoList){
-//            str.append(user.getScore()).append(" ");
-//        }
-//        System.out.println(str);
     }
 
     public void putEffect(){

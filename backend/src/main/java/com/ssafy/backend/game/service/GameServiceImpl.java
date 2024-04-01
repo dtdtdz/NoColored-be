@@ -76,9 +76,9 @@ public class GameServiceImpl implements GameService {
     @Override
     public ResultDto getResult(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        ResultDto resultDto = new ResultDto(userAccessInfo.getResultInfo());
-        if (userAccessInfo.getResultInfo().getGameInfo()!=null){
-            // System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
+        ResultDto userResultDto = new ResultDto(userAccessInfo.getResultInfo());
+        if (userAccessInfo.getResultInfo().getGameInfo().getRoom()!=null){
+            System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
             userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
 
             UserCollection userCollection=userCollectionRepository.findByUserCode(userAccessInfo.getUserProfile().getUserCode());
@@ -275,7 +275,6 @@ public class GameServiceImpl implements GameService {
         long period = 16_666; // 17ms
         
         // 여기에 반복 실행할 태스크의 로직을 작성
-        //            System.out.println("태스크 실행: " + System.currentTimeMillis());
         future = scheduledExecutorService.scheduleAtFixedRate(this::gameLogic, initialDelay, period, TimeUnit.MICROSECONDS);
     }
 //    스프링 끝나면 스케줄러에서 함수 제거, 필요없긴하다.

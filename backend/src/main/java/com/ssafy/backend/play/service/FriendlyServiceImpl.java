@@ -355,21 +355,36 @@ public class FriendlyServiceImpl implements FriendlyService {
                         // 자신 정보 바꾸고 맵에서 방 삭제
                         userAccessInfo.clearPosition();
                         roomInfoMap.remove(roomInfo.getRoomCodeInt());
+                        uuidRoomInfoMap.remove(roomInfo.getRoomDto().getRoomId());
                         return ResponseEntity.ok("The room owner has left, and the waiting room has been deleted.");
                     }else{
                         // 방장을 넘겨줄 사람 찾기
-                        int startIndex=i+1;
+                        int startIndex=0;
+
+                        // 자신 정보 바꾸기
+                        players[i].setEmptyUser();
+                        userAccessInfos[i]=null;
+                        userAccessInfo.clearPosition();
+
+                        for (int j=i+1; j<userAccessInfos.length; j++){
+                            userAccessInfos[j-1] = userAccessInfos[j];
+                            if (userAccessInfos[j-1]==null){
+                                players[j-1].setEmptyUser();
+                                break;
+                            } else {
+                                players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                            }
+                            if (roomDto.getMasterIndex()==j) roomDto.setMasterIndex(j-1);
+                        }
+                        userAccessInfos[userAccessInfos.length-1] = null;
+                        players[userAccessInfos.length-1].setEmptyUser();
+
                         // 최대 3번 탐색
                         for(int j=0;j<3;j++){
                             // 범위 벗어나면
-                            if(startIndex>3){ startIndex-=4; }
                             // 넘겨줄 사람 찾으면 넘기기
                             if(userAccessInfos[startIndex]!=null){
                                 roomDto.setMasterIndex(startIndex);
-                                // 자신 정보 바꾸기
-                                players[i].setEmptyUser();
-                                userAccessInfos[i]=null;
-                                userAccessInfo.clearPosition();
                                 // 변경했다고 세션 뿌리기
                                 sendRoomDto(roomInfo);
                                 return ResponseEntity.ok(roomDto);
@@ -386,6 +401,20 @@ public class FriendlyServiceImpl implements FriendlyService {
                     // roomInfo 반영
                     userAccessInfos[i]=null;
                     userAccessInfo.clearPosition();
+
+                    for (int j=i+1; j<userAccessInfos.length; j++){
+                        userAccessInfos[j-1] = userAccessInfos[j];
+                        if (userAccessInfos[j-1]==null){
+                            players[j-1].setEmptyUser();
+                            break;
+                        } else {
+                            players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                        }
+                        if (roomDto.getMasterIndex()==j) roomDto.setMasterIndex(j-1);
+                    }
+                    userAccessInfos[userAccessInfos.length-1] = null;
+                    players[userAccessInfos.length-1].setEmptyUser();
+
                     sendRoomDto(roomInfo);
                 }
                 return ResponseEntity.ok(roomDto);
@@ -394,7 +423,19 @@ public class FriendlyServiceImpl implements FriendlyService {
         // 방에 플레이어가 없음
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unable to find the player.");
     }
-    private void sendRoomDto(RoomInfo roomInfo){
+
+    @Override
+    public Map<Integer, RoomInfo> getRoomInfoMap() {
+        return roomInfoMap;
+    }
+
+    @Override
+    public Map<UUID, RoomInfo> getUuidRoomInfoMap() {
+        return uuidRoomInfoMap;
+    }
+
+    @Override
+    public void sendRoomDto(RoomInfo roomInfo){
         for (UserAccessInfo userAccessInfo:roomInfo.getUserAccessInfos()){
             try {
                 if (userAccessInfo!=null && userAccessInfo.getSession().isOpen()) {

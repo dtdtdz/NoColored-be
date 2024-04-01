@@ -22,10 +22,25 @@ public class UserAccessInfo {
     private UserProfileDto userProfileDto;
     private Object position;//사용할때 상태 확인해야함
     private UserAchievements userAchievements;
+    private long expireTime;
+
+    private static long USER_EXPIRE = 1000*3600;
 
 
     public UserAccessInfo(UserProfile userProfile){
         this.userProfile = userProfile;
+        setExpireTime();
+    }
+
+
+
+
+    public void setExpireTime() {
+        expireTime = System.currentTimeMillis() + USER_EXPIRE;
+    }
+
+    public boolean isExpire(){
+        return (System.currentTimeMillis()>expireTime);
     }
 
     public RoomInfo getRoomInfo(){

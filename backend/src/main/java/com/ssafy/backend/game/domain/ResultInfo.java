@@ -23,7 +23,12 @@ public class ResultInfo {
     public ResultInfo(GameInfo gameInfo){
         players = new LinkedHashMap<>();
         this.gameInfo = gameInfo;
-        if (this.gameInfo.getRoom() !=null) this.gameInfo.getRoom().setGameStart(false);
+        if (this.gameInfo.getRoom() !=null) {
+            this.gameInfo.getRoom().setGameStart(false);
+            for (UserRoomDto userRoomDto:this.gameInfo.getRoom().getRoomDto().getPlayers()){
+                userRoomDto.setReady(false);
+            }
+        }
         for (UserAccessInfo userAccessInfo:gameInfo.getUsers().keySet()){
             players.put(userAccessInfo ,new UserResultDto(userAccessInfo));
         }

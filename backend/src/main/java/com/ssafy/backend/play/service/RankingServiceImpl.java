@@ -22,16 +22,21 @@ public class RankingServiceImpl implements RankingService{
     @Override
     public void addMatchingList(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        if (userAccessInfo==null) throw new RuntimeException("Token is invalid");
         try {
+            System.out.print("매칭시도..:");
             matchingCollection.setAddMatching(userAccessInfo);
+            System.out.println("매칭성공");
         } catch (Exception e){
+            System.out.println("매칭실패");
             if (userAccessInfo.getPosition() instanceof RoomInfo){
                 throw new RuntimeException("Position conflict: "
                         +userAccessInfo.getRoomInfo().getClass()+":"
                         +userAccessInfo.getRoomInfo().getRoomDto().getRoomCode());
             } else {
+                e.printStackTrace();
                 throw new RuntimeException("Position conflict: "
-                        +userAccessInfo.getRoomInfo().getClass());
+                        +userAccessInfo.getPosition().getClass());
             }
         }
 

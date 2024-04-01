@@ -72,7 +72,9 @@ public class JwtUtil {
         redisTemplate.expire(tokenKey(token),1800, TimeUnit.SECONDS);
         UUID id = UUID.fromString((String) value);
         if (sessionCollection.userIdMap.containsKey(id)){
-            return sessionCollection.userIdMap.get(id);
+            UserAccessInfo userAccessInfo = sessionCollection.userIdMap.get(id);
+            userAccessInfo.setExpireTime();
+            return userAccessInfo;
         }
         return null;
     }

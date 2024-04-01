@@ -67,7 +67,6 @@ public class InGameLogic {
         boolean[][] floor = gameInfo.getFloor();
 
         characterQueue.clear();
-//                System.out.print(2);
 //phaser.js 에서 x좌표 이동 후 중력가속도 적용하는것처럼 작동함
         gameInfo.setCharacterDirection();
         for (int i=0; i<characterInfoArr.length; i++){
@@ -82,7 +81,6 @@ public class InGameLogic {
                 gameInfo.toRight(i);
                 tarX = 2*(mapInfo.getLeft()+halfSize)-tarX;
             }
-//                    System.out.print(3+":"+i+":1 ");
             float velY = cInfo.getVelY();
             float tarY = cInfo.getY();
 //                    +(dt/1000f)*cInfo.getVelY()
@@ -134,11 +132,9 @@ public class InGameLogic {
                     }
                 }
             } catch (Exception e){
-//                        System.out.println("err:"+tarX+" "+tarY);
                 e.printStackTrace();
             }
 
-//                    System.out.print(3+":"+i+":2 ");
             if (cInfo.getUserGameInfo()!=null &&
                     cInfo.getStates().containsKey(GameCharacterState.STOP)){
                 cInfo.setJump(false);
@@ -205,8 +201,6 @@ public class InGameLogic {
                 validCharacter.remove(tmp);
             }
         }
-//                System.out.println(4);
-//                System.out.println("game logic");
 
 
         gameInfo.applyStep();
