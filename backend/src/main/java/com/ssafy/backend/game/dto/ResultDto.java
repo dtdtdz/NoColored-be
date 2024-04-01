@@ -16,9 +16,9 @@ public class ResultDto {
     RewardDto reward;
     public ResultDto(ResultInfo resultInfo){
         players = new LinkedList<>();
-        if (resultInfo.getGameInfo().getRoom()!=null)
+        if (resultInfo.getGameInfo().getRoom()!=null) {
             roomUuid = resultInfo.getGameInfo().getRoom().getRoomDto().getRoomId();
-
+        }
         players.addAll(resultInfo.getPlayers().values());
         players.sort(Comparator.comparingInt(o -> o.rank));
 

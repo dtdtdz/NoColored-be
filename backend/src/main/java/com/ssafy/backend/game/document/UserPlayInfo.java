@@ -17,6 +17,7 @@ import java.util.*;
 public class UserPlayInfo {
     int rank;
     int step;
+    int stepped;
     int itemCount;
     LocalDateTime startDate;
     LocalDateTime endDate;
