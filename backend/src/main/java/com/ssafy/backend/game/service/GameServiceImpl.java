@@ -117,6 +117,7 @@ public class GameServiceImpl implements GameService {
             }
         }else{
             // 친선전이면
+            userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom()); // 추가
             resultDto.getReward().setTier(new TierDto());
         }
         // 스킨 처리
