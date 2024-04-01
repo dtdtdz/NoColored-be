@@ -10,6 +10,7 @@ import com.ssafy.backend.game.dto.TierDto;
 import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.game.util.InGameLogic;
+import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserAchievements;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.repository.UserAchievementsRepository;
@@ -98,9 +99,10 @@ public class GameServiceImpl implements GameService {
                 // 게스트 아니면
                 if(!userAccessInfo.getUserProfile().isGuest()){
                     String oldTier=userAccessInfo.getUserProfileDto().getTier();
-                    String newTier=tierCalculation(userAccessInfo.getResultInfo().getGameInfo().getUsers().get(userAccessInfo).getUserPlayInfo().getRank(),userAccessInfo.getUserProfile().getUserRating(),userAccessInfo.getUserProfile().getUserExp());
-                    // tier(tierCalculation(myRank.get(), userProfile.getUserRating(), userProfile.getUserExp()))
-                    // userProfileDto.setTier(tierCalculation(-1, userProfileDto.getRating(), userProfileDto.getLevel()));
+                    String newTier=tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
+                            userAccessInfo.getUserProfile().getUserRating(),userAccessInfo.getUserProfile().getUserExp());
+                    userAccessInfo.getUserProfileDto().setTier(tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
+                            userAccessInfo.getUserProfile().getUserRating(),userAccessInfo.getUserProfile().getUserExp()));
                     resultDto.getReward().getTier().setNewtier(newTier);
                     resultDto.getReward().getTier().setNewtier(oldTier);
                     boolean tierUpgrade= tierList.get(newTier) - tierList.get(oldTier) > 0;
@@ -425,6 +427,7 @@ public class GameServiceImpl implements GameService {
 
             userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
             userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
+            userAccessInfo.getUserProfileDto().setRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
         }
         ResultInfo resultInfo = new ResultInfo(gameInfo);
 
