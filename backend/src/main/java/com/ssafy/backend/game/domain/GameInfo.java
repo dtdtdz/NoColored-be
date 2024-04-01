@@ -131,10 +131,6 @@ public class GameInfo {
 
             characterInfoArr[idxs.get(i)] = characterInfo;
         }
-        for (CharacterInfo characterInfo: characterInfoArr){
-            if (characterInfo.getStates()==null)
-                System.out.println("왜 이럼");
-        }
 
         gameRoomDto = new GameRoomDto();
         List<String> skins = new LinkedList<>();
@@ -327,7 +323,6 @@ public class GameInfo {
     }
     public void putPhysicsState() {
         for (int i = 0; i < users.size(); i++) {
-//            System.out.println(buffer[i].position());
             buffer[i].put(SendBinaryMessageType.PHYSICS_STATE.getValue())
                     .put((byte) characterInfoArr.length);
             for (CharacterInfo cInfo:characterInfoArr){
@@ -384,7 +379,6 @@ public class GameInfo {
                 if (time < 0) {
                     it.remove(); // 안전하게 원소 제거
                     if (entry.getKey().equals(GameCharacterState.STOP)) {
-//                        System.out.println("속도 복귀");
                         characterInfo.setVelX(DEFAULT_VEL_X);
                     } else if (entry.getKey().equals(GameCharacterState.STEPED)){
                         int val;
@@ -411,11 +405,6 @@ public class GameInfo {
             }
         }
 
-//        StringBuilder str = new StringBuilder();
-//        for (UserGameInfo user:userGameInfoList){
-//            str.append(user.getScore()).append(" ");
-//        }
-//        System.out.println(str);
     }
 
     public void putEffect(){
