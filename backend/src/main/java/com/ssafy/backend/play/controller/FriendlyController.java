@@ -66,7 +66,7 @@ public class FriendlyController {
     @PostMapping("/renew")
     private ResponseEntity<?> renewRoom(@RequestHeader("Authorization") String token,
                                         @RequestBody Map<String, Object> requestBody){
-        String roomTitle=(String) requestBody.get("roomTitle");
+        String roomTitle = (String) requestBody.get("roomTitle");
         String roomPassword = (String) requestBody.get("roomPassword");
         int mapId = Integer.parseInt(requestBody.get("mapId").toString());
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);

@@ -31,6 +31,9 @@ public class UserAccessInfo {
         setExpireTime();
     }
 
+
+
+
     public void setExpireTime() {
         expireTime = System.currentTimeMillis() + USER_EXPIRE;
     }

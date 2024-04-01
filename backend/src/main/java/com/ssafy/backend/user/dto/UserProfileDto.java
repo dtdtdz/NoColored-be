@@ -27,11 +27,35 @@ public class UserProfileDto {
     public UserProfileDto(UserProfile userProfile){
         this.userCode = userProfile.getUserCode();
         this.nickname = userProfile.getUserNickname();
-        this.exp = userProfile.getUserExp();
+//        this.exp = userProfile.getUserExp();
         this.isGuest = userProfile.isGuest();
         this.rating = userProfile.getUserRating();
 //        this.tier = "nocolored"; //로직
         this.skin = userProfile.getUserSkin();
         this.label = userProfile.getUserLabel();
+    }
+
+    public void calcLevelExp(long exp){
+        long currentExp=exp;
+        int level=0;
+        long reqExp=50;
+        while(currentExp>=reqExp){
+            currentExp-=reqExp;
+            level++;
+            if(level<=10){
+                reqExp=500;
+            }else if(level<=30) {
+                reqExp=1000;
+            }else if(level<=50) {
+                reqExp=1500;
+            }else if(level<=75) {
+                reqExp=2000;
+            }else{
+                reqExp=3000;
+            }
+        }
+        this.level = level;
+        this.exp = currentExp;
+        this.expRequire = reqExp;
     }
 }
