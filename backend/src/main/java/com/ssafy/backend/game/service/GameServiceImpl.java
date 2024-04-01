@@ -10,6 +10,7 @@ import com.ssafy.backend.game.dto.TierDto;
 import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.game.util.InGameLogic;
+import com.ssafy.backend.rank.util.RankUtil;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserAchievements;
 import com.ssafy.backend.user.entity.UserProfile;
@@ -49,13 +50,14 @@ public class GameServiceImpl implements GameService {
     private ScheduledFuture<?> future;
     private final UserAchievementsRepository userAchievementsRepository;
     private final UserCollectionRepository userCollectionRepository;
+    private final RankUtil rankUtil;
     GameServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
                     @Qualifier("authScheduledExecutorService")ScheduledExecutorService saveScheduledExecutorService,
                     UserProfileRepository userProfileRepository,
                     SessionCollection sessionRepository,
                     InGameCollection inGameRepository,
                     InGameLogic inGameLogic,
-                    JwtUtil jwtUtil, UserAchievementsRepository userAchievementsRepository, UserCollectionRepository userCollectionRepository){
+                    JwtUtil jwtUtil, UserAchievementsRepository userAchievementsRepository, UserCollectionRepository userCollectionRepository, RankUtil rankUtil){
         this.scheduledExecutorService = scheduledExecutorService;
         this.saveScheduledExecutorService = saveScheduledExecutorService;
         this.userProfileRepository = userProfileRepository;
@@ -65,6 +67,7 @@ public class GameServiceImpl implements GameService {
         this.jwtUtil = jwtUtil;
         this.userAchievementsRepository = userAchievementsRepository;
         this.userCollectionRepository = userCollectionRepository;
+        this.rankUtil = rankUtil;
     }
 
     @Override
@@ -372,6 +375,10 @@ public class GameServiceImpl implements GameService {
                         userCollection.getLabelIds().add(60);
                     }
 
+
+
+
+
                     userProfileRepository.save(userProfile);
                     userCollectionRepository.save(userCollection);
                     userAchievementsRepository.save(userAchievements);
@@ -467,6 +474,10 @@ public class GameServiceImpl implements GameService {
 
             userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
             userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
+
+            // mongo, redis 업데이트
+            rankUtil.updateUserRankRedis(userProfile);
+
             userAccessInfo.getUserProfileDto().setRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
         }
         ResultInfo resultInfo = new ResultInfo(gameInfo);
