@@ -1,6 +1,7 @@
 package com.ssafy.backend.game.domain;
 
 import com.ssafy.backend.assets.SynchronizedSend;
+import com.ssafy.backend.game.document.UserPlayInfo;
 import com.ssafy.backend.game.type.EffectType;
 import com.ssafy.backend.game.type.GameCycle;
 import com.ssafy.backend.game.type.GameItemType;
@@ -223,6 +224,10 @@ public class GameInfo {
     public void applyItem(){
         if (useItem==null) return;
         //itemUse에서 useItem에 할당할경우 duration<=0이고 필요하다면 지정
+        UserPlayInfo userPlayInfo = userGameInfoList.get(useItem[1]).getUserPlayInfo();
+        userPlayInfo.setItemCount(userPlayInfo.getItemCount()+1);
+        userPlayInfo.getItemCountMap().put(GameItemType.valueOf(useItem[0]).name(),
+                userPlayInfo.getItemCountMap().get(GameItemType.valueOf(useItem[0]).name())+1);
         switch (GameItemType.valueOf(useItem[0])){
             case LIGHT_U_PALL -> {
                 for (UserGameInfo userGameInfo: userGameInfoList){
@@ -232,6 +237,7 @@ public class GameInfo {
                     effectList.add(new Effect(EffectType.SKIN_APPEAR,
                             characterInfo.getX(), characterInfo.getY()));
                 }
+
             }
             case STOP_NPC -> {
                 for (CharacterInfo characterInfo: characterInfoArr){
@@ -354,6 +360,8 @@ public class GameInfo {
                     characterInfoArr[characterNum].getY()));
             user1.getUserPlayInfo()
                     .setStep(user1.getUserPlayInfo().getStep() + 1);
+            user2.getUserPlayInfo()
+                    .setStepped(user2.getUserPlayInfo().getStepped()+1);
             applyState(char1, GameCharacterState.DISPLAY_SKIN, 4000L);
             applyState(char2, GameCharacterState.DISPLAY_SKIN, 2000L);
             applyState(char2, GameCharacterState.STOP, 2000L);

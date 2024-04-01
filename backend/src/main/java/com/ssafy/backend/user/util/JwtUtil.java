@@ -73,6 +73,7 @@ public class JwtUtil {
         UUID id = UUID.fromString((String) value);
         if (sessionCollection.userIdMap.containsKey(id)){
             UserAccessInfo userAccessInfo = sessionCollection.userIdMap.get(id);
+            if (userAccessInfo==null) return null;
             userAccessInfo.setExpireTime();
             return userAccessInfo;
         }

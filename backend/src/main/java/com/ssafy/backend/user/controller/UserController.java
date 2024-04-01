@@ -19,6 +19,11 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/token")
+    public ResponseEntity<?> isTokenValid(@RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(userService.isTokenValid(token));
+    }
+
     @GetMapping
     public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token){
         UserProfileDto userProfileDto = userService.getUserProfileDto(token);
