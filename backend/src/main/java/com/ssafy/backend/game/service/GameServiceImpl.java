@@ -103,13 +103,18 @@ public class GameServiceImpl implements GameService {
                     String oldTier=userAccessInfo.getUserProfileDto().getTier();
                     String newTier=tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
                             userAccessInfo.getUserProfile().getUserRating(),userAccessInfo.getUserProfile().getUserExp());
-                    userAccessInfo.getUserProfileDto().setTier(tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
-                            userAccessInfo.getUserProfile().getUserRating(),userAccessInfo.getUserProfile().getUserExp()));
-                    resultDto.getReward().getTier().setNewtier(newTier);
-                    resultDto.getReward().getTier().setOldtier(oldTier);
-                    boolean tierUpgrade= tierList.get(newTier) - tierList.get(oldTier) > 0;
-                    resultDto.getReward().getTier().setUpgrade(tierUpgrade);
+                    userAccessInfo.getUserProfileDto().setTier(newTier);
+
+                    TierDto tierDto = new TierDto();
+                    tierDto.setNewtier(newTier);
+                    tierDto.setOldtier(oldTier);
+                    boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
+                    tierDto.setUpgrade(tierUpgrade);
+                    resultDto.getReward().setTier(tierDto);
+                }else{
+                    resultDto.getReward().setTier(new TierDto());
                 }
+            }else{
                 resultDto.getReward().setTier(new TierDto());
             }
             resultDto.getReward().setSkins(new ArrayList<>());
