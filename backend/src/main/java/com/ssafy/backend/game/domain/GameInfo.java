@@ -109,7 +109,7 @@ public class GameInfo {
 
         for (byte i=0; i<userList.size(); i++){
             UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
-                    idxs.get(i),i);
+                    idxs.get(i),i,(room==null)?"friendly":"ranking");
             CharacterInfo characterInfo = new CharacterInfo(
                     (floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE,
                     floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
@@ -468,7 +468,7 @@ public class GameInfo {
     public void insertUser(UserAccessInfo user){
         byte num = 0;
         while (characterInfoArr[num].getUserGameInfo()==null) num++;
-        UserGameInfo userInfo = new UserGameInfo(user.getSession(), (byte) users.size(), num);
+        UserGameInfo userInfo = new UserGameInfo(user.getSession(), (byte) users.size(), num, (room==null)?"friendly":"ranking");
         users.put(user, userInfo);
         characterInfoArr[num].setUserGameInfo(userInfo);
     }
