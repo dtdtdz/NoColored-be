@@ -1,15 +1,12 @@
 package com.ssafy.backend.game.service;
 
-import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.ResultInfo;
 import com.ssafy.backend.game.dto.ResultDto;
-import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.game.util.InGameLogic;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.repository.UserProfileRepository;
 import com.ssafy.backend.user.util.JwtUtil;
-import com.ssafy.backend.websocket.domain.SendTextMessageType;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.game.domain.*;
@@ -18,7 +15,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -67,9 +63,9 @@ public class GameServiceImpl implements GameService {
     public ResultDto getResult(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         ResultDto userResultDto = new ResultDto(userAccessInfo.getResultInfo());
-        if (userAccessInfo.getResultInfo().getRoom()!=null){
-            System.out.println(userAccessInfo.getResultInfo().getRoom().getRoomDto().getRoomTitle());
-            userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getRoom());
+        if (userAccessInfo.getResultInfo().getGameInfo()!=null){
+            System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
+            userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
         } else {
             userAccessInfo.clearPosition();
         }
@@ -128,9 +124,6 @@ public class GameServiceImpl implements GameService {
                             entry.getKey().getUserProfile().getId()).orElse(null);
                     if (userProfile==null) throw new RuntimeException("Can't find user");
 
-                    int rank = entry.getValue().getUserPlayInfo().getRank();
-                    userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
-                    userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
                     userProfileRepository.save(userProfile);
                 }
             } catch (Exception e){
@@ -197,7 +190,13 @@ public class GameServiceImpl implements GameService {
             UserGameInfo cur = pq.poll();
             cur.getUserPlayInfo().setRank(rank++);
         }
+        for (Map.Entry<UserAccessInfo, UserGameInfo> entry:gameInfo.getUsers().entrySet()){
+            UserProfile userProfile = entry.getKey().getUserProfile();
+            rank = entry.getValue().getUserPlayInfo().getRank();
+            userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
+            userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
 
+        }
         ResultInfo resultInfo = new ResultInfo(gameInfo);
 
         // userinfo마다 처리한다
