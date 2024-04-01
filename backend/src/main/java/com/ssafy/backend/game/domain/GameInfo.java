@@ -212,7 +212,7 @@ public class GameInfo {
     public void itemUse(CharacterInfo cInfo){
         float interval = (ITEM_SIZE+CHARACTER_SIZE)/2f;
         if (cInfo.getUserGameInfo()==null) return;
-        if ((Math.abs(cInfo.getX()-ITEM_X)<interval)
+        if ((Math.abs(cInfo.getX()-ITEM_X)<interval && (!curItem.equals(GameItemType.NO_ITEM)))
                 && (Math.abs(cInfo.getY()-ITEM_Y)<interval)){
             effectList.add(new Effect(EffectType.ITEM_USE, ITEM_X, ITEM_Y));
             useItem = new byte[]{curItem.getValue(), cInfo.getUserGameInfo().getPlayerNum()};
