@@ -59,9 +59,9 @@ public class UserController {
         if (!user.confirm()) return ResponseEntity.badRequest().body("Passwords do not match.");
         if (user.getNickname().length() < 2 || user.getNickname().length() > 9) return ResponseEntity.badRequest().body("Nickname does not meet the length requirements (6-20 characters).");
 
-        UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
+        UserAccessInfo userAccessInfo = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
         try {
-            return ResponseEntity.ok(userService.generateToken(new UserAccessInfo(userProfile)));
+            return ResponseEntity.ok(userService.generateToken(userAccessInfo));
         } catch (Exception e){
             return ResponseEntity.internalServerError().body("User registration failed");
         }
