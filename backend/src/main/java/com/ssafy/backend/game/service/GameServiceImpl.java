@@ -93,6 +93,9 @@ public class GameServiceImpl implements GameService {
         tierList.put("rgb",7);
         tierList.put("origin",8);
 
+        System.out.println("테스트 1234 1345");
+        System.out.println("테스트 : "+userAccessInfo.getResultInfo().getGameInfo().getRoom());
+
         if (userAccessInfo.getResultInfo().getGameInfo().getRoom()!=null){
             // System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
             userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
