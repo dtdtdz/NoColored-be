@@ -137,7 +137,8 @@ public class UserController {
 
     @GetMapping("/logout")
     private ResponseEntity<?> logout(@RequestHeader("Authorization") String token){
-        return ResponseEntity.ok("logout Success");
+        userService.activeLogout(token);
+        return ResponseEntity.ok("Logout Success.");
     }
     
 
