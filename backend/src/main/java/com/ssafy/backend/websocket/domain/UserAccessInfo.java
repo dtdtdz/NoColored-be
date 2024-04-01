@@ -23,6 +23,7 @@ public class UserAccessInfo {
     private Object position;//사용할때 상태 확인해야함
     private UserAchievements userAchievements;
 
+
     public UserAccessInfo(UserProfile userProfile){
         this.userProfile = userProfile;
     }
