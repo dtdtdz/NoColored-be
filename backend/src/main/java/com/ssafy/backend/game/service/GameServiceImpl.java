@@ -96,15 +96,10 @@ public class GameServiceImpl implements GameService {
         System.out.println("테스트 1234 1345");
         System.out.println("테스트 : "+userAccessInfo.getResultInfo().getGameInfo().getRoom());
 
-        if (userAccessInfo.getResultInfo().getGameInfo().getRoom()!=null){
-            // System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
-            userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
-
-            System.out.println("roomuuid = "+resultDto.getRoomUuid());
-            System.out.println("guest = "+userAccessInfo.getUserProfile().isGuest());
-            // 매칭이고 게스트 아니면
-            if(resultDto.getRoomUuid()==null&& !userAccessInfo.getUserProfile().isGuest()) {
-
+        // 매칭이면
+        if (userAccessInfo.getResultInfo().getGameInfo().getRoom()==null){
+            // 게스트 아니면
+            if( !userAccessInfo.getUserProfile().isGuest()){
                 String oldTier = userAccessInfo.getUserProfileDto().getTier();
                 String newTier = tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
                         userAccessInfo.getUserProfile().getUserRating(), userAccessInfo.getUserProfile().getUserExp());
@@ -116,14 +111,45 @@ public class GameServiceImpl implements GameService {
                 boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
                 tierDto.setUpgrade(tierUpgrade);
                 resultDto.getReward().setTier(tierDto);
-
             }else{
+                // 게스트면
                 resultDto.getReward().setTier(new TierDto());
             }
-            resultDto.getReward().setSkins(new ArrayList<>());
-        } else {
-            userAccessInfo.clearPosition();
+        }else{
+            // 친선전이면
+            resultDto.getReward().setTier(new TierDto());
         }
+        // 스킨 처리
+        resultDto.getReward().setSkins(new ArrayList<>());
+        userAccessInfo.clearPosition();
+//        if (userAccessInfo.getResultInfo().getGameInfo().getRoom()!=null){
+//            // System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
+//            userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
+//
+//            System.out.println("roomuuid = "+resultDto.getRoomUuid());
+//            System.out.println("guest = "+userAccessInfo.getUserProfile().isGuest());
+//            // 매칭이고 게스트 아니면
+//            if(resultDto.getRoomUuid()==null&& !userAccessInfo.getUserProfile().isGuest()) {
+//
+//                String oldTier = userAccessInfo.getUserProfileDto().getTier();
+//                String newTier = tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
+//                        userAccessInfo.getUserProfile().getUserRating(), userAccessInfo.getUserProfile().getUserExp());
+//                userAccessInfo.getUserProfileDto().setTier(newTier);
+//
+//                TierDto tierDto = new TierDto();
+//                tierDto.setNewtier(newTier);
+//                tierDto.setOldtier(oldTier);
+//                boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
+//                tierDto.setUpgrade(tierUpgrade);
+//                resultDto.getReward().setTier(tierDto);
+//
+//            }else{
+//                resultDto.getReward().setTier(new TierDto());
+//            }
+//            resultDto.getReward().setSkins(new ArrayList<>());
+//        } else {
+//            userAccessInfo.clearPosition();
+//        }
         return resultDto;
     }
 
