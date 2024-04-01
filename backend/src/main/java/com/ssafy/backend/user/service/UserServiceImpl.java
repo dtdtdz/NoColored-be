@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserProfile guestSignUp(){
+    public UserAccessInfo guestSignUp(){
         try {
             String userCode = getUserCode();
             if (userCode == null) throw new RuntimeException("유저코드 생성 실패");
@@ -106,8 +106,8 @@ public class UserServiceImpl implements UserService {
                     .userLabel("손님")
                     .isGuest(true)
                     .build();
-            userProfileRepository.save(userProfile);
-
+            userProfile = userProfileRepository.save(userProfile);
+            if (userProfile.getId() == null) throw new RuntimeException("게스트 생성 실패");
             // userachievements
             UserAchievements userAchievements=UserAchievements.builder()
                     .userCode(userCode)
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
                     .itemCount(0)
                     .userProfile(userProfile)
                     .build();
-            userAchievementsRepository.save(userAchievements);
+            userAchievements = userAchievementsRepository.save(userAchievements);
 
 
             // usercollection 생성
@@ -147,8 +147,9 @@ public class UserServiceImpl implements UserService {
                     .rating(defaultRating)
                     .build();
             rankRepository.save(rankMongo);
-
-            return userProfile;
+            UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
+            userAccessInfo.setUserAchievements(userAchievements);
+            return userAccessInfo;
         } catch (Exception e) {
             throw new RuntimeException("게스트 생성 실패.");
         }
@@ -202,81 +203,79 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserProfile signUp(String id, String password, String nickname) {
-        try {
-            String userCode = getUserCode();
-            if (userCode == null) throw new RuntimeException("유저코드 생성 실패");
-            UserProfile userProfile = UserProfile.builder()
-                    .userNickname(nickname)
-                    .userCode(userCode)
-                    .userExp(0L)
-                    .userRating(defaultRating)
-                    .userSkin("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue.png")
-                    .userLabel("파릇파릇 새싹")
-                    .isGuest(false)
-                    .build();
-            userProfileRepository.save(userProfile);
+    public UserAccessInfo signUp(String id, String password, String nickname) {
+        if (userInfoRepository.existsByUserId(id)) throw new RuntimeException("유저 id 중복");
 
-            // userachievements
-            UserAchievements userAchievements=UserAchievements.builder()
-                    .userCode(userCode)
-                    .lastLoginDate(LocalDateTime.now())
-                    .consecutiveLoginDays(1)
-                    .cumulativeLoginDays(1)
-                    .isConsecutiveLogin(true)
-                    .cumulativePlayCount(0)
-                    .cumulativeWinCount(0)
-                    .cumulativeLoseCount(0)
-                    .playtime(0L)
-                    .step(0)
-                    .stepped(0)
-                    .lightUPallCount(0)
-                    .stopNPCCount(0)
-                    .randomBoxCount(0)
-                    .rebelCount(0)
-                    .stopPlayerCount(0)
-                    .itemCount(0)
-                    .userProfile(userProfile)
-                    .build();
-            userAchievementsRepository.save(userAchievements);
+        String userCode = getUserCode();
+        if (userCode == null) throw new RuntimeException("유저코드 생성 실패");
+        UserProfile userProfile = UserProfile.builder()
+                .userNickname(nickname)
+                .userCode(userCode)
+                .userExp(0L)
+                .userRating(defaultRating)
+                .userSkin("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue.png")
+                .userLabel("파릇파릇 새싹")
+                .isGuest(false)
+                .build();
+        userProfile = userProfileRepository.save(userProfile);
+        // userachievements
+        UserAchievements userAchievements=UserAchievements.builder()
+                .userCode(userCode)
+                .lastLoginDate(LocalDateTime.now())
+                .consecutiveLoginDays(1)
+                .cumulativeLoginDays(1)
+                .isConsecutiveLogin(true)
+                .cumulativePlayCount(0)
+                .cumulativeWinCount(0)
+                .cumulativeLoseCount(0)
+                .playtime(0L)
+                .step(0)
+                .stepped(0)
+                .lightUPallCount(0)
+                .stopNPCCount(0)
+                .randomBoxCount(0)
+                .rebelCount(0)
+                .stopPlayerCount(0)
+                .itemCount(0)
+                .userProfile(userProfile)
+                .build();
+        userAchievements = userAchievementsRepository.save(userAchievements);
 
-            // usercollection 생성
-            UserCollection userCollection=UserCollection.builder()
-                    .userCode(userCode)
-                    .skinIds(new ArrayList<>(Arrays.asList(11,15,19,21,23,27,28,29))) // 게스트->회원전환할때 보상도 다 포함
-                    .labelIds(new ArrayList<>(Arrays.asList(1,10,64,71,72)))
-                    .achievementIds(new ArrayList<>())
-                    .build();
-            userCollectionRepository.save(userCollection);
+        // usercollection 생성
+        UserCollection userCollection=UserCollection.builder()
+                .userCode(userCode)
+                .skinIds(new ArrayList<>(Arrays.asList(11,15,19,21,23,27,28,29))) // 게스트->회원전환할때 보상도 다 포함
+                .labelIds(new ArrayList<>(Arrays.asList(1,10,64,71,72)))
+                .achievementIds(new ArrayList<>())
+                .build();
+        userCollectionRepository.save(userCollection);
 
-            // mongodb에 넣을 rank정보
-            RankMongo rankMongo=RankMongo.builder()
-                    .userCode(userCode)
-                    .rating(userProfile.getUserRating())
-                    .build();
-            rankRepository.save(rankMongo);
+        // mongodb에 넣을 rank정보
+        RankMongo rankMongo=RankMongo.builder()
+                .userCode(userCode)
+                .rating(userProfile.getUserRating())
+                .build();
+        rankRepository.save(rankMongo);
 
-            // redis에 넣기
-            // rankUtil.createUserRankRedis(userProfileDto);
+        // redis에 넣기
+        // rankUtil.createUserRankRedis(userProfileDto);
 
 
 //        System.out.println(userProfile.getId());
-            UserInfo userInfo = UserInfo.builder()
+        UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
-                    .userId(id)
-                    .userPwd(password)
-                    .userProfile(userProfile)
-                    .isDeleted(false)
-                    .build();
-            userInfoRepository.save(userInfo);
+                .userId(id)
+                .userPwd(password)
+                .userProfile(userProfile)
+                .isDeleted(false)
+                .build();
+        userInfoRepository.save(userInfo);
 
 
+        UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
+        userAccessInfo.setUserAchievements(userAchievements);
 
-            return userProfile;
-
-        } catch (Exception e){
-            throw new RuntimeException("이미 있는 id입니다.");
-        }
+        return userAccessInfo;
     }
     @Override
     public String generateToken(UserAccessInfo userAccessInfo){
