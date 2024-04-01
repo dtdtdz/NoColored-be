@@ -24,7 +24,6 @@ public class UserController {
         if (userProfileDto==null){
             return ResponseEntity.badRequest().body("Token is invalid");
         } else {
-            userService.doUserProfileDto(userProfileDto);
             System.out.println(userProfileDto.isGuest());
             return ResponseEntity.ok(userProfileDto);
         }
@@ -126,7 +125,7 @@ public class UserController {
     private ResponseEntity<?> findUserInfo(@PathVariable("userCode") String userCode){
         UserProfileDto userProfileDto = userService.findUserInfo(userCode);
         if (userProfileDto==null) return ResponseEntity.badRequest().body("Can't find user");
-        userService.doUserProfileDto(userProfileDto);
+
         return ResponseEntity.ok(userProfileDto);
     }
 

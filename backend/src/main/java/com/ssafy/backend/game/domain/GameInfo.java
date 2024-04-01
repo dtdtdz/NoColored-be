@@ -50,7 +50,7 @@ public class GameInfo {
     public static final int MAP_HEIGHT = 19;
     public static final int MAP_WIDTH = 27;
     public static final int WALL_WIDTH = 3;
-    public static final int GAME_TIME = 60;
+    public static final int GAME_TIME = 90;
     public static final int CHARACTER_NUM = 10;
     public static final int JUMP_VEL_Y = -300;
     public static final int STEP_VEL_Y = -200;
@@ -385,9 +385,8 @@ public class GameInfo {
                         do {
                             val = random.nextInt(CHARACTER_NUM);
                         } while (characterInfoArr[val].getUserGameInfo()!=null);
-                        CharacterInfo tmp = characterInfoArr[characterInfo.getUserGameInfo().getCharacterNum()];
                         characterInfoArr[characterInfo.getUserGameInfo().getCharacterNum()] = characterInfoArr[val];
-                        characterInfoArr[val] = tmp;
+                        characterInfoArr[val] = characterInfo;
                         characterInfo.getUserGameInfo().setCharacterNum((byte) val);
                     }
                 } else {
