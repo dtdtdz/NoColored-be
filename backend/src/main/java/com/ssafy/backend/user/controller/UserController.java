@@ -4,6 +4,7 @@ import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.dto.UserSignDto;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.user.service.UserService;
+import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,8 @@ public class UserController {
     @GetMapping("/guest")
     public ResponseEntity<String> guestSignUp(){
         UserProfile userProfile = userService.guestSignUp();
-        return ResponseEntity.ok(userService.generateToken(userProfile));
+        UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
+        return ResponseEntity.ok(userService.generateToken(userAccessInfo));
     }
     @PostMapping("/guest")
     public ResponseEntity<String> guestConvert(@RequestHeader("Authorization") String token,
@@ -60,7 +62,7 @@ public class UserController {
 
         UserProfile userProfile = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
         try {
-            return ResponseEntity.ok(userService.generateToken(userProfile));
+            return ResponseEntity.ok(userService.generateToken(new UserAccessInfo(userProfile)));
         } catch (Exception e){
             return ResponseEntity.internalServerError().body("User registration failed");
         }

@@ -279,10 +279,10 @@ public class UserServiceImpl implements UserService {
         }
     }
     @Override
-    public String generateToken(UserProfile userProfile){
+    public String generateToken(UserAccessInfo userAccessInfo){
+        UserProfile userProfile = userAccessInfo.getUserProfile();
         String token = jwtUtil.generateToken(userProfile.getUserCode());
         jwtUtil.setTokenRedis(token, userProfile.getId());
-        UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
         sessionCollection.userIdMap.put(userProfile.getId(), userAccessInfo);
 
 //        Integer rating= (Integer) redisTemplate.opsForValue().get(userProfile.getUserRating());
@@ -384,8 +384,9 @@ public class UserServiceImpl implements UserService {
 
         userAchievementsRepository.save(userAchievements);
         userCollectionRepository.save(userCollection);
-
-        return generateToken(userProfile);
+        UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
+        userAccessInfo.setUserAchievements(userAchievements);
+        return generateToken(userAccessInfo);
     }
 
     @Override
