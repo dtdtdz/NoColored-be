@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserProfile guestSignUp(){
+    public UserAccessInfo guestSignUp(){
         try {
             String userCode = getUserCode();
             if (userCode == null) throw new RuntimeException("유저코드 생성 실패");
@@ -106,8 +106,8 @@ public class UserServiceImpl implements UserService {
                     .userLabel("손님")
                     .isGuest(true)
                     .build();
-            userProfileRepository.save(userProfile);
-
+            userProfile = userProfileRepository.save(userProfile);
+            if (userProfile.getId() == null) throw new RuntimeException("게스트 생성 실패");
             // userachievements
             UserAchievements userAchievements=UserAchievements.builder()
                     .userCode(userCode)
@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
                     .itemCount(0)
                     .userProfile(userProfile)
                     .build();
-            userAchievementsRepository.save(userAchievements);
+            userAchievements = userAchievementsRepository.save(userAchievements);
 
 
             // usercollection 생성
@@ -147,8 +147,9 @@ public class UserServiceImpl implements UserService {
                     .rating(defaultRating)
                     .build();
             rankRepository.save(rankMongo);
-
-            return userProfile;
+            UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
+            userAccessInfo.setUserAchievements(userAchievements);
+            return userAccessInfo;
         } catch (Exception e) {
             throw new RuntimeException("게스트 생성 실패.");
         }

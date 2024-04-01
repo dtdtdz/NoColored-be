@@ -32,8 +32,7 @@ public class UserController {
 
     @GetMapping("/guest")
     public ResponseEntity<String> guestSignUp(){
-        UserProfile userProfile = userService.guestSignUp();
-        UserAccessInfo userAccessInfo = new UserAccessInfo(userProfile);
+        UserAccessInfo userAccessInfo = userService.guestSignUp();
         return ResponseEntity.ok(userService.generateToken(userAccessInfo));
     }
     @PostMapping("/guest")
