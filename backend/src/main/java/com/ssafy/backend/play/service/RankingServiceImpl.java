@@ -23,8 +23,11 @@ public class RankingServiceImpl implements RankingService{
     public void addMatchingList(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         try {
+            System.out.print("매칭시도..:");
             matchingCollection.setAddMatching(userAccessInfo);
+            System.out.println("매칭성공");
         } catch (Exception e){
+            System.out.println("매칭실패");
             if (userAccessInfo.getPosition() instanceof RoomInfo){
                 throw new RuntimeException("Position conflict: "
                         +userAccessInfo.getRoomInfo().getClass()+":"

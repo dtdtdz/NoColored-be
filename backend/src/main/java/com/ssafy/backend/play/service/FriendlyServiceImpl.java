@@ -358,18 +358,27 @@ public class FriendlyServiceImpl implements FriendlyService {
                         return ResponseEntity.ok("The room owner has left, and the waiting room has been deleted.");
                     }else{
                         // 방장을 넘겨줄 사람 찾기
-                        int startIndex=i+1;
+                        int startIndex=0;
+
+                        // 자신 정보 바꾸기
+                        players[i].setEmptyUser();
+                        userAccessInfos[i]=null;
+                        userAccessInfo.clearPosition();
+
+                        for (int j=i+1; j<userAccessInfos.length; j++){
+                            userAccessInfos[j-1] = userAccessInfos[j];
+                            players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                            if (roomDto.getMasterIndex()==j) roomDto.setMasterIndex(j-1);
+                        }
+                        userAccessInfos[userAccessInfos.length-1] = null;
+                        players[userAccessInfos.length-1].setEmptyUser();
+
                         // 최대 3번 탐색
                         for(int j=0;j<3;j++){
                             // 범위 벗어나면
-                            if(startIndex>3){ startIndex-=4; }
                             // 넘겨줄 사람 찾으면 넘기기
                             if(userAccessInfos[startIndex]!=null){
                                 roomDto.setMasterIndex(startIndex);
-                                // 자신 정보 바꾸기
-                                players[i].setEmptyUser();
-                                userAccessInfos[i]=null;
-                                userAccessInfo.clearPosition();
                                 // 변경했다고 세션 뿌리기
                                 sendRoomDto(roomInfo);
                                 return ResponseEntity.ok(roomDto);
@@ -386,6 +395,15 @@ public class FriendlyServiceImpl implements FriendlyService {
                     // roomInfo 반영
                     userAccessInfos[i]=null;
                     userAccessInfo.clearPosition();
+
+                    for (int j=i+1; j<userAccessInfos.length; j++){
+                        userAccessInfos[j-1] = userAccessInfos[j];
+                        players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                        if (roomDto.getMasterIndex()==j) roomDto.setMasterIndex(j-1);
+                    }
+                    userAccessInfos[userAccessInfos.length-1] = null;
+                    players[userAccessInfos.length-1].setEmptyUser();
+
                     sendRoomDto(roomInfo);
                 }
                 return ResponseEntity.ok(roomDto);
