@@ -85,7 +85,7 @@ public class GameServiceImpl implements GameService {
             UserAchievements newUserAchievements=userAccessInfo.getUserAchievements();
 
             // UserAccessInfo에서 깊은 복사본 가져오기
-            UserAchievements oldCopyOfAchievements = userAccessInfo.getResultInfo().getDeepCopyOfAchievements();
+//            UserAchievements oldCopyOfAchievements = userAccessInfo.getResultInfo().getDeepCopyOfAchievements();
 
             RewardDto reward=new RewardDto();
 
@@ -407,8 +407,8 @@ public class GameServiceImpl implements GameService {
             // 갱신 전에 복사본 생성
             UserAccessInfo userAccessInfo = entry.getKey();
             UserAchievements userAchievements=userAccessInfo.getUserAchievements();
-            UserAchievements deepCopyOfAchievements = new UserAchievements(userAchievements);
-            userAccessInfo.getResultInfo().setDeepCopyOfAchievements(deepCopyOfAchievements);
+//            UserAchievements deepCopyOfAchievements = new UserAchievements(userAchievements);
+//            userAccessInfo.getResultInfo().setDeepCopyOfAchievements(deepCopyOfAchievements);
 
             userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
             userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
