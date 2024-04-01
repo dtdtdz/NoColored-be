@@ -1,5 +1,6 @@
 package com.ssafy.backend.websocket.domain;
 
+import com.ssafy.backend.collection.document.UserCollection;
 import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.game.domain.ResultInfo;
 import com.ssafy.backend.play.domain.MatchingInfo;
@@ -22,6 +23,7 @@ public class UserAccessInfo {
     private UserProfileDto userProfileDto;
     private Object position;//사용할때 상태 확인해야함
     private UserAchievements userAchievements;
+    private UserCollection userCollection;
     private long expireTime;
 
     private static long USER_EXPIRE = 1000*3600;
