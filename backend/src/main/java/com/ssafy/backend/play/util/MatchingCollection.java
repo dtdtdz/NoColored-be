@@ -25,8 +25,8 @@ public class MatchingCollection {
         this.inGameCollection = inGameCollection;
         matchingQueue = new ArrayList<>();
         matchingInfoMap = new LinkedHashMap<>();
-        addQueue = new ConcurrentLinkedQueue<>();
-        delQueue = new ConcurrentLinkedQueue<>();
+        addQueue = new ArrayDeque<>();
+        delQueue = new ArrayDeque<>();
         for (int i=0; i<100; i++){
             matchingQueue.add(new LinkedList<>());
         }
@@ -100,7 +100,7 @@ public class MatchingCollection {
             int ratingLevel = matchingInfo.getRatingLevel();
             int timeDiff = (int)((now - matchingInfo.getStartTime())/500);
             //매칭 리스트에 추가
-            while (timeDiff < expandLevel && expandLevel<matchingQueue.size()){
+            while (timeDiff > expandLevel && expandLevel<matchingQueue.size()){
                 expandLevel++;
                 if (ratingLevel-expandLevel>=0){
                     matchingQueue.get(ratingLevel-expandLevel).add(matchingInfo.getUserAccessInfo());
