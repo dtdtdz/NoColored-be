@@ -562,6 +562,7 @@ public class UserServiceImpl implements UserService {
     }
     public void logout(UserAccessInfo userAccessInfo){
         if (userAccessInfo.getRoomInfo()!=null){
+            logoutRoomExit(userAccessInfo);
         }
     }
 }
