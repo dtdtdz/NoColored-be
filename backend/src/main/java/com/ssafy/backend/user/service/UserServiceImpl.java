@@ -2,6 +2,11 @@ package com.ssafy.backend.user.service;
 
 import com.ssafy.backend.collection.document.UserCollection;
 import com.ssafy.backend.collection.repository.UserCollectionRepository;
+import com.ssafy.backend.play.domain.RoomInfo;
+import com.ssafy.backend.play.dto.RoomDto;
+import com.ssafy.backend.play.dto.UserRoomDto;
+import com.ssafy.backend.play.service.FriendlyService;
+import com.ssafy.backend.play.service.FriendlyServiceImpl;
 import com.ssafy.backend.rank.document.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.rank.util.RankUtil;
@@ -18,15 +23,15 @@ import com.ssafy.backend.user.util.RandomNickname;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 
 
@@ -44,11 +49,14 @@ public class UserServiceImpl implements UserService {
     private final RankRepository rankRepository;
     private final RankUtil rankUtil;
     private final UserAchievementsRepository userAchievementsRepository;
+    private final FriendlyService friendlyService;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
                            @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
-                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository, RankRepository rankRepository, RankUtil rankUtil, UserAchievementsRepository userAchievementsRepository
+                           SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository, RankRepository rankRepository, RankUtil rankUtil, UserAchievementsRepository userAchievementsRepository,
+                           FriendlyService friendlyService
+
     ) {
         this.userProfileRepository = userProfileRepository;
         this.userInfoRepository = userInfoRepository;
@@ -60,6 +68,7 @@ public class UserServiceImpl implements UserService {
         this.rankRepository = rankRepository;
         this.rankUtil = rankUtil;
         this.userAchievementsRepository = userAchievementsRepository;
+        this.friendlyService = friendlyService;
     }
 
     private String getUserCode() {
@@ -407,12 +416,7 @@ public class UserServiceImpl implements UserService {
         return new UserProfileDto(userProfile);
     }
 
-    @Override
-    public void logout(String token) {
-        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        jwtUtil.deleteTokenRedis(token);
-        
-    }
+
 
     private void calcLevelExp(UserProfileDto userProfileDto){
         long currentExp=userProfileDto.getExp();
@@ -449,4 +453,109 @@ public class UserServiceImpl implements UserService {
 
     }
 
+//    @Scheduled(cron = "0 0/10 * * * *")
+    public void scheduledUserLogout() {
+        for (UserAccessInfo userAccessInfo: sessionCollection.userIdMap.values()){
+            synchronized (userAccessInfo){
+                if (userAccessInfo.isExpire()){
+                    logout(userAccessInfo);
+                }
+            }
+
+        }
+    }
+
+    @Override
+    public void activeLogout(String token) {
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        jwtUtil.deleteTokenRedis(token);
+
+    }
+    public void logoutRoomExit(UserAccessInfo userAccessInfo){
+
+        RoomInfo roomInfo = userAccessInfo.getRoomInfo();
+        UserAccessInfo[] userAccessInfos=roomInfo.getUserAccessInfos();
+        // 내 위치 찾기
+        for(int i=0;i<4;i++) {
+            // 찾으면 해당하는 userRoomDto의 상태 변경
+            if (userAccessInfos[i] != null && userAccessInfos[i].getUserProfile().getUserCode().equals(userAccessInfo.getUserProfile().getUserCode())) {
+                RoomDto roomDto = roomInfo.getRoomDto();
+                UserRoomDto[] players = roomDto.getPlayers();
+
+                // 방장이면
+                if (i == roomDto.getMasterIndex()) {
+                    // 방에 있는 유저 수
+                    int userNumber = (int) Arrays.stream(userAccessInfos).filter(Objects::nonNull).count();
+
+                    // 방장 혼자 있다면
+                    if(userNumber==1){
+                        // 자신 정보 바꾸고 맵에서 방 삭제
+                        userAccessInfo.clearPosition();
+                        friendlyService.getRoomInfoMap().remove(roomInfo.getRoomCodeInt());
+                        friendlyService.getUuidRoomInfoMap().remove(roomInfo.getRoomDto().getRoomId());
+                    }else{
+                        // 방장을 넘겨줄 사람 찾기
+                        int startIndex=0;
+
+                        // 자신 정보 바꾸기
+                        players[i].setEmptyUser();
+                        userAccessInfos[i]=null;
+                        userAccessInfo.clearPosition();
+
+                        for (int j=i+1; j<userAccessInfos.length; j++){
+                            userAccessInfos[j-1] = userAccessInfos[j];
+                            if (userAccessInfos[j-1]==null){
+                                players[j-1].setEmptyUser();
+                                break;
+                            } else {
+                                players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                            }
+                            if (roomDto.getMasterIndex()==j) roomDto.setMasterIndex(j-1);
+                        }
+                        userAccessInfos[userAccessInfos.length-1] = null;
+                        players[userAccessInfos.length-1].setEmptyUser();
+
+                        // 최대 3번 탐색
+                        for(int j=0;j<3;j++){
+                            // 범위 벗어나면
+                            // 넘겨줄 사람 찾으면 넘기기
+                            if(userAccessInfos[startIndex]!=null){
+                                roomDto.setMasterIndex(startIndex);
+                                // 변경했다고 세션 뿌리기
+                                friendlyService.sendRoomDto(roomInfo);
+                            }else{
+                                startIndex++;
+                            }
+                        }
+                    }
+                }else{
+                    // 방장 아니면
+                    // 자신 위치의 정보 초기화
+                    players[i].setEmptyUser();
+                    // roomInfo 반영
+                    userAccessInfos[i]=null;
+                    userAccessInfo.clearPosition();
+
+                    for (int j=i+1; j<userAccessInfos.length; j++){
+                        userAccessInfos[j-1] = userAccessInfos[j];
+                        if (userAccessInfos[j-1]==null){
+                            players[j-1].setEmptyUser();
+                            break;
+                        } else {
+                            players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                        }
+                        if (roomDto.getMasterIndex()==j) roomDto.setMasterIndex(j-1);
+                    }
+                    userAccessInfos[userAccessInfos.length-1] = null;
+                    players[userAccessInfos.length-1].setEmptyUser();
+
+                    friendlyService.sendRoomDto(roomInfo);
+                }
+            }
+        }
+    }
+    public void logout(UserAccessInfo userAccessInfo){
+        if (userAccessInfo.getRoomInfo()!=null){
+        }
+    }
 }
