@@ -12,6 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserResultDto {
 
+    String userCode;
     String nickname;
     String label;
     int index;
@@ -20,6 +21,7 @@ public class UserResultDto {
     int score;
 
     public UserResultDto(UserAccessInfo userAccessInfo){
+        userCode=userAccessInfo.getUserProfile().getUserCode();
         nickname = userAccessInfo.getUserProfile().getUserNickname();
         label = userAccessInfo.getUserProfile().getUserLabel();
         skin = userAccessInfo.getUserProfile().getUserSkin();
