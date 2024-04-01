@@ -82,38 +82,36 @@ public class GameServiceImpl implements GameService {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         ResultDto resultDto = new ResultDto(userAccessInfo.getResultInfo());
 
+        Map<String,Integer> tierList=new HashMap<>();
+        tierList.put("nocolored",0);
+        tierList.put("bronze",1);
+        tierList.put("silver",2);
+        tierList.put("gold",3);
+        tierList.put("platinum",4);
+        tierList.put("diamond",5);
+        tierList.put("colored",6);
+        tierList.put("rgb",7);
+        tierList.put("origin",8);
+
         if (userAccessInfo.getResultInfo().getGameInfo().getRoom()!=null){
             // System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
             userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
 
-            Map<String,Integer> tierList=new HashMap<>();
-            tierList.put("nocolored",0);
-            tierList.put("bronze",1);
-            tierList.put("silver",2);
-            tierList.put("gold",3);
-            tierList.put("platinum",4);
-            tierList.put("diamond",5);
-            tierList.put("colored",6);
-            tierList.put("rgb",7);
-            tierList.put("origin",8);
-            // 매칭이라면
-            if(resultDto.getRoomUuid()==null){
-                // 게스트 아니면
-                if(!userAccessInfo.getUserProfile().isGuest()){
-                    String oldTier=userAccessInfo.getUserProfileDto().getTier();
-                    String newTier=tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
-                            userAccessInfo.getUserProfile().getUserRating(),userAccessInfo.getUserProfile().getUserExp());
-                    userAccessInfo.getUserProfileDto().setTier(newTier);
+            // 매칭이고 게스트 아니면
+            if(resultDto.getRoomUuid()==null&& !userAccessInfo.getUserProfile().isGuest()) {
 
-                    TierDto tierDto = new TierDto();
-                    tierDto.setNewtier(newTier);
-                    tierDto.setOldtier(oldTier);
-                    boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
-                    tierDto.setUpgrade(tierUpgrade);
-                    resultDto.getReward().setTier(tierDto);
-                }else{
-                    resultDto.getReward().setTier(new TierDto());
-                }
+                String oldTier = userAccessInfo.getUserProfileDto().getTier();
+                String newTier = tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
+                        userAccessInfo.getUserProfile().getUserRating(), userAccessInfo.getUserProfile().getUserExp());
+                userAccessInfo.getUserProfileDto().setTier(newTier);
+
+                TierDto tierDto = new TierDto();
+                tierDto.setNewtier(newTier);
+                tierDto.setOldtier(oldTier);
+                boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
+                tierDto.setUpgrade(tierUpgrade);
+                resultDto.getReward().setTier(tierDto);
+
             }else{
                 resultDto.getReward().setTier(new TierDto());
             }
