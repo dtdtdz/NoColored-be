@@ -18,6 +18,7 @@ public class RankingController {
     @GetMapping
     private ResponseEntity<?> addMatchingList(@RequestHeader("Authorization") String token){
         try {
+            System.out.println("매칭시도:"+token);
             rankingService.addMatchingList(token);
         } catch (Exception e){
             if (e.getMessage().startsWith("Position conflict")){
