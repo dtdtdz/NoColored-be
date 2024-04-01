@@ -226,8 +226,8 @@ public class GameInfo {
         //itemUse에서 useItem에 할당할경우 duration<=0이고 필요하다면 지정
         UserPlayInfo userPlayInfo = userGameInfoList.get(useItem[1]).getUserPlayInfo();
         userPlayInfo.setItemCount(userPlayInfo.getItemCount()+1);
-        userPlayInfo.getItemCountMap().put(GameItemType.valueOf(useItem[0]).name(),
-                userPlayInfo.getItemCountMap().get(GameItemType.valueOf(useItem[0]).name())+1);
+        userPlayInfo.getItemCountMap().put(GameItemType.valueOf(useItem[0]).name().toLowerCase(),
+                userPlayInfo.getItemCountMap().get(GameItemType.valueOf(useItem[0]).name().toLowerCase())+1);
         switch (GameItemType.valueOf(useItem[0])){
             case LIGHT_U_PALL -> {
                 for (UserGameInfo userGameInfo: userGameInfoList){
