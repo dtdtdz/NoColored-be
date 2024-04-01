@@ -88,8 +88,9 @@ public class MatchingCollection {
 
         long now = System.currentTimeMillis();
         //접속중인 유저를 매칭 리스트에 추가한다.
+        System.out.println("matching size:"+ matchingInfoMap.size());
         for (MatchingInfo matchingInfo: matchingInfoMap.values()){
-
+;
             if (matchingInfo.getUserAccessInfo().getSession()==null || !matchingInfo.getUserAccessInfo().getSession().isOpen()) {
                 setDelMatching(matchingInfo.getUserAccessInfo());
                 continue;
