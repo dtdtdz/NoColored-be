@@ -119,6 +119,14 @@ public class UserServiceImpl implements UserService {
                     .cumulativeWinCount(0)
                     .cumulativeLoseCount(0)
                     .playtime(0L)
+                    .step(0)
+                    .stepped(0)
+                    .lightUPallCount(0)
+                    .stopNPCCount(0)
+                    .randomBoxCount(0)
+                    .rebelCount(0)
+                    .stopPlayerCount(0)
+                    .itemCount(0)
                     .userProfile(userProfile)
                     .build();
             userAchievementsRepository.save(userAchievements);
@@ -220,6 +228,14 @@ public class UserServiceImpl implements UserService {
                     .cumulativeWinCount(0)
                     .cumulativeLoseCount(0)
                     .playtime(0L)
+                    .step(0)
+                    .stepped(0)
+                    .lightUPallCount(0)
+                    .stopNPCCount(0)
+                    .randomBoxCount(0)
+                    .rebelCount(0)
+                    .stopPlayerCount(0)
+                    .itemCount(0)
                     .userProfile(userProfile)
                     .build();
             userAchievementsRepository.save(userAchievements);

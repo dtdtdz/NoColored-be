@@ -1,10 +1,18 @@
 package com.ssafy.backend.game.service;
 
+import com.ssafy.backend.collection.document.UserCollection;
+import com.ssafy.backend.collection.repository.UserCollectionRepository;
+import com.ssafy.backend.game.document.UserPlayInfo;
 import com.ssafy.backend.game.domain.ResultInfo;
 import com.ssafy.backend.game.dto.ResultDto;
+import com.ssafy.backend.game.dto.RewardDto;
+import com.ssafy.backend.game.dto.TierDto;
+import com.ssafy.backend.game.dto.UserResultDto;
 import com.ssafy.backend.game.util.InGameCollection;
 import com.ssafy.backend.game.util.InGameLogic;
+import com.ssafy.backend.user.entity.UserAchievements;
 import com.ssafy.backend.user.entity.UserProfile;
+import com.ssafy.backend.user.repository.UserAchievementsRepository;
 import com.ssafy.backend.user.repository.UserProfileRepository;
 import com.ssafy.backend.user.util.JwtUtil;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
@@ -15,6 +23,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -33,13 +43,15 @@ public class GameServiceImpl implements GameService {
     private final InGameLogic inGameLogic;
     private final JwtUtil jwtUtil;
     private ScheduledFuture<?> future;
+    private final UserAchievementsRepository userAchievementsRepository;
+    private final UserCollectionRepository userCollectionRepository;
     GameServiceImpl(@Qualifier("scheduledExecutorService")ScheduledExecutorService scheduledExecutorService,
                     @Qualifier("authScheduledExecutorService")ScheduledExecutorService saveScheduledExecutorService,
                     UserProfileRepository userProfileRepository,
                     SessionCollection sessionRepository,
                     InGameCollection inGameRepository,
                     InGameLogic inGameLogic,
-                    JwtUtil jwtUtil){
+                    JwtUtil jwtUtil, UserAchievementsRepository userAchievementsRepository, UserCollectionRepository userCollectionRepository){
         this.scheduledExecutorService = scheduledExecutorService;
         this.saveScheduledExecutorService = saveScheduledExecutorService;
         this.userProfileRepository = userProfileRepository;
@@ -47,6 +59,8 @@ public class GameServiceImpl implements GameService {
         this.inGameCollection = inGameRepository;
         this.inGameLogic = inGameLogic;
         this.jwtUtil = jwtUtil;
+        this.userAchievementsRepository = userAchievementsRepository;
+        this.userCollectionRepository = userCollectionRepository;
     }
 
     @Override
@@ -62,14 +76,197 @@ public class GameServiceImpl implements GameService {
     @Override
     public ResultDto getResult(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        ResultDto userResultDto = new ResultDto(userAccessInfo.getResultInfo());
+        ResultDto resultDto = new ResultDto(userAccessInfo.getResultInfo());
         if (userAccessInfo.getResultInfo().getGameInfo().getRoom()!=null){
             System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
             userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
+
+            UserCollection userCollection=userCollectionRepository.findByUserCode(userAccessInfo.getUserProfile().getUserCode());
+            UserAchievements newUserAchievements=userAccessInfo.getUserAchievements();
+
+            // UserAccessInfo에서 깊은 복사본 가져오기
+            UserAchievements oldCopyOfAchievements = userAccessInfo.getResultInfo().getDeepCopyOfAchievements();
+
+            RewardDto reward=new RewardDto();
+
+            // 누적 플레이 수 증가
+            newUserAchievements.setCumulativePlayCount(newUserAchievements.getCumulativePlayCount()+1);
+            // 누적 플레이 수 업적
+            if(newUserAchievements.getCumulativePlayCount()==1){
+                userCollection.getLabelIds().add(25);
+                userCollection.getSkinIds().add(1);
+                reward.getSkins().add("pastelyellow");
+            }else if(newUserAchievements.getCumulativePlayCount()==3){
+                userCollection.getLabelIds().add(26);
+                userCollection.getSkinIds().add(2);
+                reward.getSkins().add("pastelred");
+            }else if(newUserAchievements.getCumulativePlayCount()==5){
+                userCollection.getLabelIds().add(27);
+                userCollection.getSkinIds().add(3);
+                reward.getSkins().add("pastelpink");
+            }else if(newUserAchievements.getCumulativePlayCount()==10){
+                userCollection.getLabelIds().add(28);
+                userCollection.getSkinIds().add(4);
+                reward.getSkins().add("pastelgreen");
+            }else if(newUserAchievements.getCumulativePlayCount()==30){
+                userCollection.getLabelIds().add(29);
+            }else if(newUserAchievements.getCumulativePlayCount()==50){
+                userCollection.getLabelIds().add(30);
+            }else if(newUserAchievements.getCumulativePlayCount()==100){
+                userCollection.getLabelIds().add(31);
+            }
+
+            UserPlayInfo newUserPlayInfo=userAccessInfo.getResultInfo().getGameInfo().getUsers().get(userAccessInfo).getUserPlayInfo();
+            int rank=newUserPlayInfo.getRank();
+            // 승패 +1
+            if(rank==1){
+                newUserAchievements.setCumulativeWinCount(newUserAchievements.getCumulativeWinCount()+1);
+            }else{
+                newUserAchievements.setCumulativeLoseCount(newUserAchievements.getCumulativeLoseCount()+1);
+            }
+            // 승 업적
+            if(newUserAchievements.getCumulativeWinCount()==1){
+                userCollection.getLabelIds().add(32);
+                userCollection.getSkinIds().add(5);
+                reward.getSkins().add("pastelblue");
+            }else if(newUserAchievements.getCumulativeWinCount()==2){
+                userCollection.getLabelIds().add(33);
+                userCollection.getSkinIds().add(7);
+                reward.getSkins().add("googlered");
+            }else if(newUserAchievements.getCumulativeWinCount()==3){
+                userCollection.getLabelIds().add(34);
+                userCollection.getSkinIds().add(8);
+                reward.getSkins().add("googleorange");
+            }else if(newUserAchievements.getCumulativeWinCount()==5){
+                userCollection.getLabelIds().add(35);
+                userCollection.getSkinIds().add(9);
+                reward.getSkins().add("googlegreen");
+            }else if(newUserAchievements.getCumulativeWinCount()==7){
+                userCollection.getLabelIds().add(36);
+                userCollection.getSkinIds().add(10);
+                reward.getSkins().add("googleblue");
+            }else if(newUserAchievements.getCumulativeWinCount()==10){
+                userCollection.getLabelIds().add(37);
+                userCollection.getSkinIds().add(12);
+                reward.getSkins().add("basicyellow-sunglass");
+            }else if(newUserAchievements.getCumulativeWinCount()==20){
+                userCollection.getLabelIds().add(38);
+            }
+            // 패 업적
+            if(newUserAchievements.getCumulativeLoseCount()==1){
+                userCollection.getLabelIds().add(39);
+                userCollection.getSkinIds().add(6);
+                reward.getSkins().add("npcWhite");
+            }else if(newUserAchievements.getCumulativeLoseCount()==2){
+                userCollection.getLabelIds().add(40);
+                userCollection.getSkinIds().add(24);
+                reward.getSkins().add("basicgreen-sunglass");
+            }else if(newUserAchievements.getCumulativeLoseCount()==3){
+                userCollection.getLabelIds().add(41);
+                userCollection.getSkinIds().add(15);
+                reward.getSkins().add("basicred");
+            }else if(newUserAchievements.getCumulativeLoseCount()==5){
+                userCollection.getLabelIds().add(42);
+                userCollection.getSkinIds().add(16);
+                reward.getSkins().add("basicred-sunglass");
+            }else if(newUserAchievements.getCumulativeLoseCount()==7){
+                userCollection.getLabelIds().add(43);
+            }else if(newUserAchievements.getCumulativeLoseCount()==10){
+                userCollection.getLabelIds().add(44);
+            }
+
+            // 누적 밟기
+            int step=newUserPlayInfo.getStep();
+            newUserAchievements.setStep(newUserAchievements.getStep()+step);
+            if(newUserAchievements.getStep()>=100){
+                userCollection.getLabelIds().add(49);
+            }else if(newUserAchievements.getStep()>=50){
+                userCollection.getLabelIds().add(48);
+            }else if(newUserAchievements.getStep()==20){
+                userCollection.getLabelIds().add(47);
+                userCollection.getSkinIds().add(24);
+                reward.getSkins().add("basicgreen-sunglass");
+            }else if(newUserAchievements.getStep()>=10){
+                userCollection.getLabelIds().add(46);
+                userCollection.getSkinIds().add(18);
+                reward.getSkins().add("basicred-butterfly");
+            }else if(newUserAchievements.getStep()>=5){
+                userCollection.getLabelIds().add(45);
+                userCollection.getSkinIds().add(17);
+                reward.getSkins().add("basicred-magichat");
+            }
+
+            // 누적 밟히기
+            int stepped=newUserPlayInfo.getStepped();
+            newUserAchievements.setStepped(newUserAchievements.getStepped()+stepped);
+            if(newUserAchievements.getStepped()>=200){
+                userCollection.getLabelIds().add(54);
+            }else if(newUserAchievements.getStepped()>=100){
+                userCollection.getLabelIds().add(53);
+            }else if(newUserAchievements.getStepped()>=50){
+                userCollection.getLabelIds().add(52);
+            }else if(newUserAchievements.getStepped()>=10){
+                userCollection.getLabelIds().add(51);
+                userCollection.getSkinIds().add(17);
+                reward.getSkins().add("basicred-magichat");
+            }else if(newUserAchievements.getStepped()>=5){
+                userCollection.getLabelIds().add(50);
+            }
+            
+            // 0데스
+            if(stepped==0){
+                userCollection.getLabelIds().add(55);
+            }
+
+            // 아이템 획득 수
+            int itemCount=newUserPlayInfo.getItemCount();
+            newUserAchievements.setItemCount(newUserAchievements.getItemCount()+itemCount);
+            if(newUserAchievements.getItemCount()>=20){
+                userCollection.getLabelIds().add(59);
+            }else if(newUserAchievements.getItemCount()>=10){
+                userCollection.getLabelIds().add(58);
+                userCollection.getSkinIds().add(17);
+                reward.getSkins().add("basicred-magichat");
+            }else if(newUserAchievements.getItemCount()>=5){
+                userCollection.getLabelIds().add(57);
+                userCollection.getSkinIds().add(20);
+                reward.getSkins().add("basicpink-sunglass");
+            }else if(newUserAchievements.getItemCount()>=1){
+                userCollection.getLabelIds().add(56);
+                userCollection.getSkinIds().add(18);
+                reward.getSkins().add("basicred-butterfly");
+            }
+
+            // 누적 플레이타임(분)
+            long playTime=Duration.between(newUserPlayInfo.getStartDate(),newUserPlayInfo.getEndDate()).toMinutes();
+            newUserAchievements.setPlaytime(newUserAchievements.getPlaytime()+playTime);
+            if(newUserAchievements.getPlaytime()>=600){
+                userCollection.getLabelIds().add(63);
+            }else if(newUserAchievements.getItemCount()>=300){
+                userCollection.getLabelIds().add(62);
+            }else if(newUserAchievements.getItemCount()>=120){
+                userCollection.getLabelIds().add(61);
+            }else if(newUserAchievements.getItemCount()>=60){
+                userCollection.getLabelIds().add(60);
+            }
+
+//            // 매칭이라면
+//            if(resultDto.getRoomUuid()==null){
+//                // 게스트 아니면
+//                if(!userAccessInfo.getUserProfile().isGuest()){
+//                    String oldTier=userAccessInfo.get
+//                }
+//            }
+
+            resultDto.setReward(reward);
+
+            userAchievementsRepository.save(newUserAchievements);
+            userCollectionRepository.save(userCollection);
+
         } else {
             userAccessInfo.clearPosition();
         }
-        return userResultDto;
+        return resultDto;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -122,7 +319,6 @@ public class GameServiceImpl implements GameService {
                     UserProfile userProfile = userProfileRepository.findById(
                             entry.getKey().getUserProfile().getId()).orElse(null);
                     if (userProfile==null) throw new RuntimeException("Can't find user");
-
                     userProfileRepository.save(userProfile);
                 }
             } catch (Exception e){
@@ -134,36 +330,49 @@ public class GameServiceImpl implements GameService {
     }
 
     private long calExp(long exp, int rank, int size){
+        long tmp=exp;
         if (size==2){
-            if (rank==1) return 200;
-            return 100;
+            if (rank==1) return tmp+150;
+            return tmp+50;
         } else if (size==3){
-            if (rank==1) return 250;
-            else if (rank==2) return 175;
-            return 100;
+            if (rank==1) return tmp+225;
+            else if (rank==2) return tmp+125;
+            return tmp+75;
         } else {
-            if (rank==1) return 300;
-            else if (rank==2) return 200;
-            else if (rank==3) return 150;
-            return 100;
+            if (rank==1) return tmp+300;
+            else if (rank==2) return tmp+200;
+            else if (rank==3) return tmp+150;
+            return tmp+100;
         }
+//        if (size==2){
+//            if (rank==1) return 200;
+//            return 100;
+//        } else if (size==3){
+//            if (rank==1) return 250;
+//            else if (rank==2) return 175;
+//            return 100;
+//        } else {
+//            if (rank==1) return 300;
+//            else if (rank==2) return 200;
+//            else if (rank==3) return 150;
+//            return 100;
+//        }
     }
     private int calRating(int rating, int rank, int size){
         int tmp = rating;
         if (size==2){
-            if (rank==1) tmp = 70;
-            else tmp = -30;
+            if (rank==1) tmp += 70;
+            else tmp -= 30;
         } else if (size==3){
-            if (rank==1) tmp = 80;
-            else if (rank==2) tmp = 20;
-            else tmp = -40;
+            if (rank==1) tmp += 80;
+            else if (rank==2) tmp += 20;
+            else tmp -= 40;
         } else {
-            if (rank==1) tmp = 100;
-            else if (rank==2) tmp = 200;
-            else if (rank==3) tmp = 150;
-            else tmp = 100;
+            if (rank==1) tmp += 100;
+            else if (rank==2) tmp += 40;
+            else if (rank==3) tmp += 10;
+            else tmp -= 50;
         }
-
         return Math.max(0, tmp);
     }
 
@@ -172,6 +381,7 @@ public class GameServiceImpl implements GameService {
 //        roomUuid있으면 해당 룸으로 보낸다.
         System.out.println("game close");
 
+        // 순위 정하기
         PriorityQueue<UserGameInfo> pq = new PriorityQueue<UserGameInfo>((x,y)->{
             if (x.getScore()==y.getScore()){
                 return x.getStepOrder()-y.getStepOrder();
@@ -184,6 +394,7 @@ public class GameServiceImpl implements GameService {
             } else pq.add(userGameInfo);
         }
 
+        // 경험치, 레이팅 업데이트
         int rank = 1;
         while (!pq.isEmpty()){
             UserGameInfo cur = pq.poll();
@@ -192,16 +403,26 @@ public class GameServiceImpl implements GameService {
         for (Map.Entry<UserAccessInfo, UserGameInfo> entry:gameInfo.getUsers().entrySet()){
             UserProfile userProfile = entry.getKey().getUserProfile();
             rank = entry.getValue().getUserPlayInfo().getRank();
+
+            // 갱신 전에 복사본 생성
+            UserAccessInfo userAccessInfo = entry.getKey();
+            UserAchievements userAchievements=userAccessInfo.getUserAchievements();
+            UserAchievements deepCopyOfAchievements = new UserAchievements(userAchievements);
+            userAccessInfo.getResultInfo().setDeepCopyOfAchievements(deepCopyOfAchievements);
+
             userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
             userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
-
         }
         ResultInfo resultInfo = new ResultInfo(gameInfo);
 
         // userinfo마다 처리한다
         for (Map.Entry<UserAccessInfo, UserGameInfo> entry: gameInfo.getUsers().entrySet()){
+            // useraccessinfo를 조회해서 achivement의 깊은 복사본을 만들고 resultinfo에 넣는다
+            // datasave에서 사용할 원래 achivement를 갱신함
+            // 이 두 차이를 가지고 getresult에서 갱신
+            // useraccessinfo에 있는게 최신본
+            // 깊은 복사가 과거꺼
             UserAccessInfo userAccessInfo = entry.getKey();
-
             userAccessInfo.setResultInfo(resultInfo);
         }
 

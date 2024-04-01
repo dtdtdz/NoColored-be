@@ -77,24 +77,34 @@ public class RankUtil {
         if(exp==0){
             return "nocolored";
         }
-        if(rank>0&&rank<2){
-            return "origin";
-        }else if(rank<=6){
-            return "rgb";
-        }else if(rank<=26){
-            return "colored";
-        }else{
-            if(rating<=2500){
+        if (rank>0){
+            if(rank<2){
+                return "origin";
+            }else if(rank<=6){
+                return "rgb";
+            }else if(rank<=26){
+                return "colored";
+            } else if(rating<=2500){
                 return "bronze";
-            }else if(rating<=3000){
+            } else if(rating<=3000){
                 return "silver";
-            }else if(rating<=3500){
+            } else if(rating<=3500){
                 return "gold";
-            }else if(rating<=4200){
+            } else if(rating<=4200){
                 return "platinum";
-            }else {
+            } else {
                 return "diamond";
             }
+        } else if(rating<=2500){
+            return "bronze";
+        } else if(rating<=3000){
+            return "silver";
+        } else if(rating<=3500){
+            return "gold";
+        } else if(rating<=4200){
+            return "platinum";
+        } else {
+            return "diamond";
         }
     }
 

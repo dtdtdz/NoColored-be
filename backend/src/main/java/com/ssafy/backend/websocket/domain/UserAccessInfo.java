@@ -26,6 +26,7 @@ public class UserAccessInfo {
 
     private static long USER_EXPIRE = 1000*3600;
 
+
     public UserAccessInfo(UserProfile userProfile){
         this.userProfile = userProfile;
         setExpireTime();
