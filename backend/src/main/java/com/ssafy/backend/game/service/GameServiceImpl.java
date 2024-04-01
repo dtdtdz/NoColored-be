@@ -170,7 +170,7 @@ public class GameServiceImpl implements GameService {
                     UserAccessInfo userAccessInfo=entry.getKey();
                     UserCollection userCollection=userCollectionRepository.findByUserCode(userProfile.getUserCode());
                     UserAchievements userAchievements=userAchievementsRepository.findByUserCode(userProfile.getUserCode());
-                    RewardDto reward=new RewardDto();
+//                    RewardDto reward=new RewardDto();
                     UserPlayInfo userPlayInfo=userAccessInfo.getResultInfo().getGameInfo().getUsers().get(userAccessInfo).getUserPlayInfo();
 
                     // 누적플레이 증가
@@ -179,19 +179,19 @@ public class GameServiceImpl implements GameService {
                     if(userAchievements.getCumulativePlayCount()==1){
                         userCollection.getLabelIds().add(25);
                         userCollection.getSkinIds().add(1);
-                        reward.getSkins().add("pastelyellow");
+//                        reward.getSkins().add("pastelyellow");
                     }else if(userAchievements.getCumulativePlayCount()==3){
                         userCollection.getLabelIds().add(26);
                         userCollection.getSkinIds().add(2);
-                        reward.getSkins().add("pastelred");
+//                        reward.getSkins().add("pastelred");
                     }else if(userAchievements.getCumulativePlayCount()==5){
                         userCollection.getLabelIds().add(27);
                         userCollection.getSkinIds().add(3);
-                        reward.getSkins().add("pastelpink");
+//                        reward.getSkins().add("pastelpink");
                     }else if(userAchievements.getCumulativePlayCount()==10){
                         userCollection.getLabelIds().add(28);
                         userCollection.getSkinIds().add(4);
-                        reward.getSkins().add("pastelgreen");
+//                        reward.getSkins().add("pastelgreen");
                     }else if(userAchievements.getCumulativePlayCount()==30){
                         userCollection.getLabelIds().add(29);
                     }else if(userAchievements.getCumulativePlayCount()==50){
@@ -211,27 +211,27 @@ public class GameServiceImpl implements GameService {
                     if(userAchievements.getCumulativeWinCount()==1){
                         userCollection.getLabelIds().add(32);
                         userCollection.getSkinIds().add(5);
-                        reward.getSkins().add("pastelblue");
+//                        reward.getSkins().add("pastelblue");
                     }else if(userAchievements.getCumulativeWinCount()==2){
                         userCollection.getLabelIds().add(33);
                         userCollection.getSkinIds().add(7);
-                        reward.getSkins().add("googlered");
+//                        reward.getSkins().add("googlered");
                     }else if(userAchievements.getCumulativeWinCount()==3){
                         userCollection.getLabelIds().add(34);
                         userCollection.getSkinIds().add(8);
-                        reward.getSkins().add("googleorange");
+//                        reward.getSkins().add("googleorange");
                     }else if(userAchievements.getCumulativeWinCount()==5){
                         userCollection.getLabelIds().add(35);
                         userCollection.getSkinIds().add(9);
-                        reward.getSkins().add("googlegreen");
+//                        reward.getSkins().add("googlegreen");
                     }else if(userAchievements.getCumulativeWinCount()==7){
                         userCollection.getLabelIds().add(36);
                         userCollection.getSkinIds().add(10);
-                        reward.getSkins().add("googleblue");
+//                        reward.getSkins().add("googleblue");
                     }else if(userAchievements.getCumulativeWinCount()==10){
                         userCollection.getLabelIds().add(37);
                         userCollection.getSkinIds().add(12);
-                        reward.getSkins().add("basicyellow-sunglass");
+//                        reward.getSkins().add("basicyellow-sunglass");
                     }else if(userAchievements.getCumulativeWinCount()==20){
                         userCollection.getLabelIds().add(38);
                     }
@@ -239,19 +239,19 @@ public class GameServiceImpl implements GameService {
                     if(userAchievements.getCumulativeLoseCount()==1){
                         userCollection.getLabelIds().add(39);
                         userCollection.getSkinIds().add(6);
-                        reward.getSkins().add("npcWhite");
+//                        reward.getSkins().add("npcWhite");
                     }else if(userAchievements.getCumulativeLoseCount()==2){
                         userCollection.getLabelIds().add(40);
                         userCollection.getSkinIds().add(24);
-                        reward.getSkins().add("basicgreen-sunglass");
+//                        reward.getSkins().add("basicgreen-sunglass");
                     }else if(userAchievements.getCumulativeLoseCount()==3){
                         userCollection.getLabelIds().add(41);
                         userCollection.getSkinIds().add(15);
-                        reward.getSkins().add("basicred");
+//                        reward.getSkins().add("basicred");
                     }else if(userAchievements.getCumulativeLoseCount()==5){
                         userCollection.getLabelIds().add(42);
                         userCollection.getSkinIds().add(16);
-                        reward.getSkins().add("basicred-sunglass");
+//                        reward.getSkins().add("basicred-sunglass");
                     }else if(userAchievements.getCumulativeLoseCount()==7){
                         userCollection.getLabelIds().add(43);
                     }else if(userAchievements.getCumulativeLoseCount()==10){
@@ -268,15 +268,15 @@ public class GameServiceImpl implements GameService {
                     }else if(userAchievements.getStep()==20){
                         userCollection.getLabelIds().add(47);
                         userCollection.getSkinIds().add(24);
-                        reward.getSkins().add("basicgreen-sunglass");
+//                        reward.getSkins().add("basicgreen-sunglass");
                     }else if(userAchievements.getStep()>=10){
                         userCollection.getLabelIds().add(46);
                         userCollection.getSkinIds().add(18);
-                        reward.getSkins().add("basicred-butterfly");
+//                        reward.getSkins().add("basicred-butterfly");
                     }else if(userAchievements.getStep()>=5){
                         userCollection.getLabelIds().add(45);
                         userCollection.getSkinIds().add(17);
-                        reward.getSkins().add("basicred-magichat");
+//                        reward.getSkins().add("basicred-magichat");
                     }
 
                     // 누적 밟히기
@@ -291,7 +291,7 @@ public class GameServiceImpl implements GameService {
                     }else if(userAchievements.getStepped()>=10){
                         userCollection.getLabelIds().add(51);
                         userCollection.getSkinIds().add(17);
-                        reward.getSkins().add("basicred-magichat");
+//                        reward.getSkins().add("basicred-magichat");
                     }else if(userAchievements.getStepped()>=5){
                         userCollection.getLabelIds().add(50);
                     }
@@ -309,15 +309,15 @@ public class GameServiceImpl implements GameService {
                     }else if(userAchievements.getItemCount()>=10){
                         userCollection.getLabelIds().add(58);
                         userCollection.getSkinIds().add(17);
-                        reward.getSkins().add("basicred-magichat");
+//                        reward.getSkins().add("basicred-magichat");
                     }else if(userAchievements.getItemCount()>=5){
                         userCollection.getLabelIds().add(57);
                         userCollection.getSkinIds().add(20);
-                        reward.getSkins().add("basicpink-sunglass");
+//                        reward.getSkins().add("basicpink-sunglass");
                     }else if(userAchievements.getItemCount()>=1){
                         userCollection.getLabelIds().add(56);
                         userCollection.getSkinIds().add(18);
-                        reward.getSkins().add("basicred-butterfly");
+//                        reward.getSkins().add("basicred-butterfly");
                     }
 
                     // 누적 플레이타임(분)
