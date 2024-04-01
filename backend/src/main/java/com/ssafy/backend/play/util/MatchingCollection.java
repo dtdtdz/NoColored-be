@@ -117,6 +117,8 @@ public class MatchingCollection {
             while (!matchingQueue.get(i).isEmpty() && matchingQueue.get(i).size() >= getMatchingSize(matchingQueue.get(i),now)){
                 List<UserAccessInfo> list = new ArrayList<>();
                 int size = getMatchingSize(matchingQueue.get(i),now);
+                if (size!=0)
+                    System.out.println(i+":"+size);
                 for (int j=0; j<size; j++){
                     try {
                         list.add(matchingQueue.get(i).get(0));
