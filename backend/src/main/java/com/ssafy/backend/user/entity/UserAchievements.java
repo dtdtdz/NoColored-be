@@ -31,9 +31,11 @@ public class UserAchievements {
     private long playtime; // 누적 플레이타임(분)
 
     // 아이템 획득 수 5개 넣어놓기
-
-
-
+    private int lightUPallCount;
+    private int stopNPCCount;
+    private int randomBoxCount;
+    private int rebelCount;
+    private int stopPlayerCount;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId // 이를 통해 테이블의 PK를 UserProfile 테이블의 PK와 동일하게 사용
