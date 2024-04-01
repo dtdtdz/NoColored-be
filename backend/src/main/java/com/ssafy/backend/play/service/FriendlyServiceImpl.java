@@ -355,6 +355,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                         // 자신 정보 바꾸고 맵에서 방 삭제
                         userAccessInfo.clearPosition();
                         roomInfoMap.remove(roomInfo.getRoomCodeInt());
+                        uuidRoomInfoMap.remove(roomInfo.getRoomDto().getRoomId());
                         return ResponseEntity.ok("The room owner has left, and the waiting room has been deleted.");
                     }else{
                         // 방장을 넘겨줄 사람 찾기
@@ -422,7 +423,19 @@ public class FriendlyServiceImpl implements FriendlyService {
         // 방에 플레이어가 없음
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unable to find the player.");
     }
-    private void sendRoomDto(RoomInfo roomInfo){
+
+    @Override
+    public Map<Integer, RoomInfo> getRoomInfoMap() {
+        return roomInfoMap;
+    }
+
+    @Override
+    public Map<UUID, RoomInfo> getUuidRoomInfoMap() {
+        return uuidRoomInfoMap;
+    }
+
+    @Override
+    public void sendRoomDto(RoomInfo roomInfo){
         for (UserAccessInfo userAccessInfo:roomInfo.getUserAccessInfos()){
             try {
                 if (userAccessInfo!=null && userAccessInfo.getSession().isOpen()) {
