@@ -5,6 +5,7 @@ import com.ssafy.backend.game.domain.ResultInfo;
 import com.ssafy.backend.play.domain.MatchingInfo;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.user.dto.UserProfileDto;
+import com.ssafy.backend.user.entity.UserAchievements;
 import com.ssafy.backend.user.entity.UserProfile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class UserAccessInfo {
     private UserProfile userProfile;
     private UserProfileDto userProfileDto;
     private Object position;//사용할때 상태 확인해야함
+    private UserAchievements userAchievements;
 
     public UserAccessInfo(UserProfile userProfile){
         this.userProfile = userProfile;

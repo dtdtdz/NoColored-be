@@ -36,4 +36,9 @@ public class UserProfile {
     private String userLabel;
 
     private Integer userRating;
+
+//    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
+//    private UserAchievements userAchievements;
+
+
 }
