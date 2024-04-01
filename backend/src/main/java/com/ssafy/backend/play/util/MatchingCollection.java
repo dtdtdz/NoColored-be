@@ -109,6 +109,7 @@ public class MatchingCollection {
                     matchingQueue.get(ratingLevel+expandLevel).add(matchingInfo.getUserAccessInfo());
                 }
             }
+            matchingInfo.setExpandLevel(expandLevel);
         }
         delMatchingList();
 
