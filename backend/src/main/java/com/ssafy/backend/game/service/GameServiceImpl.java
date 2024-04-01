@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+
+import static com.ssafy.backend.game.domain.GameInfo.GAME_TIME;
 import static com.ssafy.backend.rank.util.RankUtil.tierCalculation;
 
 import java.time.Duration;
@@ -321,7 +323,8 @@ public class GameServiceImpl implements GameService {
                     }
 
                     // 누적 플레이타임(분)
-                    long playTime=Duration.between(userPlayInfo.getStartDate(),userPlayInfo.getEndDate()).toMinutes();
+                    // long playTime=Duration.between(userPlayInfo.getStartDate(),userPlayInfo.getEndDate()).toMinutes();
+                    long playTime=GAME_TIME;
                     userAchievements.setPlaytime(userAchievements.getPlaytime()+playTime);
                     if(userAchievements.getPlaytime()>=600){
                         userCollection.getLabelIds().add(63);
