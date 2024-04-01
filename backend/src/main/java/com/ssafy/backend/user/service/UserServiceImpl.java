@@ -86,7 +86,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileDto getUserProfileDto(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        //계산해야됨 어디서 해야됨?
+        if (userAccessInfo==null) return null;
+        doUserProfileDto(userAccessInfo);
         return userAccessInfo.getUserProfileDto();
     }
 
@@ -166,7 +167,7 @@ public class UserServiceImpl implements UserService {
         userProfileDto.setNickname(userSignDto.getNickname());
         userProfileDto.setLabel("파릇파릇 새싹");
 
-        doUserProfileDto(userProfileDto);
+        doUserProfileDto(userAccessInfo);
         // userAccessInfo에 반영
         userAccessInfo.setUserProfileDto(userProfileDto);
 
@@ -413,37 +414,19 @@ public class UserServiceImpl implements UserService {
     public UserProfileDto findUserInfo(String userCode) {
         UserProfile userProfile = userProfileRepository.findByUserCode(userCode).orElse(null);
         if (userProfile==null) return null;
-        return new UserProfileDto(userProfile);
+        UserAccessInfo dummyUser = new UserAccessInfo(userProfile);
+        dummyUser.setUserProfileDto(new UserProfileDto(userProfile));
+        doUserProfileDto(dummyUser);
+        return dummyUser.getUserProfileDto();
     }
 
 
 
-    private void calcLevelExp(UserProfileDto userProfileDto){
-        long currentExp=userProfileDto.getExp();
-        int level=0;
-        long reqExp=50;
-        while(currentExp>=reqExp){
-            currentExp-=reqExp;
-            level++;
-            if(level<=10){
-                reqExp=500;
-            }else if(level<=30) {
-                reqExp=1000;
-            }else if(level<=50) {
-                reqExp=1500;
-            }else if(level<=75) {
-                reqExp=2000;
-            }else{
-                reqExp=3000;
-            }
-        }
-        userProfileDto.setLevel(level);
-        userProfileDto.setExp(currentExp);
-        userProfileDto.setExpRequire(reqExp);
-    }
 
-    public void doUserProfileDto(UserProfileDto userProfileDto){
-        calcLevelExp(userProfileDto); // exp, expRequire, level 계산
+
+    private void doUserProfileDto(UserAccessInfo userAccessInfo){
+        UserProfileDto userProfileDto = userAccessInfo.getUserProfileDto();
+        userProfileDto.calcLevelExp(userAccessInfo.getUserProfile().getUserExp()); // exp, expRequire, level 계산
         if(!userProfileDto.isGuest()){
             rankUtil.createUserRankRedis(userProfileDto); // redis에 넣기
             rankUtil.getMyRank(userProfileDto); // 순위, 티어 계산
