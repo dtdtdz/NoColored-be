@@ -367,7 +367,12 @@ public class FriendlyServiceImpl implements FriendlyService {
 
                         for (int j=i+1; j<userAccessInfos.length; j++){
                             userAccessInfos[j-1] = userAccessInfos[j];
-                            players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                            if (userAccessInfos[j-1]==null){
+                                players[j-1].setEmptyUser();
+                                break;
+                            } else {
+                                players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                            }
                             if (roomDto.getMasterIndex()==j) roomDto.setMasterIndex(j-1);
                         }
                         userAccessInfos[userAccessInfos.length-1] = null;
@@ -398,7 +403,12 @@ public class FriendlyServiceImpl implements FriendlyService {
 
                     for (int j=i+1; j<userAccessInfos.length; j++){
                         userAccessInfos[j-1] = userAccessInfos[j];
-                        players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                        if (userAccessInfos[j-1]==null){
+                            players[j-1].setEmptyUser();
+                            break;
+                        } else {
+                            players[j-1].setUser(userAccessInfos[j-1].getUserProfileDto());
+                        }
                         if (roomDto.getMasterIndex()==j) roomDto.setMasterIndex(j-1);
                     }
                     userAccessInfos[userAccessInfos.length-1] = null;
