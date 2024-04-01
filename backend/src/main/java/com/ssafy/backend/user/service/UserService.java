@@ -19,4 +19,5 @@ public interface UserService {
     boolean existsUserId(String userId);
     UserProfileDto findUserInfo(String userCode);
     void activeLogout(String token);
+    boolean isTokenValid(String token);
 }

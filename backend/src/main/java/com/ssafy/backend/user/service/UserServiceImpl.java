@@ -470,6 +470,13 @@ public class UserServiceImpl implements UserService {
         jwtUtil.deleteTokenRedis(token);
 
     }
+
+    @Override
+    public boolean isTokenValid(String token) {
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        return (userAccessInfo!=null);
+    }
+
     public void logoutRoomExit(UserAccessInfo userAccessInfo){
 
         RoomInfo roomInfo = userAccessInfo.getRoomInfo();
