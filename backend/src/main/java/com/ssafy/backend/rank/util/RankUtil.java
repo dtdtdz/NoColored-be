@@ -4,6 +4,7 @@ import com.ssafy.backend.rank.document.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
+import com.ssafy.backend.user.repository.UserProfileRepository;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,10 +22,12 @@ public class RankUtil {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final RankRepository rankRepository;
+    private final UserProfileRepository userProfileRepository;
 
-    public RankUtil(RedisTemplate<String, Object> redisTemplate, RankRepository rankRepository) {
+    public RankUtil(RedisTemplate<String, Object> redisTemplate, RankRepository rankRepository, UserProfileRepository userProfileRepository) {
         this.redisTemplate = redisTemplate;
         this.rankRepository = rankRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     // userRank 레디스에 데이터 생성하기
@@ -155,8 +158,13 @@ public class RankUtil {
             String userCode = rankMongo.getUserCode();
             Integer rating = rankMongo.getRating();
 
-            // 사용자의 rating이 null이 아닌 경우에만 Redis에 저장
-            if (rating != null) {
+            Optional<UserProfile> userProfile=userProfileRepository.findByUserCode(userCode);
+            if(userProfile.isEmpty()){
+                continue;
+            }
+
+            // 사용자의 rating이 null이 아니고 유저만 레디스에 저장
+            if (rating != null && !userProfile.get().isGuest()) {
                 // MongoDB에서 조회한 사용자 정보를 Redis의 userRank Sorted Set에 저장
                 zSetOperations.add(key, userCode, rating.doubleValue());
             }
@@ -189,8 +197,13 @@ public class RankUtil {
             String userCode = rankMongo.getUserCode();
             Integer rating = rankMongo.getRating();
 
-            // 사용자의 rating이 null이 아닌 경우에만 Redis에 저장
-            if (rating != null) {
+            Optional<UserProfile> userProfile=userProfileRepository.findByUserCode(userCode);
+            if(userProfile.isEmpty()){
+                continue;
+            }
+
+            // 사용자의 rating이 null이 아니고 유저만 Redis에 저장
+            if (rating != null && !userProfile.get().isGuest()) {
                 // MongoDB에서 조회한 사용자 정보를 Redis의 userRank Sorted Set에 저장
                 zSetOperations.add(key, userCode, rating.doubleValue());
             }

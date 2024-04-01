@@ -23,6 +23,7 @@ import com.ssafy.backend.user.util.RandomNickname;
 import com.ssafy.backend.websocket.util.SessionCollection;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -198,6 +199,10 @@ public class UserServiceImpl implements UserService {
                 .isDeleted(false)
                 .build();
         userInfoRepository.save(userInfo);
+
+        // redis에 넣기
+        rankUtil.createUserRankRedis(userProfileDto);
+
         return token;
     }
 
