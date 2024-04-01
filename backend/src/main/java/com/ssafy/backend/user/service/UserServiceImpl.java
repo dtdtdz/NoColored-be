@@ -187,7 +187,7 @@ public class UserServiceImpl implements UserService {
                 new NoSuchElementException("해당 사용자의 UserCollection이 존재하지 않습니다: " + tempUserProfile.getUserCode()));
         userCollection.getLabelIds().add(72);
         userCollection.getLabelIds().add(64); // 게스트 로그인 회원 전환
-        userCollection.getSkinIds().add(28);
+        userCollection.getSkinIds().add(12);
         userCollectionRepository.save(userCollection);
         
         UserInfo userInfo = UserInfo.builder()
@@ -244,7 +244,7 @@ public class UserServiceImpl implements UserService {
         // usercollection 생성
         UserCollection userCollection=UserCollection.builder()
                 .userCode(userCode)
-                .skinIds(new ArrayList<>(Arrays.asList(11,15,19,21,23,27,28,29))) // 게스트->회원전환할때 보상도 다 포함
+                .skinIds(new ArrayList<>(Arrays.asList(11,12,15,19,21,23,27,29))) // 게스트->회원전환할때 보상도 다 포함
                 .labelIds(new ArrayList<>(Arrays.asList(1,10,64,71,72)))
                 .achievementIds(new ArrayList<>())
                 .build();
