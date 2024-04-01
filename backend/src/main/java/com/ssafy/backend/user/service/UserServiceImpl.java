@@ -2,11 +2,14 @@ package com.ssafy.backend.user.service;
 
 import com.ssafy.backend.collection.document.UserCollection;
 import com.ssafy.backend.collection.repository.UserCollectionRepository;
+import com.ssafy.backend.game.domain.GameInfo;
+import com.ssafy.backend.play.domain.MatchingInfo;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.play.dto.RoomDto;
 import com.ssafy.backend.play.dto.UserRoomDto;
 import com.ssafy.backend.play.service.FriendlyService;
 import com.ssafy.backend.play.service.FriendlyServiceImpl;
+import com.ssafy.backend.play.util.MatchingCollection;
 import com.ssafy.backend.rank.document.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.rank.util.RankUtil;
@@ -51,12 +54,14 @@ public class UserServiceImpl implements UserService {
     private final RankUtil rankUtil;
     private final UserAchievementsRepository userAchievementsRepository;
     private final FriendlyService friendlyService;
+    private final MatchingCollection matchingCollection;
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
                            @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
                            SessionCollection sessionCollection, RedisTemplate<String, Object> redisTemplate, UserCollectionRepository userCollectionRepository, RankRepository rankRepository, RankUtil rankUtil, UserAchievementsRepository userAchievementsRepository,
-                           FriendlyService friendlyService
+                           FriendlyService friendlyService,
+                           MatchingCollection matchingCollection
 
     ) {
         this.userProfileRepository = userProfileRepository;
@@ -70,6 +75,7 @@ public class UserServiceImpl implements UserService {
         this.rankUtil = rankUtil;
         this.userAchievementsRepository = userAchievementsRepository;
         this.friendlyService = friendlyService;
+        this.matchingCollection = matchingCollection;
     }
 
     private String getUserCode() {
@@ -457,13 +463,11 @@ public class UserServiceImpl implements UserService {
 
     }
 
-//    @Scheduled(cron = "0 0/10 * * * *")
+//    @Scheduled(cron = "0 0/20 * * * *")
     public void scheduledUserLogout() {
         for (UserAccessInfo userAccessInfo: sessionCollection.userIdMap.values()){
-            synchronized (userAccessInfo){
-                if (userAccessInfo.isExpire()){
-                    logout(userAccessInfo);
-                }
+            if (userAccessInfo.isExpire()){
+                logout(userAccessInfo);
             }
 
         }
@@ -473,7 +477,7 @@ public class UserServiceImpl implements UserService {
     public void activeLogout(String token) {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         jwtUtil.deleteTokenRedis(token);
-
+        logout(userAccessInfo);
     }
 
     @Override
@@ -566,8 +570,28 @@ public class UserServiceImpl implements UserService {
         }
     }
     public void logout(UserAccessInfo userAccessInfo){
-        if (userAccessInfo.getRoomInfo()!=null){
-            logoutRoomExit(userAccessInfo);
+        synchronized (userAccessInfo){
+
+            Object position = userAccessInfo.getPosition();
+            if (position !=null){
+                if (position instanceof RoomInfo){
+                    logoutRoomExit(userAccessInfo);
+                }
+                else if (position instanceof MatchingInfo){
+                    matchingCollection.setDelMatching(userAccessInfo);
+                    return;
+                } else if (position instanceof GameInfo){
+                    return;
+                }
+            }
+            userAccessInfo.setPosition(null);
+            sessionCollection.userIdMap.remove(userAccessInfo.getUserProfile().getId());
+            try {
+                userAccessInfo.getSession().close();
+            } catch (Exception e){
+                System.out.println("Can't close session");
+            }
+            sessionCollection.userWebsocketMap.remove(userAccessInfo.getSession());
         }
     }
 }
