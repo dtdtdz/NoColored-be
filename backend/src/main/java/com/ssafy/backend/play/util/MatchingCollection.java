@@ -116,7 +116,7 @@ public class MatchingCollection {
         //7초 3인, 12초 2인 매칭가능
         for (int i=matchingQueue.size()-1; i>=0; i--){
 
-            if (matchingQueue.get(i).isEmpty())
+            if (!matchingQueue.get(i).isEmpty())
                 System.out.println(i+":"+matchingQueue.get(i).size());
             while (!matchingQueue.get(i).isEmpty() && matchingQueue.get(i).size() >= getMatchingSize(matchingQueue.get(i),now)){
                 List<UserAccessInfo> list = new ArrayList<>();
