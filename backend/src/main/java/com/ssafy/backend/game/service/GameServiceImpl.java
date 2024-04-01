@@ -97,6 +97,8 @@ public class GameServiceImpl implements GameService {
             // System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
             userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
 
+            System.out.println("roomuuid = "+resultDto.getRoomUuid());
+            System.out.println("guest = "+userAccessInfo.getUserProfile().isGuest());
             // 매칭이고 게스트 아니면
             if(resultDto.getRoomUuid()==null&& !userAccessInfo.getUserProfile().isGuest()) {
 
