@@ -21,6 +21,7 @@ import java.util.*;
 @AllArgsConstructor
 public class GameInfo {
     private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private long targetTime;
     private long time;
     private long itemTime;
@@ -73,6 +74,7 @@ public class GameInfo {
         users = new LinkedHashMap<>();
         userGameInfoList = new LinkedList<>();
         startDate = LocalDateTime.now();
+        endDate=startDate.plusSeconds(GAME_TIME); // enddate 만들어주기
         setSecond(3);
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
