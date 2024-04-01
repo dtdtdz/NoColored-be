@@ -2,6 +2,7 @@ package com.ssafy.backend.game.domain;
 
 import com.ssafy.backend.game.dto.RewardDto;
 import com.ssafy.backend.game.dto.UserResultDto;
+import com.ssafy.backend.play.dto.UserRoomDto;
 import com.ssafy.backend.user.entity.UserAchievements;
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import lombok.Getter;
