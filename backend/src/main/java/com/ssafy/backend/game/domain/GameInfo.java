@@ -385,9 +385,19 @@ public class GameInfo {
                         do {
                             val = random.nextInt(CHARACTER_NUM);
                         } while (characterInfoArr[val].getUserGameInfo()!=null);
+
+                        float tmp = characterInfo.getX();
+                        characterInfo.setX(characterInfoArr[val].getX());
+                        characterInfoArr[val].setX(tmp);
+
+                        tmp = characterInfo.getY();
+                        characterInfo.setY(characterInfoArr[val].getY());
+                        characterInfoArr[val].setY(tmp);
+
                         characterInfoArr[characterInfo.getUserGameInfo().getCharacterNum()] = characterInfoArr[val];
                         characterInfoArr[val] = characterInfo;
                         characterInfo.getUserGameInfo().setCharacterNum((byte) val);
+
                     }
                 } else {
                     entry.setValue(time); // 값을 직접 수정하는 것은 안전함
