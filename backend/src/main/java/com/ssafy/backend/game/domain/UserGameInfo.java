@@ -24,13 +24,14 @@ public class UserGameInfo {
 
     public UserGameInfo(WebSocketSession webSocketSession,
                         byte characterNum,
-                        byte playerNum){
+                        byte playerNum,
+                        String type){
         this.webSocketSession = webSocketSession;
         this.characterNum = characterNum;
         this.playerNum = playerNum;
         isAccess = false;
         score = 0;
-        userPlayInfo = new UserPlayInfo();
+        userPlayInfo = new UserPlayInfo(type);
 
         stepOrder = null;
     }
