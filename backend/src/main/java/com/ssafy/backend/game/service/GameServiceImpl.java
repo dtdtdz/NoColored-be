@@ -211,7 +211,7 @@ public class GameServiceImpl implements GameService {
         } catch (Exception e){
             e.printStackTrace();
         }
-        System.out.println(System.currentTimeMillis()-t);
+        System.out.println("game dt:"+(System.currentTimeMillis()-t));
     }
     private void dataSave(GameInfo gameInfo){
 
