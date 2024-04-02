@@ -36,6 +36,7 @@ public class InGameLogic {
             if (gameInfo.getSecond()<=0){
                 gameInfo.putStart();
                 gameInfo.putCountDown();
+                gameInfo.putCharacterMapping();
                 gameInfo.goToNextCycle();
                 for (CharacterInfo characterInfo: gameInfo.getCharacterInfoArr()){
                     characterInfo.setVelX(GameInfo.DEFAULT_VEL_X);
