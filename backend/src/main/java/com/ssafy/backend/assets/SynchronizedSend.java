@@ -14,12 +14,15 @@ import java.nio.ByteBuffer;
 public class SynchronizedSend {
     public static void binarySend(WebSocketSession session, ByteBuffer buffer){
         long dt1 = System.currentTimeMillis();
-
-        if (session==null) {
-            System.out.println("Can't find session.");
-            return;
-        }
+        
         synchronized (session){
+            if (session==null) {
+                System.out.println("Can't find session.");
+                return;
+            } else if (!session.isOpen()){
+                System.out.println("Session isn't open.");
+                return;
+            }
             try {
                 buffer.flip();
                 session.sendMessage(new BinaryMessage(buffer));
@@ -38,17 +41,21 @@ public class SynchronizedSend {
     private static final Wrapper wrapper = new Wrapper();
 
     public static void textSend(WebSocketSession session, String action, Object data){
-        if (session==null) {
-            System.out.println("Can't find session.");
-            return;
-        }
+
         try {
+        synchronized (session){
+            if (session==null) {
+                System.out.println("Can't find session.");
+                return;
+            } else if (!session.isOpen()){
+                System.out.println("Session isn't open.");
+                return;
+            }
             wrapper.setAction(action);
             wrapper.setData(data);
             String messageContent = objectMapper.writeValueAsString(wrapper);
             // 메시지 내용 출력
             System.out.println("Sending message: " + messageContent);
-            synchronized (session){
                 session.sendMessage(new TextMessage(objectMapper.writeValueAsString(wrapper)));
             }
         } catch (IOException e){
