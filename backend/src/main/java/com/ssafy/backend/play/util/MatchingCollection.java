@@ -119,6 +119,10 @@ public class MatchingCollection {
             while (!matchingQueue.get(i).isEmpty()
                     && matchingQueue.get(i).size() >= getMatchingSize(matchingQueue.get(i),now)){
                 List<UserAccessInfo> list = new ArrayList<>();
+                if (matchingInfoMap.get(matchingQueue.get(i).get(0))==null) {
+                    delMatching(matchingQueue.get(i).get(0));
+                    continue;
+                }
                 int size = getMatchingSize(matchingQueue.get(i),now);
 
                 for (int j=0; j<size; j++){
