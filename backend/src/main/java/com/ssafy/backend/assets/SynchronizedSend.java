@@ -13,6 +13,8 @@ import java.nio.ByteBuffer;
 
 public class SynchronizedSend {
     public static void binarySend(WebSocketSession session, ByteBuffer buffer){
+        long dt1 = System.currentTimeMillis();
+
         if (session==null) {
             System.out.println("Can't find session.");
             return;
@@ -28,6 +30,8 @@ public class SynchronizedSend {
             }
 
         }
+        long dt2 = System.currentTimeMillis();
+        if (dt2-dt1>50) System.out.println("send"+(dt2-dt1));
     }
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
