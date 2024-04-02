@@ -4,6 +4,7 @@ import com.ssafy.backend.rank.document.RankMongo;
 import com.ssafy.backend.rank.repository.RankRepository;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.entity.UserProfile;
+import com.ssafy.backend.user.repository.UserProfileRepository;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,10 +22,12 @@ public class RankUtil {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final RankRepository rankRepository;
+    private final UserProfileRepository userProfileRepository;
 
-    public RankUtil(RedisTemplate<String, Object> redisTemplate, RankRepository rankRepository) {
+    public RankUtil(RedisTemplate<String, Object> redisTemplate, RankRepository rankRepository, UserProfileRepository userProfileRepository) {
         this.redisTemplate = redisTemplate;
         this.rankRepository = rankRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     // userRank 레디스에 데이터 생성하기
@@ -36,11 +39,10 @@ public class RankUtil {
     }
 
     // 게임 끝나고 호출함!
-    // userprofile의 rating은 로그아웃할때 갱신
     // userprofile을 가지고 몽고 안에 있는 레이팅도 갱신함
     // 그 후 회원이면 레디스 안에 있는 rating을 갱신한다
     // plus 점수를 받았다고 가정함
-    public void updateUserRankRedis(UserProfile userProfile, int plusRating){
+    public void updateUserRankRedis(UserProfile userProfile){
         String key="userRank";
         String userCode=userProfile.getUserCode();
         int currentRating=userProfile.getUserRating();
@@ -48,7 +50,7 @@ public class RankUtil {
         Optional<RankMongo> rankMongoOptional=rankRepository.findById(userCode);
         if(rankMongoOptional.isPresent()){
             RankMongo rankMongo=rankMongoOptional.get();
-            rankMongo.setRating(rankMongo.getRating()+plusRating);
+            rankMongo.setRating(userProfile.getUserRating());
             rankRepository.save(rankMongo);
         }
         // 게스트면 데이터 갱신 안함
@@ -64,7 +66,7 @@ public class RankUtil {
         // 현재 시간(밀리세컨드)의 역수를 점수에 반영
         long currentTimeMillis = System.currentTimeMillis();
         // 시간 역수를 스코어에 적용하여 유니크한 스코어 생성
-        double newRating= currentScore+(double) plusRating;
+        double newRating= currentScore;
         double timeFactor = 1.0 / currentTimeMillis;
         newRating+=timeFactor;
         redisTemplate.opsForZSet().add(key,userCode,newRating);
@@ -155,8 +157,13 @@ public class RankUtil {
             String userCode = rankMongo.getUserCode();
             Integer rating = rankMongo.getRating();
 
-            // 사용자의 rating이 null이 아닌 경우에만 Redis에 저장
-            if (rating != null) {
+            Optional<UserProfile> userProfile=userProfileRepository.findByUserCode(userCode);
+            if(userProfile.isEmpty()){
+                continue;
+            }
+
+            // 사용자의 rating이 null이 아니고 유저만 레디스에 저장
+            if (rating != null && !userProfile.get().isGuest()) {
                 // MongoDB에서 조회한 사용자 정보를 Redis의 userRank Sorted Set에 저장
                 zSetOperations.add(key, userCode, rating.doubleValue());
             }
@@ -189,8 +196,13 @@ public class RankUtil {
             String userCode = rankMongo.getUserCode();
             Integer rating = rankMongo.getRating();
 
-            // 사용자의 rating이 null이 아닌 경우에만 Redis에 저장
-            if (rating != null) {
+            Optional<UserProfile> userProfile=userProfileRepository.findByUserCode(userCode);
+            if(userProfile.isEmpty()){
+                continue;
+            }
+
+            // 사용자의 rating이 null이 아니고 유저만 Redis에 저장
+            if (rating != null && !userProfile.get().isGuest()) {
                 // MongoDB에서 조회한 사용자 정보를 Redis의 userRank Sorted Set에 저장
                 zSetOperations.add(key, userCode, rating.doubleValue());
             }

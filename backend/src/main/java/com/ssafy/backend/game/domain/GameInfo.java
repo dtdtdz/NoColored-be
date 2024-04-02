@@ -21,6 +21,7 @@ import java.util.*;
 @AllArgsConstructor
 public class GameInfo {
     private LocalDateTime startDate;
+    private LocalDateTime endDate;
     private long targetTime;
     private long time;
     private long itemTime;

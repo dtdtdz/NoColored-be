@@ -264,7 +264,7 @@ public class CollectionServiceImpl implements CollectionService {
         achievements.add(new Achievement(34, "누적 3승", "Google Orange"));
         achievements.add(new Achievement(35, "누적 5승", "Google Green"));
         achievements.add(new Achievement(36, "누적 7승", "Google Blue"));
-        achievements.add(new Achievement(37, "누적 10승", "Basic Yellow Sunglass"));
+        achievements.add(new Achievement(37, "누적 10승", "Basic Blue Sunglass"));
         achievements.add(new Achievement(38, "누적 20승", "칼드컵 우승을 향해"));
         achievements.add(new Achievement(39, "누적 1패", "NPC White"));
         achievements.add(new Achievement(40, "누적 2패", "Basic Green Sunglass"));
@@ -291,7 +291,7 @@ public class CollectionServiceImpl implements CollectionService {
         achievements.add(new Achievement(61, "누적 2시간", "밥 먹으러 갑시다!"));
         achievements.add(new Achievement(62, "누적 5시간", "타임머신"));
         achievements.add(new Achievement(63, "누적 10시간", "정말 고마워요"));
-        achievements.add(new Achievement(64, "게스트 로그인 회원 전환", "Basic Blue Sunglass"));
+        achievements.add(new Achievement(64, "게스트 로그인 회원 전환", "Basic Yellow Sunglass"));
         achievements.add(new Achievement(65, "단판, 혼자만 아이템 독식", " 욕심쟁이"));
         achievements.add(new Achievement(66, "모두 점수가 같은 상태로 마무리", "공산주의 노컬러랜드"));
         achievements.add(new Achievement(67, "모두 점수가 0점인 상태로 마무리", "게임하긴 했나요?"));
