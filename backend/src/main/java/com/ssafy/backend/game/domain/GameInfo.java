@@ -65,15 +65,13 @@ public class GameInfo {
     public static final int MOVE_CLONE_PROP = 250;
 
 
-    public static final ByteBuffer[] buffer = new ByteBuffer[4];
-    static {
-        for (int i=0; i<buffer.length; i++){
-            buffer[i] = ByteBuffer.allocate(2048);
-        }
-    }
+    private ByteBuffer[] buffer = new ByteBuffer[4];
 
     private GameCycle gameCycle;
     public GameInfo(List<UserAccessInfo> userList, RoomInfo room) {
+        for (int i=0; i<buffer.length; i++){
+            buffer[i] = ByteBuffer.allocate(2048);
+        }
         users = new LinkedHashMap<>();
         userGameInfoList = new LinkedList<>();
         startDate = LocalDateTime.now();

@@ -221,11 +221,7 @@ public class InGameLogic {
             gameInfo.putScore();
             gameInfo.putEffect();
             gameInfo.putSkin();
-            long dt2 = System.currentTimeMillis();
-            if (dt2-dt1>50) System.out.println("set"+(dt2-dt1));
             gameInfo.sendBuffer();
-            dt2 = System.currentTimeMillis();
-            if (dt2-dt1>50) System.out.println("send"+(dt2-dt1));
     }
     public boolean indexCheck(int idx, int size){
         return idx>=0 && idx<size;
