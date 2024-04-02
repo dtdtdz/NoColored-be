@@ -8,6 +8,7 @@ import com.ssafy.backend.play.dto.UserRoomDto;
 import com.ssafy.backend.play.service.FriendlyService;
 import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.util.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,9 @@ public class FriendlyController {
     }
 
     @GetMapping("list/{offset}")
-    private ResponseEntity<?> getRoomList(@PathVariable("offset") int offset){
+    private ResponseEntity<?> getRoomList(@RequestHeader("Authorization") String token, @PathVariable("offset") int offset){
+        UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
+        if (userAccessInfo==null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
         return friendlyService.getRoomList(offset);
     }
 

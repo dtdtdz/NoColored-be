@@ -113,7 +113,7 @@ public class GameInfo {
                     idxs.get(i),i,(room==null)?"friendly":"ranking");
             CharacterInfo characterInfo = new CharacterInfo(
                     (floorPos.get(i)[0]+0.5f)*BLOCK_SIZE,
-                    floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f+1,
+                    floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
                     (int) ((random.nextInt(2)-0.5f)*2),
                     userGameInfo
             );
