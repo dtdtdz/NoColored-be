@@ -38,7 +38,8 @@ public class UserController {
     @GetMapping("/guest")
     public ResponseEntity<String> guestSignUp(){
         UserAccessInfo userAccessInfo = userService.guestSignUp();
-        return ResponseEntity.ok(userService.generateToken(userAccessInfo));
+        String token = userService.generateToken(userAccessInfo);
+        return ResponseEntity.ok(token);
     }
     @PostMapping("/guest")
     public ResponseEntity<String> guestConvert(@RequestHeader("Authorization") String token,
@@ -63,12 +64,13 @@ public class UserController {
         if (user.getPassword().length() < 6 || user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
         if (!user.confirm()) return ResponseEntity.badRequest().body("Passwords do not match.");
         if (user.getNickname().length() < 2 || user.getNickname().length() > 9) return ResponseEntity.badRequest().body("Nickname does not meet the length requirements (6-20 characters).");
-
-        UserAccessInfo userAccessInfo = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
         try {
-            return ResponseEntity.ok(userService.generateToken(userAccessInfo));
+            UserAccessInfo userAccessInfo = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
+            String token = userService.generateToken(userAccessInfo);
+            if (token==null) ResponseEntity.internalServerError().body("Please try to login.");
+            return ResponseEntity.ok(token);
         } catch (Exception e){
-            return ResponseEntity.internalServerError().body("User registration failed");
+            return ResponseEntity.internalServerError().body("User registration failed.");
         }
     }
     @PostMapping("/login")

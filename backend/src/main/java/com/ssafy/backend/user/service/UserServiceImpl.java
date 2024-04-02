@@ -33,6 +33,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -291,8 +292,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public String generateToken(UserAccessInfo userAccessInfo){
         UserProfile userProfile = userAccessInfo.getUserProfile();
+
+        if (sessionCollection.userIdMap.containsKey(userProfile.getId())) {
+            WebSocketSession session = sessionCollection.userIdMap.get(userProfile.getId()).getSession();
+            if (session!=null&&session.isOpen()){
+                return null;
+            }
+        }
+
         String token = jwtUtil.generateToken(userProfile.getUserCode());
         jwtUtil.setTokenRedis(token, userProfile.getId());
+
         sessionCollection.userIdMap.put(userProfile.getId(), userAccessInfo);
 
 //        Integer rating= (Integer) redisTemplate.opsForValue().get(userProfile.getUserRating());

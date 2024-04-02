@@ -64,8 +64,14 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             UserAccessInfo result = (UserAccessInfo)handler.apply(jsonNode.get("data"));
             if (result!=null) {
                 result.setSession(session);
-                sessionCollection.userWebsocketMap.put(session, result);
-                SynchronizedSend.textSend(session, SendTextMessageType.AUTHORIZED.getValue(), null);
+                if (result.getSession()!=null&&(!result.getSession().isOpen())) {
+                    jwtUtil.deleteTokenRedis(jsonNode.get("data").asText());
+                    SynchronizedSend.textSend(session, SendTextMessageType.INVALID_TOKEN.getValue(), null);
+                    session.close();
+                } else {
+                    sessionCollection.userWebsocketMap.put(session, result);
+                    SynchronizedSend.textSend(session, SendTextMessageType.AUTHORIZED.getValue(), null);
+                }
 //                System.out.println(result.getUserProfile().getUserNickname());
 //                System.out.println(result.getUserProfile().getId());
             } else {
@@ -96,7 +102,6 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             case JUMP -> applyJump(session);
             case TEST_START2 -> testStart2(session);
             case TEST_START -> testStart(session);
-            case TEST_LOGIN -> testLogin(session);
         }
     }
 
@@ -178,9 +183,5 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         users.add(user);
         sessionCollection.userWebsocketMap.put(session, user);
         inGameCollection.addGame(users);
-    }
-
-    private void testLogin(WebSocketSession session){
-
     }
 }
