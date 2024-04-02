@@ -298,7 +298,7 @@ public class GameServiceImpl implements GameService {
                     // 패 업적
                     if(userAchievements.getCumulativeLoseCount()==1){
                         userCollection.getLabelIds().add(39);
-                        userCollection.getSkinIds().add(6);
+//                        userCollection.getSkinIds().add(6);
 //                        reward.getSkins().add("npcWhite");
                     }else if(userAchievements.getCumulativeLoseCount()==2){
                         userCollection.getLabelIds().add(40);
