@@ -185,6 +185,7 @@ public class UserServiceImpl implements UserService {
 
         doUserProfileDto(userAccessInfo);
         // userAccessInfo에 반영
+        userAccessInfo.setUserProfile(userProfile);
         userAccessInfo.setUserProfileDto(userProfileDto);
 
         // 파릇파릇 새싹 칭호 얻었다고 처리
