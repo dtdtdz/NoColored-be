@@ -45,7 +45,7 @@ public class GameInfo {
 
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
-    public static final float DEFAULT_VEL_X = 160;
+    public static final float DEFAULT_VEL_X = 120;
     public static final int MAX_PLAYER = 4;
     public static final float GRAVITY = 500;
     public static final int BLOCK_SIZE = 18;
