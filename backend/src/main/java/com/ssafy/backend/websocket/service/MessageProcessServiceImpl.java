@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
 import com.ssafy.backend.play.domain.RoomInfo;
+import com.ssafy.backend.play.service.FriendlyService;
 import com.ssafy.backend.user.entity.UserProfile;
 import com.ssafy.backend.websocket.domain.ReceiveBinaryMessageType;
 import com.ssafy.backend.websocket.domain.SendTextMessageType;
@@ -35,11 +36,14 @@ public class MessageProcessServiceImpl implements MessageProcessService{
     private final ObjectMapper mapper;
     private final Map<String, Function<JsonNode, Object>> actionHandlers;
 
+    private final FriendlyService friendlyService;
+
 
     public MessageProcessServiceImpl(SessionCollection sessionCollection,
                                      InGameCollection inGameCollection,
                                      JwtUtil jwtUtil,
-                                     @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService){
+                                     @Qualifier("authScheduledExecutorService")ScheduledExecutorService authScheduledExecutorService,
+                                     FriendlyService friendlyService){
         this.sessionCollection = sessionCollection;
         this.inGameCollection = inGameCollection;
         this.jwtUtil = jwtUtil;
@@ -47,6 +51,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         mapper = new ObjectMapper();
         actionHandlers = new HashMap<>();
         actionHandlers.put("token", this::handleToken);
+        this.friendlyService = friendlyService;
     }
 
 
@@ -62,16 +67,22 @@ public class MessageProcessServiceImpl implements MessageProcessService{
 //        System.out.println("text");
         if (handler != null) {
             UserAccessInfo result = (UserAccessInfo)handler.apply(jsonNode.get("data"));
-            if (result!=null) {
-                result.setSession(session);
-                if (result.getSession()!=null&&(!result.getSession().isOpen())) {
+            if (result!=null) { //토큰 결과 userAccessInfo 있는가?
+
+                if (result.getSession()!=null&&(!result.getSession().isOpen())) { //userAccessInfo 에 세션이 열려있는가?
+                    //연결을 차단한다.
                     jwtUtil.deleteTokenRedis(jsonNode.get("data").asText());
                     SynchronizedSend.textSend(session, SendTextMessageType.INVALID_TOKEN.getValue(), null);
                     session.close();
-                } else {
+                } else if (result.getSession()==null){ //세션이 없을때
+                    sessionCollection.userWebsocketMap.put(session, result);
+                    SynchronizedSend.textSend(session, SendTextMessageType.AUTHORIZED.getValue(), null);
+                } else { //세션이 있으나 닫혀있음
+                    sessionCollection.userWebsocketMap.remove(result.getSession());
                     sessionCollection.userWebsocketMap.put(session, result);
                     SynchronizedSend.textSend(session, SendTextMessageType.AUTHORIZED.getValue(), null);
                 }
+                result.setSession(session);
 //                System.out.println(result.getUserProfile().getUserNickname());
 //                System.out.println(result.getUserProfile().getId());
             } else {
@@ -106,7 +117,6 @@ public class MessageProcessServiceImpl implements MessageProcessService{
     }
 
 
-
     @Override
     public void setAuthSessionTimeOut(WebSocketSession session) throws Exception {
 
@@ -121,6 +131,27 @@ public class MessageProcessServiceImpl implements MessageProcessService{
                 }
             }
         },10, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void setRoomQuitWarningTimeOut(WebSocketSession session) {
+        if (!sessionCollection.userWebsocketMap.containsKey(session)) return;
+
+        authScheduledExecutorService.schedule(()->{
+            if (!sessionCollection.userWebsocketMap.containsKey(session)) return;//여전히 세션 재연결 안된상태, 재연결시 session 제거됨
+            UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(session);
+            if (userAccessInfo.getRoomInfo()==null) return;
+            setRoomQuitTimeOut(session);
+        },30, TimeUnit.SECONDS);
+    }
+
+    private void setRoomQuitTimeOut(WebSocketSession session) {
+        authScheduledExecutorService.schedule(()->{
+            if (!sessionCollection.userWebsocketMap.containsKey(session)) return;
+            UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(session);
+            if (userAccessInfo.getRoomInfo()==null) return;;
+            friendlyService.quitRoom(userAccessInfo);
+        },30, TimeUnit.SECONDS);
     }
 
     private UserAccessInfo handleToken(JsonNode node) {
