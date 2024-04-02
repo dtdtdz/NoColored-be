@@ -5,13 +5,17 @@ import com.ssafy.backend.game.type.GameCharacterState;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class InGameLogic {
 
     private final PriorityQueue<CharacterInfo> characterQueue;
-    public InGameLogic(){
+    private final ScheduledExecutorService scheduledExecutorService;
+    public InGameLogic(ScheduledExecutorService scheduledExecutorService){
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
+        this.scheduledExecutorService = scheduledExecutorService;
     }
     public void create(GameInfo gameInfo){
         gameInfo.tick();
@@ -55,7 +59,6 @@ public class InGameLogic {
     }
 
     public void play(GameInfo gameInfo){
-        long dt1 = System.currentTimeMillis();
         long dt = gameInfo.tick();
 
         if (gameInfo.checkSecond()){
@@ -208,22 +211,24 @@ public class InGameLogic {
             }
         }
 
-        long dt2 =System.currentTimeMillis();
-        if (dt2-dt1>50) System.out.println("physics"+(dt2-dt1));
-        dt1 = dt2;
-        gameInfo.applyStep();
-        gameInfo.applyItem();
+        scheduledExecutorService.schedule(()->{
+            long dt1 = System.currentTimeMillis();
+            gameInfo.applyStep();
+            gameInfo.applyItem();
 
-        gameInfo.putCharacterMapping();
-        gameInfo.putPhysicsState();
-        gameInfo.putItem();
+            gameInfo.putCharacterMapping();
+            gameInfo.putPhysicsState();
+            gameInfo.putItem();
 
-        gameInfo.putScore();
-        gameInfo.putEffect();
-        gameInfo.putSkin();
-        gameInfo.sendBuffer();
-        dt2 =System.currentTimeMillis();
-        if (dt2-dt1>50) System.out.println("play end"+(dt2-dt1));
+            gameInfo.putScore();
+            gameInfo.putEffect();
+            gameInfo.putSkin();
+            long dt2 = System.currentTimeMillis();
+            if (dt2-dt1>50) System.out.println("set"+(dt2-dt1));
+            gameInfo.sendBuffer();
+            dt2 = System.currentTimeMillis();
+            if (dt2-dt1>50) System.out.println("send"+(dt2-dt1));
+        },0, TimeUnit.SECONDS);
     }
     public boolean indexCheck(int idx, int size){
         return idx>=0 && idx<size;
