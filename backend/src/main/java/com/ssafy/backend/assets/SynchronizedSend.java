@@ -14,13 +14,15 @@ import java.nio.ByteBuffer;
 public class SynchronizedSend {
     public static void binarySend(WebSocketSession session, ByteBuffer buffer){
         long dt1 = System.currentTimeMillis();
-        
+
         synchronized (session){
             if (session==null) {
                 System.out.println("Can't find session.");
+                buffer.clear();
                 return;
             } else if (!session.isOpen()){
                 System.out.println("Session isn't open.");
+                buffer.clear();
                 return;
             }
             try {
