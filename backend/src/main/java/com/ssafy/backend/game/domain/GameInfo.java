@@ -42,6 +42,7 @@ public class GameInfo {
     private byte stepOrder;
     private GameItemType curItem;
     private byte[] useItem;
+    private int idxItemY;
 
     //이것들 리팩토링 고려
     public static final int CHARACTER_SIZE = 27;
@@ -60,7 +61,7 @@ public class GameInfo {
     public static final int ITEM_REMOVE_INTERVAL = 5;
     public static final int ITEM_SIZE = 32;
     public static final float ITEM_X = (WALL_WIDTH+MAP_WIDTH/2f)*BLOCK_SIZE;
-    public static final float ITEM_Y = (3)*BLOCK_SIZE;
+    public static final float[] ITEM_Y_ARR = new float[] {3*BLOCK_SIZE, 7*BLOCK_SIZE, 11*BLOCK_SIZE, 15*BLOCK_SIZE};
 
     public static final ByteBuffer[] buffer = new ByteBuffer[4];
     static {
@@ -107,6 +108,9 @@ public class GameInfo {
         }
         Collections.shuffle(idxs);
 //        Collections.shuffle(floorPos);
+        for (int i=0; i<10; i++){
+            floorPos.remove(0);
+        }
 
         for (byte i=0; i<userList.size(); i++){
             UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
@@ -206,7 +210,9 @@ public class GameInfo {
             }
         } else if (itemTime-(ITEM_CREATE_INTERVAL-ITEM_REMOVE_INTERVAL)*1000L<time){
             curItem = GameItemType.NO_ITEM;
-            effectList.add(new Effect(EffectType.ITEM_TIME_OUT, ITEM_X, ITEM_Y));
+            idxItemY = random.nextInt(ITEM_Y_ARR.length);
+            effectList.add(new Effect(EffectType.ITEM_TIME_OUT, ITEM_X,
+                    ITEM_Y_ARR[idxItemY]));
         }
 
     }
@@ -215,8 +221,8 @@ public class GameInfo {
         float interval = (ITEM_SIZE+CHARACTER_SIZE)/2f;
         if (cInfo.getUserGameInfo()==null) return;
         if ((Math.abs(cInfo.getX()-ITEM_X)<interval && (!curItem.equals(GameItemType.NO_ITEM)))
-                && (Math.abs(cInfo.getY()-ITEM_Y)<interval)){
-            effectList.add(new Effect(EffectType.ITEM_USE, ITEM_X, ITEM_Y));
+                && (Math.abs(cInfo.getY()- ITEM_Y_ARR[idxItemY])<interval)){
+            effectList.add(new Effect(EffectType.ITEM_USE, ITEM_X, ITEM_Y_ARR[idxItemY]));
             useItem = new byte[]{curItem.getValue(), cInfo.getUserGameInfo().getPlayerNum()};
             curItem = GameItemType.NO_ITEM;
         }
@@ -256,7 +262,7 @@ public class GameInfo {
 
             }
             case REBEL -> {
-                effectList.add(new Effect(EffectType.REBEL, ITEM_X, ITEM_Y));
+                effectList.add(new Effect(EffectType.REBEL, ITEM_X, ITEM_Y_ARR[idxItemY]));
             }
             case STOP_PLAYER -> {
                 for (UserGameInfo userGameInfo: userGameInfoList) {
@@ -320,7 +326,7 @@ public class GameInfo {
         for (int i=0; i<users.size(); i++){
             buffer[i].put(SendBinaryMessageType.ITEM.getValue())
                     .put(curItem.getValue())
-                    .putFloat(ITEM_X).putFloat(ITEM_Y);
+                    .putFloat(ITEM_X).putFloat(ITEM_Y_ARR[idxItemY]);
         }
     }
     public void putEnd() {

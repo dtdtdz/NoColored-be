@@ -46,6 +46,7 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         System.out.println("Connection closed: " + status);
+        messageProcessService.setRoomQuitWarningTimeOut(session);
 //        close logic
     }
 
