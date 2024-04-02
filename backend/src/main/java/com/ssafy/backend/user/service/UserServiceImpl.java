@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService {
                     .userCode(userCode)
                     .skinIds(new ArrayList<>(Arrays.asList(11,15,19,21,23,27,29)))
                     .labelIds(new ArrayList<>(Arrays.asList(1,10,71)))
-                    .achievementIds(new ArrayList<>())
+                    .achievementIds(new ArrayList<>(Arrays.asList(1,10,71)))
                     .build();
             userCollectionRepository.save(userCollection);
 
@@ -197,6 +197,8 @@ public class UserServiceImpl implements UserService {
         userCollection.getLabelIds().add(72);
         userCollection.getLabelIds().add(64); // 게스트 로그인 회원 전환
         userCollection.getSkinIds().add(12);
+        userCollection.getAchievementIds().add(64); // achievement 해주기
+        userCollection.getAchievementIds().add(72);
         userCollectionRepository.save(userCollection);
         
         UserInfo userInfo = UserInfo.builder()
@@ -259,7 +261,7 @@ public class UserServiceImpl implements UserService {
                 .userCode(userCode)
                 .skinIds(new ArrayList<>(Arrays.asList(11,12,15,19,21,23,27,29))) // 게스트->회원전환할때 보상도 다 포함
                 .labelIds(new ArrayList<>(Arrays.asList(1,10,64,71,72)))
-                .achievementIds(new ArrayList<>())
+                .achievementIds(new ArrayList<>(Arrays.asList(1,10,64,71,72)))
                 .build();
         userCollectionRepository.save(userCollection);
 
@@ -344,63 +346,86 @@ public class UserServiceImpl implements UserService {
         }else if(!lastLoginDate.equals(today)){
             userAchievements.setConsecutiveLogin(false);
             userAchievements.setConsecutiveLoginDays(1);
-            userCollection.getLabelIds().add(68);
+            if(!userCollection.getLabelIds().contains(68))userCollection.getLabelIds().add(68);
+            if(!userCollection.getAchievementIds().contains(68))userCollection.getAchievementIds().add(68);
         }
         userAchievements.setLastLoginDate(today);
 
         // 누적 접속
         if(userAchievements.getCumulativeLoginDays()==2){
-            userCollection.getLabelIds().add(2);
-            userCollection.getSkinIds().add(30);
+            if(!userCollection.getLabelIds().contains(2))userCollection.getLabelIds().add(2);
+            if(!userCollection.getSkinIds().contains(30))userCollection.getSkinIds().add(30);
+            if(!userCollection.getAchievementIds().contains(2))userCollection.getAchievementIds().add(2);
         }else if(userAchievements.getCumulativeLoginDays()==3){
-            userCollection.getLabelIds().add(3);
-            userCollection.getSkinIds().add(25);
+            if(!userCollection.getLabelIds().contains(3))userCollection.getLabelIds().add(3);
+            if(!userCollection.getSkinIds().contains(25))userCollection.getSkinIds().add(25);
+            if(!userCollection.getAchievementIds().contains(3))userCollection.getAchievementIds().add(3);
         }else if(userAchievements.getCumulativeLoginDays()==4){
-            userCollection.getLabelIds().add(4);
-            userCollection.getSkinIds().add(26);
+            if(!userCollection.getLabelIds().contains(4))userCollection.getLabelIds().add(4);
+            if(!userCollection.getSkinIds().contains(26))userCollection.getSkinIds().add(26);
+            if(!userCollection.getAchievementIds().contains(4))userCollection.getAchievementIds().add(4);
         }else if(userAchievements.getCumulativeLoginDays()==5){
-            userCollection.getLabelIds().add(5);
+            if(!userCollection.getLabelIds().contains(5))userCollection.getLabelIds().add(5);
+            if(!userCollection.getAchievementIds().contains(5))userCollection.getAchievementIds().add(5);
         }else if(userAchievements.getCumulativeLoginDays()==7){
-            userCollection.getLabelIds().add(6);
+            if(!userCollection.getLabelIds().contains(6))userCollection.getLabelIds().add(6);
+            if(!userCollection.getAchievementIds().contains(6))userCollection.getAchievementIds().add(6);
         }else if(userAchievements.getCumulativeLoginDays()==10){
-            userCollection.getLabelIds().add(7);
+            if(!userCollection.getLabelIds().contains(7))userCollection.getLabelIds().add(7);
+            if(!userCollection.getAchievementIds().contains(7))userCollection.getAchievementIds().add(7);
         }else if(userAchievements.getCumulativeLoginDays()==15){
-            userCollection.getLabelIds().add(8);
+            if(!userCollection.getLabelIds().contains(8))userCollection.getLabelIds().add(8);
+            if(!userCollection.getAchievementIds().contains(8))userCollection.getAchievementIds().add(8);
         }else if(userAchievements.getCumulativeLoginDays()==30){
-            userCollection.getLabelIds().add(9);
+            if(!userCollection.getLabelIds().contains(9))userCollection.getLabelIds().add(9);
+            if(!userCollection.getAchievementIds().contains(9))userCollection.getAchievementIds().add(9);
         }
         // 연속 접속
         if(userAchievements.getConsecutiveLoginDays()==2){
-            userCollection.getLabelIds().add(11);
-            userCollection.getSkinIds().add(22);
+            if(!userCollection.getLabelIds().contains(11))userCollection.getLabelIds().add(11);
+            if(!userCollection.getSkinIds().contains(22))userCollection.getSkinIds().add(22);
+            if(!userCollection.getAchievementIds().contains(11))userCollection.getAchievementIds().add(11);
         }else if(userAchievements.getConsecutiveLoginDays()==3){
-            userCollection.getLabelIds().add(12);
-            userCollection.getSkinIds().add(13);
+            if(!userCollection.getLabelIds().contains(12))userCollection.getLabelIds().add(12);
+            if(!userCollection.getSkinIds().contains(13))userCollection.getSkinIds().add(13);
+            if(!userCollection.getAchievementIds().contains(12))userCollection.getAchievementIds().add(12);
         }else if(userAchievements.getConsecutiveLoginDays()==4){
-            userCollection.getLabelIds().add(13);
-            userCollection.getSkinIds().add(14);
+            if(!userCollection.getLabelIds().contains(13))userCollection.getLabelIds().add(13);
+            if(!userCollection.getSkinIds().contains(14))userCollection.getSkinIds().add(14);
+            if(!userCollection.getAchievementIds().contains(13))userCollection.getAchievementIds().add(13);
         }else if(userAchievements.getConsecutiveLoginDays()==5){
-            userCollection.getLabelIds().add(14);
+            if(!userCollection.getLabelIds().contains(14))userCollection.getLabelIds().add(14);
+            if(!userCollection.getAchievementIds().contains(14))userCollection.getAchievementIds().add(14);
         }else if(userAchievements.getConsecutiveLoginDays()==6){
-            userCollection.getLabelIds().add(15);
+            if(!userCollection.getLabelIds().contains(15))userCollection.getLabelIds().add(15);
+            if(!userCollection.getAchievementIds().contains(15))userCollection.getAchievementIds().add(15);
         }else if(userAchievements.getConsecutiveLoginDays()==7){
-            userCollection.getLabelIds().add(16);
+            if(!userCollection.getLabelIds().contains(16))userCollection.getLabelIds().add(16);
+            if(!userCollection.getAchievementIds().contains(16))userCollection.getAchievementIds().add(16);
         }else if(userAchievements.getConsecutiveLoginDays()==8){
-            userCollection.getLabelIds().add(17);
+            if(!userCollection.getLabelIds().contains(17))userCollection.getLabelIds().add(17);
+            if(!userCollection.getAchievementIds().contains(17))userCollection.getAchievementIds().add(17);
         }else if(userAchievements.getConsecutiveLoginDays()==9){
-            userCollection.getLabelIds().add(18);
+            if(!userCollection.getLabelIds().contains(18))userCollection.getLabelIds().add(18);
+            if(!userCollection.getAchievementIds().contains(18))userCollection.getAchievementIds().add(18);
         }else if(userAchievements.getConsecutiveLoginDays()==10){
-            userCollection.getLabelIds().add(19);
+            if(!userCollection.getLabelIds().contains(19))userCollection.getLabelIds().add(19);
+            if(!userCollection.getAchievementIds().contains(19))userCollection.getAchievementIds().add(19);
         }else if(userAchievements.getConsecutiveLoginDays()==12){
-            userCollection.getLabelIds().add(20);
+            if(!userCollection.getLabelIds().contains(20))userCollection.getLabelIds().add(20);
+            if(!userCollection.getAchievementIds().contains(20))userCollection.getAchievementIds().add(20);
         }else if(userAchievements.getConsecutiveLoginDays()==14){
-            userCollection.getLabelIds().add(21);
+            if(!userCollection.getLabelIds().contains(21))userCollection.getLabelIds().add(21);
+            if(!userCollection.getAchievementIds().contains(21))userCollection.getAchievementIds().add(21);
         }else if(userAchievements.getConsecutiveLoginDays()==16){
-            userCollection.getLabelIds().add(22);
+            if(!userCollection.getLabelIds().contains(22))userCollection.getLabelIds().add(22);
+            if(!userCollection.getAchievementIds().contains(22))userCollection.getAchievementIds().add(22);
         }else if(userAchievements.getConsecutiveLoginDays()==18){
-            userCollection.getLabelIds().add(23);
+            if(!userCollection.getLabelIds().contains(23))userCollection.getLabelIds().add(23);
+            if(!userCollection.getAchievementIds().contains(23))userCollection.getAchievementIds().add(23);
         }else if(userAchievements.getConsecutiveLoginDays()==20){
-            userCollection.getLabelIds().add(24);
+            if(!userCollection.getLabelIds().contains(24))userCollection.getLabelIds().add(24);
+            if(!userCollection.getAchievementIds().contains(24))userCollection.getAchievementIds().add(24);
         }
 
         userAchievementsRepository.save(userAchievements);
