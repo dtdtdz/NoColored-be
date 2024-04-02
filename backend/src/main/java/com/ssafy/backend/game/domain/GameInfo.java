@@ -78,6 +78,7 @@ public class GameInfo {
         userGameInfoList = new LinkedList<>();
         startDate = LocalDateTime.now();
         setSecond(5);
+        setItemTime();
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
         random = new Random();
@@ -196,23 +197,16 @@ public class GameInfo {
     }
 
     private void itemManageProcess(long dt){
-        //할당된 duration 전부 소친하면...
-//        if (useItem!=null){
-//            itemDuration-=dt;
-//            if (itemDuration<=0){
-//                useItem = null;
-//            }
-//        }
         if (curItem==null) return;
         if (curItem.equals(GameItemType.NO_ITEM)){
             if (itemTime<time){
+                idxItemY = random.nextInt(ITEM_Y_ARR.length);
                 curItem = GameItemType.valueOf((byte)(random.nextInt(GameItemType.size()-1)+1));
 //                curItem = GameItemType.STOP_NPC;
                 setItemTime();
             }
         } else if (itemTime-(ITEM_CREATE_INTERVAL-ITEM_REMOVE_INTERVAL)*1000L<time){
             curItem = GameItemType.NO_ITEM;
-            idxItemY = random.nextInt(ITEM_Y_ARR.length);
             effectList.add(new Effect(EffectType.ITEM_TIME_OUT, ITEM_X,
                     ITEM_Y_ARR[idxItemY]));
         }
@@ -502,5 +496,9 @@ public class GameInfo {
             }
         }
 
+    }
+
+    public void setEndDate(){
+        endDate = LocalDateTime.now();
     }
 }

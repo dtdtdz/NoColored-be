@@ -185,6 +185,7 @@ public class GameServiceImpl implements GameService {
 //    }
 
     private void gameLogic(){
+        long t = System.currentTimeMillis();
         try {
             inGameCollection.updateGameList();
             Iterator<GameInfo> gameInfoIterator = inGameCollection.getGameInfoIterator();
@@ -210,7 +211,7 @@ public class GameServiceImpl implements GameService {
         } catch (Exception e){
             e.printStackTrace();
         }
-
+        System.out.println(System.currentTimeMillis()-t);
     }
     private void dataSave(GameInfo gameInfo){
 
@@ -465,6 +466,7 @@ public class GameServiceImpl implements GameService {
     private void gameClose(GameInfo gameInfo){
 //        roomUuid있으면 해당 룸으로 보낸다.
         System.out.println("game close");
+        gameInfo.setEndDate();
 
         // 순위 정하기
         PriorityQueue<UserGameInfo> pq = new PriorityQueue<UserGameInfo>((x,y)->{
