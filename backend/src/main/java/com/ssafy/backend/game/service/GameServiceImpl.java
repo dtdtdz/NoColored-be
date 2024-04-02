@@ -112,6 +112,7 @@ public class GameServiceImpl implements GameService {
         } else {
             userAccessInfo.clearPosition();
         }
+
         return resultDto;
     }
 

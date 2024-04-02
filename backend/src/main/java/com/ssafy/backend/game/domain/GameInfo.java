@@ -73,7 +73,7 @@ public class GameInfo {
         users = new LinkedHashMap<>();
         userGameInfoList = new LinkedList<>();
         startDate = LocalDateTime.now();
-        setSecond(3);
+        setSecond(5);
         floor = new boolean[MAP_WIDTH][MAP_HEIGHT];
         characterInfoArr = new CharacterInfo[CHARACTER_NUM];
         random = new Random();
