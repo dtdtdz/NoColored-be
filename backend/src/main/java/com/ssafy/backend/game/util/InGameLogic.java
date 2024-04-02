@@ -14,7 +14,6 @@ public class InGameLogic {
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
     }
     public void create(GameInfo gameInfo){
-        long dt1 = System.currentTimeMillis();
         gameInfo.tick();
         //http 요청을 10초 기다린다. -> gameinfo 생성자
         //모든 유저준비 완료
@@ -30,10 +29,8 @@ public class InGameLogic {
             gameInfo.sendBuffer();
         }
         long dt2 =System.currentTimeMillis();
-        if (dt2-dt1>50) System.out.println("create"+(dt2-dt1));
     }
     public void ready(GameInfo gameInfo){
-        long dt1 = System.currentTimeMillis();
 
         gameInfo.tick();
         if (gameInfo.checkSecond()){
@@ -55,7 +52,6 @@ public class InGameLogic {
         }
 
         long dt2 =System.currentTimeMillis();
-        if (dt2-dt1>50) System.out.println("ready"+(dt2-dt1));
     }
 
     public void play(GameInfo gameInfo){
@@ -212,7 +208,9 @@ public class InGameLogic {
             }
         }
 
-
+        long dt2 =System.currentTimeMillis();
+        if (dt2-dt1>50) System.out.println("physics"+(dt2-dt1));
+        dt1 = dt2;
         gameInfo.applyStep();
         gameInfo.applyItem();
 
@@ -224,8 +222,8 @@ public class InGameLogic {
         gameInfo.putEffect();
         gameInfo.putSkin();
         gameInfo.sendBuffer();
-        long dt2 =System.currentTimeMillis();
-        if (dt2-dt1>50) System.out.println("play"+(dt2-dt1));
+        dt2 =System.currentTimeMillis();
+        if (dt2-dt1>50) System.out.println("play end"+(dt2-dt1));
     }
     public boolean indexCheck(int idx, int size){
         return idx>=0 && idx<size;
