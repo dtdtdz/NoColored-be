@@ -2,6 +2,7 @@ package com.ssafy.backend.game.util;
 
 import com.ssafy.backend.game.domain.*;
 import com.ssafy.backend.game.type.GameCharacterState;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -13,7 +14,7 @@ public class InGameLogic {
 
     private final PriorityQueue<CharacterInfo> characterQueue;
     private final ScheduledExecutorService scheduledExecutorService;
-    public InGameLogic(ScheduledExecutorService scheduledExecutorService){
+    public InGameLogic(@Qualifier("authScheduledExecutorService") ScheduledExecutorService scheduledExecutorService){
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
         this.scheduledExecutorService = scheduledExecutorService;
     }
