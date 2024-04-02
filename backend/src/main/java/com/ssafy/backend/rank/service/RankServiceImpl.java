@@ -89,7 +89,6 @@ public class RankServiceImpl implements RankService{
         for (String userCode : topRanks) {
             Double score = redisTemplate.opsForZSet().score("userRank", userCode);
             int rating= score.intValue();
-            System.out.println(userCode+" 점수 : "+rating);
 
             userProfileRepository.findByUserCode(userCode).ifPresent(userProfile -> {
                 RankDto rankDto = RankDto.builder()
