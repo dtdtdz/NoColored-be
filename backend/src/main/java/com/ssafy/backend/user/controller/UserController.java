@@ -67,7 +67,7 @@ public class UserController {
         try {
             UserAccessInfo userAccessInfo = userService.signUp(user.getId(), user.getPassword(), user.getNickname());
             String token = userService.generateToken(userAccessInfo);
-            if (token==null) ResponseEntity.internalServerError().body("Please try to login.");
+            if (token==null) return ResponseEntity.internalServerError().body("Please try to login.");
             return ResponseEntity.ok(token);
         } catch (Exception e){
             return ResponseEntity.internalServerError().body("User registration failed.");
