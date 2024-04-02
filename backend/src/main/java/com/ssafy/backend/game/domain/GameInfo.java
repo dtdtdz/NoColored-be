@@ -107,6 +107,9 @@ public class GameInfo {
         }
         Collections.shuffle(idxs);
 //        Collections.shuffle(floorPos);
+        for (int i=0; i<10; i++){
+            floorPos.remove(0);
+        }
 
         for (byte i=0; i<userList.size(); i++){
             UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),

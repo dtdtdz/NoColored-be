@@ -10,5 +10,6 @@ public interface MessageProcessService {
     void textMessageProcessing(WebSocketSession session, TextMessage message) throws IOException;
     void binaryMessageProcessing(WebSocketSession session, BinaryMessage message);
     void setAuthSessionTimeOut(WebSocketSession session) throws Exception;
+    void setRoomQuitWarningTimeOut(WebSocketSession session);
 
 }

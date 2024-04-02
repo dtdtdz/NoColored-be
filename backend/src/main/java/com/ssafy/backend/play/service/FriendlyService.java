@@ -21,10 +21,9 @@ public interface FriendlyService {
 
     ResponseEntity<?> renewRoom(UserAccessInfo userAccessInfo, String title, String password, int mapId);
 
-    ResponseEntity<?> quitRoom(UserAccessInfo userAccessInfo);
+    ResponseEntity<?> quitRoomRequest(UserAccessInfo userAccessInfo);
 
-    Map<Integer, RoomInfo> getRoomInfoMap();
-    Map<UUID, RoomInfo> getUuidRoomInfoMap();
     void sendRoomDto(RoomInfo roomInfo);
+    public void quitRoom(UserAccessInfo userAccessInfo);
 
 }

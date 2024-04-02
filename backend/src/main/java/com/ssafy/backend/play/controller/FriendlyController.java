@@ -3,10 +3,7 @@ package com.ssafy.backend.play.controller;
 
 
 import com.ssafy.backend.websocket.domain.UserAccessInfo;
-import com.ssafy.backend.play.dto.RoomDto;
-import com.ssafy.backend.play.dto.UserRoomDto;
 import com.ssafy.backend.play.service.FriendlyService;
-import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.user.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -79,7 +76,7 @@ public class FriendlyController {
     @GetMapping("/out")
     private ResponseEntity<?> quitRoom(@RequestHeader("Authorization") String token){
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
-        return friendlyService.quitRoom(userAccessInfo);
+        return friendlyService.quitRoomRequest(userAccessInfo);
     }
 
 }
