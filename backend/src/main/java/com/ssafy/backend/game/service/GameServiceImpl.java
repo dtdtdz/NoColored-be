@@ -237,27 +237,34 @@ public class GameServiceImpl implements GameService {
                     userAchievements.setCumulativePlayCount(userAchievements.getCumulativePlayCount()+1);
                     // 누적 플레이 수 업적
                     if(userAchievements.getCumulativePlayCount()==1){
-                        userCollection.getLabelIds().add(25);
-                        userCollection.getSkinIds().add(1);
+                        if(!userCollection.getLabelIds().contains(25))userCollection.getLabelIds().add(25);
+                        if(!userCollection.getSkinIds().contains(1))userCollection.getSkinIds().add(1);
+                        if(!userCollection.getAchievementIds().contains(25))userCollection.getAchievementIds().add(25);
 //                        reward.getSkins().add("pastelyellow");
                     }else if(userAchievements.getCumulativePlayCount()==3){
-                        userCollection.getLabelIds().add(26);
-                        userCollection.getSkinIds().add(2);
+                        if(!userCollection.getLabelIds().contains(26))userCollection.getLabelIds().add(26);
+                        if(!userCollection.getSkinIds().contains(2))userCollection.getSkinIds().add(2);
+                        if(!userCollection.getAchievementIds().contains(26))userCollection.getAchievementIds().add(26);
 //                        reward.getSkins().add("pastelred");
                     }else if(userAchievements.getCumulativePlayCount()==5){
-                        userCollection.getLabelIds().add(27);
-                        userCollection.getSkinIds().add(3);
+                        if(!userCollection.getLabelIds().contains(27))userCollection.getLabelIds().add(27);
+                        if(!userCollection.getSkinIds().contains(3))userCollection.getSkinIds().add(3);
+                        if(!userCollection.getAchievementIds().contains(27))userCollection.getAchievementIds().add(27);
 //                        reward.getSkins().add("pastelpink");
                     }else if(userAchievements.getCumulativePlayCount()==10){
-                        userCollection.getLabelIds().add(28);
-                        userCollection.getSkinIds().add(4);
+                        if(!userCollection.getLabelIds().contains(28))userCollection.getLabelIds().add(28);
+                        if(!userCollection.getSkinIds().contains(4))userCollection.getSkinIds().add(4);
+                        if(!userCollection.getAchievementIds().contains(28))userCollection.getAchievementIds().add(28);
 //                        reward.getSkins().add("pastelgreen");
                     }else if(userAchievements.getCumulativePlayCount()==30){
-                        userCollection.getLabelIds().add(29);
+                        if(!userCollection.getLabelIds().contains(29))userCollection.getLabelIds().add(29);
+                        if(!userCollection.getAchievementIds().contains(29))userCollection.getAchievementIds().add(29);
                     }else if(userAchievements.getCumulativePlayCount()==50){
-                        userCollection.getLabelIds().add(30);
+                        if(!userCollection.getLabelIds().contains(30))userCollection.getLabelIds().add(30);
+                        if(!userCollection.getAchievementIds().contains(30))userCollection.getAchievementIds().add(30);
                     }else if(userAchievements.getCumulativePlayCount()==100) {
-                        userCollection.getLabelIds().add(31);
+                        if(!userCollection.getLabelIds().contains(31))userCollection.getLabelIds().add(31);
+                        if(!userCollection.getAchievementIds().contains(31))userCollection.getAchievementIds().add(31);
                     }
 
                     int rank=userPlayInfo.getRank();
@@ -269,73 +276,91 @@ public class GameServiceImpl implements GameService {
                     }
                     // 승 업적
                     if(userAchievements.getCumulativeWinCount()==1){
-                        userCollection.getLabelIds().add(32);
-                        userCollection.getSkinIds().add(5);
+                        if(!userCollection.getLabelIds().contains(32))userCollection.getLabelIds().add(32);
+                        if(!userCollection.getSkinIds().contains(5))userCollection.getSkinIds().add(5);
+                        if(!userCollection.getAchievementIds().contains(32))userCollection.getAchievementIds().add(32);
 //                        reward.getSkins().add("pastelblue");
                     }else if(userAchievements.getCumulativeWinCount()==2){
-                        userCollection.getLabelIds().add(33);
-                        userCollection.getSkinIds().add(7);
+                        if(!userCollection.getLabelIds().contains(33))userCollection.getLabelIds().add(33);
+                        if(!userCollection.getSkinIds().contains(7))userCollection.getSkinIds().add(7);
+                        if(!userCollection.getAchievementIds().contains(33))userCollection.getAchievementIds().add(33);
 //                        reward.getSkins().add("googlered");
                     }else if(userAchievements.getCumulativeWinCount()==3){
-                        userCollection.getLabelIds().add(34);
-                        userCollection.getSkinIds().add(8);
+                        if(!userCollection.getLabelIds().contains(34))userCollection.getLabelIds().add(34);
+                        if(!userCollection.getSkinIds().contains(8))userCollection.getSkinIds().add(8);
+                        if(!userCollection.getAchievementIds().contains(34))userCollection.getAchievementIds().add(34);
 //                        reward.getSkins().add("googleorange");
                     }else if(userAchievements.getCumulativeWinCount()==5){
-                        userCollection.getLabelIds().add(35);
-                        userCollection.getSkinIds().add(9);
+                        if(!userCollection.getLabelIds().contains(35))userCollection.getLabelIds().add(35);
+                        if(!userCollection.getSkinIds().contains(9))userCollection.getSkinIds().add(9);
+                        if(!userCollection.getAchievementIds().contains(35))userCollection.getAchievementIds().add(35);
 //                        reward.getSkins().add("googlegreen");
                     }else if(userAchievements.getCumulativeWinCount()==7){
-                        userCollection.getLabelIds().add(36);
-                        userCollection.getSkinIds().add(10);
+                        if(!userCollection.getLabelIds().contains(36))userCollection.getLabelIds().add(36);
+                        if(!userCollection.getSkinIds().contains(10))userCollection.getSkinIds().add(10);
+                        if(!userCollection.getAchievementIds().contains(36))userCollection.getAchievementIds().add(36);
 //                        reward.getSkins().add("googleblue");
                     }else if(userAchievements.getCumulativeWinCount()==10){
-                        userCollection.getLabelIds().add(37);
-                        userCollection.getSkinIds().add(28);
+                        if(!userCollection.getLabelIds().contains(37))userCollection.getLabelIds().add(37);
+                        if(!userCollection.getSkinIds().contains(28))userCollection.getSkinIds().add(28);
+                        if(!userCollection.getAchievementIds().contains(37))userCollection.getAchievementIds().add(37);
 //                        reward.getSkins().add("basicyellow-sunglass");
                     }else if(userAchievements.getCumulativeWinCount()==20){
-                        userCollection.getLabelIds().add(38);
+                        if(!userCollection.getLabelIds().contains(38))userCollection.getLabelIds().add(38);
+                        if(!userCollection.getAchievementIds().contains(38))userCollection.getAchievementIds().add(38);
                     }
                     // 패 업적
                     if(userAchievements.getCumulativeLoseCount()==1){
-                        userCollection.getLabelIds().add(39);
+                        if(!userCollection.getLabelIds().contains(39))userCollection.getLabelIds().add(39);
+                        if(!userCollection.getAchievementIds().contains(39))userCollection.getAchievementIds().add(39);
 //                        userCollection.getSkinIds().add(6);
 //                        reward.getSkins().add("npcWhite");
                     }else if(userAchievements.getCumulativeLoseCount()==2){
-                        userCollection.getLabelIds().add(40);
-                        userCollection.getSkinIds().add(24);
+                        if(!userCollection.getLabelIds().contains(40))userCollection.getLabelIds().add(40);
+                        if(!userCollection.getSkinIds().contains(24))userCollection.getSkinIds().add(24);
+                        if(!userCollection.getAchievementIds().contains(40))userCollection.getAchievementIds().add(40);
 //                        reward.getSkins().add("basicgreen-sunglass");
                     }else if(userAchievements.getCumulativeLoseCount()==3){
-                        userCollection.getLabelIds().add(41);
-                        userCollection.getSkinIds().add(15);
+                        if(!userCollection.getLabelIds().contains(41))userCollection.getLabelIds().add(41);
+                        if(!userCollection.getSkinIds().contains(15))userCollection.getSkinIds().add(15);
+                        if(!userCollection.getAchievementIds().contains(41))userCollection.getAchievementIds().add(41);
 //                        reward.getSkins().add("basicred");
                     }else if(userAchievements.getCumulativeLoseCount()==5){
-                        userCollection.getLabelIds().add(42);
-                        userCollection.getSkinIds().add(16);
+                        if(!userCollection.getLabelIds().contains(42))userCollection.getLabelIds().add(42);
+                        if(!userCollection.getSkinIds().contains(16))userCollection.getSkinIds().add(16);
+                        if(!userCollection.getAchievementIds().contains(42))userCollection.getAchievementIds().add(42);
 //                        reward.getSkins().add("basicred-sunglass");
                     }else if(userAchievements.getCumulativeLoseCount()==7){
-                        userCollection.getLabelIds().add(43);
+                        if(!userCollection.getLabelIds().contains(43))userCollection.getLabelIds().add(43);
+                        if(!userCollection.getAchievementIds().contains(43))userCollection.getAchievementIds().add(43);
                     }else if(userAchievements.getCumulativeLoseCount()==10){
-                        userCollection.getLabelIds().add(44);
+                        if(!userCollection.getLabelIds().contains(44))userCollection.getLabelIds().add(44);
+                        if(!userCollection.getAchievementIds().contains(44))userCollection.getAchievementIds().add(44);
                     }
 
                     // 누적 밟기
                     int step=userPlayInfo.getStep();
                     userAchievements.setStep(userAchievements.getStep()+step);
                     if(userAchievements.getStep()>=100){
-                        userCollection.getLabelIds().add(49);
+                        if(!userCollection.getLabelIds().contains(49))userCollection.getLabelIds().add(49);
+                        if(!userCollection.getAchievementIds().contains(49))userCollection.getAchievementIds().add(49);
                     }else if(userAchievements.getStep()>=50){
-                        userCollection.getLabelIds().add(48);
+                        if(!userCollection.getLabelIds().contains(48))userCollection.getLabelIds().add(48);
+                        if(!userCollection.getAchievementIds().contains(48))userCollection.getAchievementIds().add(48);
                     }else if(userAchievements.getStep()==20){
-                        userCollection.getLabelIds().add(47);
-                        userCollection.getSkinIds().add(24);
+                        if(!userCollection.getLabelIds().contains(47))userCollection.getLabelIds().add(47);
+                        if(!userCollection.getSkinIds().contains(24))userCollection.getSkinIds().add(24);
+                        if(!userCollection.getAchievementIds().contains(47))userCollection.getAchievementIds().add(47);
 //                        reward.getSkins().add("basicgreen-sunglass");
                     }else if(userAchievements.getStep()>=10){
-                        userCollection.getLabelIds().add(46);
-                        userCollection.getSkinIds().add(18);
+                        if(!userCollection.getLabelIds().contains(46))userCollection.getLabelIds().add(46);
+                        if(!userCollection.getSkinIds().contains(18))userCollection.getSkinIds().add(18);
+                        if(!userCollection.getAchievementIds().contains(46))userCollection.getAchievementIds().add(46);
 //                        reward.getSkins().add("basicred-butterfly");
                     }else if(userAchievements.getStep()>=5){
-                        userCollection.getLabelIds().add(45);
-                        userCollection.getSkinIds().add(17);
+                        if(!userCollection.getLabelIds().contains(45))userCollection.getLabelIds().add(45);
+                        if(!userCollection.getSkinIds().contains(17)) userCollection.getSkinIds().add(17);
+                        if(!userCollection.getAchievementIds().contains(45))userCollection.getAchievementIds().add(45);
 //                        reward.getSkins().add("basicred-magichat");
                     }
 
@@ -343,55 +368,69 @@ public class GameServiceImpl implements GameService {
                     int stepped=userPlayInfo.getStepped();
                     userAchievements.setStepped(userAchievements.getStepped()+stepped);
                     if(userAchievements.getStepped()>=200){
-                        userCollection.getLabelIds().add(54);
+                        if(!userCollection.getLabelIds().contains(54))userCollection.getLabelIds().add(54);
+                        if(!userCollection.getAchievementIds().contains(54))userCollection.getAchievementIds().add(54);
                     }else if(userAchievements.getStepped()>=100){
-                        userCollection.getLabelIds().add(53);
+                        if(!userCollection.getLabelIds().contains(53))userCollection.getLabelIds().add(53);
+                        if(!userCollection.getAchievementIds().contains(53))userCollection.getAchievementIds().add(53);
                     }else if(userAchievements.getStepped()>=50){
-                        userCollection.getLabelIds().add(52);
+                        if(!userCollection.getLabelIds().contains(52))userCollection.getLabelIds().add(52);
+                        if(!userCollection.getAchievementIds().contains(52))userCollection.getAchievementIds().add(52);
                     }else if(userAchievements.getStepped()>=10){
-                        userCollection.getLabelIds().add(51);
-                        userCollection.getSkinIds().add(17);
+                        if(!userCollection.getLabelIds().contains(51)) userCollection.getLabelIds().add(51);
+                        if(!userCollection.getSkinIds().contains(17))userCollection.getSkinIds().add(17);
+                        if(!userCollection.getAchievementIds().contains(51))userCollection.getAchievementIds().add(51);
 //                        reward.getSkins().add("basicred-magichat");
                     }else if(userAchievements.getStepped()>=5){
-                        userCollection.getLabelIds().add(50);
+                        if(!userCollection.getLabelIds().contains(50))userCollection.getLabelIds().add(50);
+                        if(!userCollection.getAchievementIds().contains(50))userCollection.getAchievementIds().add(50);
                     }
 
                     // 0데스
                     if(stepped==0){
-                        userCollection.getLabelIds().add(55);
+                        if(!userCollection.getLabelIds().contains(55))userCollection.getLabelIds().add(55);
+                        if(!userCollection.getAchievementIds().contains(55))userCollection.getAchievementIds().add(55);
                     }
 
                     // 아이템 획득 수
                     int itemCount=userPlayInfo.getItemCount();
                     userAchievements.setItemCount(userAchievements.getItemCount()+itemCount);
                     if(userAchievements.getItemCount()>=20){
-                        userCollection.getLabelIds().add(59);
+                        if(!userCollection.getLabelIds().contains(59))userCollection.getLabelIds().add(59);
+                        if(!userCollection.getAchievementIds().contains(59))userCollection.getAchievementIds().add(59);
                     }else if(userAchievements.getItemCount()>=10){
-                        userCollection.getLabelIds().add(58);
-                        userCollection.getSkinIds().add(17);
+                        if(!userCollection.getLabelIds().contains(58))userCollection.getLabelIds().add(58);
+                        if(!userCollection.getSkinIds().contains(17))userCollection.getSkinIds().add(17);
+                        if(!userCollection.getAchievementIds().contains(58))userCollection.getAchievementIds().add(58);
 //                        reward.getSkins().add("basicred-magichat");
                     }else if(userAchievements.getItemCount()>=5){
-                        userCollection.getLabelIds().add(57);
-                        userCollection.getSkinIds().add(20);
+                        if(!userCollection.getLabelIds().contains(57))userCollection.getLabelIds().add(57);
+                        if(!userCollection.getSkinIds().contains(20))userCollection.getSkinIds().add(20);
+                        if(!userCollection.getAchievementIds().contains(57))userCollection.getAchievementIds().add(57);
 //                        reward.getSkins().add("basicpink-sunglass");
                     }else if(userAchievements.getItemCount()>=1){
-                        userCollection.getLabelIds().add(56);
-                        userCollection.getSkinIds().add(18);
+                        if(!userCollection.getLabelIds().contains(56))userCollection.getLabelIds().add(56);
+                        if(!userCollection.getSkinIds().contains(18))userCollection.getSkinIds().add(18);
+                        if(!userCollection.getAchievementIds().contains(56))userCollection.getAchievementIds().add(56);
 //                        reward.getSkins().add("basicred-butterfly");
                     }
 
-                    // 누적 플레이타임(분)
+                    // 누적 플레이타임(초)
                     // long playTime=Duration.between(userPlayInfo.getStartDate(),userPlayInfo.getEndDate()).toMinutes();
                     long playTime=GAME_TIME;
                     userAchievements.setPlaytime(userAchievements.getPlaytime()+playTime);
-                    if(userAchievements.getPlaytime()>=600){
-                        userCollection.getLabelIds().add(63);
-                    }else if(userAchievements.getItemCount()>=300){
-                        userCollection.getLabelIds().add(62);
-                    }else if(userAchievements.getItemCount()>=120){
-                        userCollection.getLabelIds().add(61);
-                    }else if(userAchievements.getItemCount()>=60){
-                        userCollection.getLabelIds().add(60);
+                    if(userAchievements.getPlaytime()>=36000){
+                        if(!userCollection.getLabelIds().contains(63))userCollection.getLabelIds().add(63);
+                        if(!userCollection.getAchievementIds().contains(63))userCollection.getAchievementIds().add(63);
+                    }else if(userAchievements.getItemCount()>=18000){
+                        if(!userCollection.getLabelIds().contains(62))userCollection.getLabelIds().add(62);
+                        if(!userCollection.getAchievementIds().contains(62))userCollection.getAchievementIds().add(62);
+                    }else if(userAchievements.getItemCount()>=7200){
+                        if(!userCollection.getLabelIds().contains(61))userCollection.getLabelIds().add(61);
+                        if(!userCollection.getAchievementIds().contains(61))userCollection.getAchievementIds().add(61);
+                    }else if(userAchievements.getItemCount()>=3600){
+                        if(!userCollection.getLabelIds().contains(60))userCollection.getLabelIds().add(60);
+                        if(!userCollection.getAchievementIds().contains(60))userCollection.getAchievementIds().add(60);
                     }
 
                     // mongo, redis 업데이트
@@ -499,13 +538,14 @@ public class GameServiceImpl implements GameService {
             userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
 //            System.out.println(userProfile.getUserCode()+" exp 테스트 후 "+userProfile.getUserExp());
 
-//            System.out.println(userProfile.getUserCode()+" rating 테스트 전 "+userProfile.getUserRating());
-            userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
-//            System.out.println(userProfile.getUserCode()+" rating 테스트 후 "+userProfile.getUserRating());
-            
-//            userAccessInfo.getUserProfileDto().setRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
-            userAccessInfo.getUserProfileDto().setRating(userProfile.getUserRating());
-//            userAccessInfo.setUserProfile(userProfile);
+            // room으로 처리
+            // 매칭일때만 rating 계산해주기
+            if(gameInfo.getRoom()==null){
+                userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
+
+                userAccessInfo.getUserProfileDto().setRating(userProfile.getUserRating());
+            }
+
         }
         ResultInfo resultInfo = new ResultInfo(gameInfo);
 
