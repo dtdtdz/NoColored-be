@@ -112,6 +112,7 @@ public class GameServiceImpl implements GameService {
             boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
             tierDto.setUpgrade(tierUpgrade);
             resultDto.getReward().setTier(tierDto);
+            userAccessInfo.clearPosition();
 
             // 게스트 아니면
 //            if( !userAccessInfo.getUserProfile().isGuest()){
@@ -137,7 +138,7 @@ public class GameServiceImpl implements GameService {
         }
         // 스킨 처리
         resultDto.getReward().setSkins(new ArrayList<>());
-        userAccessInfo.clearPosition();
+
 //        if (userAccessInfo.getResultInfo().getGameInfo().getRoom()!=null){
 //            // System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
 //            userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
