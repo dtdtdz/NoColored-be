@@ -69,7 +69,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             UserAccessInfo result = (UserAccessInfo)handler.apply(jsonNode.get("data"));
             if (result!=null) { //토큰 결과 userAccessInfo 있는가?
 
-                if (result.getSession()!=null&&(!result.getSession().isOpen())) { //userAccessInfo 에 세션이 열려있는가?
+                if (result.getSession()!=null&&result.getSession().isOpen()) { //userAccessInfo 에 세션이 열려있는가?
                     //연결을 차단한다.
                     jwtUtil.deleteTokenRedis(jsonNode.get("data").asText());
                     SynchronizedSend.textSend(session, SendTextMessageType.INVALID_TOKEN.getValue(), null);
