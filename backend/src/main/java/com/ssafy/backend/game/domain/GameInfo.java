@@ -62,6 +62,8 @@ public class GameInfo {
     public static final int ITEM_SIZE = 32;
     public static final float ITEM_X = (WALL_WIDTH+MAP_WIDTH/2f)*BLOCK_SIZE;
     public static final float[] ITEM_Y_ARR = new float[] {3*BLOCK_SIZE, 7*BLOCK_SIZE, 11*BLOCK_SIZE, 15*BLOCK_SIZE};
+    public static final int MOVE_CLONE_PROP = 250;
+
 
     public static final ByteBuffer[] buffer = new ByteBuffer[4];
     static {
@@ -107,17 +109,17 @@ public class GameInfo {
             idxs.add(i);
         }
         Collections.shuffle(idxs);
-//        Collections.shuffle(floorPos);
-        for (int i=0; i<20; i++){
-            floorPos.remove(0);
-        }
+        Collections.shuffle(floorPos);
+//        for (int i=0; i<20; i++){
+//            floorPos.remove(0);
+//        }
 
         for (byte i=0; i<userList.size(); i++){
             UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
                     idxs.get(i),i,(room==null)?"friendly":"ranking");
             CharacterInfo characterInfo = new CharacterInfo(
                     (floorPos.get(i)[0]+0.5f)*BLOCK_SIZE,
-                    floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f-BLOCK_SIZE,
+                    floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
                     (int) ((random.nextInt(2)-0.5f)*2),
                     userGameInfo
             );
@@ -289,7 +291,7 @@ public class GameInfo {
     public void setCharacterDirection() {
         for (CharacterInfo characterInfo:characterInfoArr){
             if (characterInfo.getUserGameInfo()!=null) continue;
-            if (random.nextInt(300) < 1){
+            if (random.nextInt(MOVE_CLONE_PROP) < 1){
                 characterInfo.setDir(-characterInfo.getDir());
             }
         }
