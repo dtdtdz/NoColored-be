@@ -96,8 +96,8 @@ public class GameServiceImpl implements GameService {
         tierList.put("rgb",7);
         tierList.put("origin",8);
 
-        System.out.println("테스트 1234 1345");
-        System.out.println("테스트 : "+userAccessInfo.getResultInfo().getGameInfo().getRoom());
+//        System.out.println("테스트 1234 1345");
+//        System.out.println("테스트 : "+userAccessInfo.getResultInfo().getGameInfo().getRoom());
 
         // 매칭이면
         if (userAccessInfo.getResultInfo().getGameInfo().getRoom()==null){
@@ -485,12 +485,17 @@ public class GameServiceImpl implements GameService {
 //            UserAchievements deepCopyOfAchievements = new UserAchievements(userAchievements);
 //            userAccessInfo.getResultInfo().setDeepCopyOfAchievements(deepCopyOfAchievements);
 
+            System.out.println("exp 테스트 전 "+userProfile.getUserExp());
             userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
-            userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
+            System.out.println("exp 테스트 후 "+userProfile.getUserExp());
 
+            System.out.println("rating 테스트 전 "+userProfile.getUserRating());
+            userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
+            System.out.println("rating 테스트 후 "+userProfile.getUserRating());
+            
 //            userAccessInfo.getUserProfileDto().setRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
             userAccessInfo.getUserProfileDto().setRating(userProfile.getUserRating());
-            userAccessInfo.setUserProfile(userProfile);
+//            userAccessInfo.setUserProfile(userProfile);
         }
         ResultInfo resultInfo = new ResultInfo(gameInfo);
 
