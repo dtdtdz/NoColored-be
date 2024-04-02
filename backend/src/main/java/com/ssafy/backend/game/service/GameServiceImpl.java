@@ -221,6 +221,9 @@ public class GameServiceImpl implements GameService {
                             entry.getKey().getUserProfile().getId()).orElse(null);
                     if (userProfile==null) throw new RuntimeException("Can't find user");
 
+                    System.out.println(userProfile.getUserCode()+" 의 exp는 "+userProfile.getUserExp());
+                    System.out.println(userProfile.getUserCode()+" 의 rating는 "+userProfile.getUserRating());
+
                     UserAccessInfo userAccessInfo=entry.getKey();
                     UserCollection userCollection=userCollectionRepository.findByUserCode(userProfile.getUserCode());
                     UserAchievements userAchievements=userAchievementsRepository.findByUserCode(userProfile.getUserCode());
@@ -485,13 +488,13 @@ public class GameServiceImpl implements GameService {
 //            UserAchievements deepCopyOfAchievements = new UserAchievements(userAchievements);
 //            userAccessInfo.getResultInfo().setDeepCopyOfAchievements(deepCopyOfAchievements);
 
-            System.out.println("exp 테스트 전 "+userProfile.getUserExp());
+            System.out.println(userProfile.getUserCode()+" exp 테스트 전 "+userProfile.getUserExp());
             userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
-            System.out.println("exp 테스트 후 "+userProfile.getUserExp());
+            System.out.println(userProfile.getUserCode()+" exp 테스트 후 "+userProfile.getUserExp());
 
-            System.out.println("rating 테스트 전 "+userProfile.getUserRating());
+            System.out.println(userProfile.getUserCode()+" rating 테스트 전 "+userProfile.getUserRating());
             userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
-            System.out.println("rating 테스트 후 "+userProfile.getUserRating());
+            System.out.println(userProfile.getUserCode()+" rating 테스트 후 "+userProfile.getUserRating());
             
 //            userAccessInfo.getUserProfileDto().setRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
             userAccessInfo.getUserProfileDto().setRating(userProfile.getUserRating());
