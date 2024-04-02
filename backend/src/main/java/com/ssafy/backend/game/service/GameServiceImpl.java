@@ -397,6 +397,10 @@ public class GameServiceImpl implements GameService {
                     rankUtil.updateUserRankRedis(userProfile);
                     rankUtil.getMyRank(userAccessInfo.getUserProfileDto()); // 순위, 티어 계산
 
+                    userAccessInfo.setUserAchievements(userAchievements);
+                    userAccessInfo.setUserCollection(userCollection);
+                    userAccessInfo.setUserProfile(userProfile);
+
                     userProfileRepository.save(userProfile);
                     userCollectionRepository.save(userCollection);
                     userAchievementsRepository.save(userAchievements);
