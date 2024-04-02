@@ -88,7 +88,9 @@ public class RankServiceImpl implements RankService{
         AtomicInteger myRank = new AtomicInteger(0);
         for (String userCode : topRanks) {
             String ratingStr = (String) redisTemplate.opsForValue().get(userCode);
+            System.out.println(userCode+ " str : "+ratingStr);
             int rating = Optional.ofNullable(ratingStr).map(Integer::parseInt).orElse(0); // rating이 없는 경우 기본값으로 0을 사용
+            System.out.println(userCode+" int : "+rating);
 
             userProfileRepository.findByUserCode(userCode).ifPresent(userProfile -> {
                 RankDto rankDto = RankDto.builder()
