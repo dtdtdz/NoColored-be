@@ -13,10 +13,8 @@ import java.util.concurrent.TimeUnit;
 public class InGameLogic {
 
     private final PriorityQueue<CharacterInfo> characterQueue;
-    private final ScheduledExecutorService scheduledExecutorService;
-    public InGameLogic(@Qualifier("authScheduledExecutorService") ScheduledExecutorService scheduledExecutorService){
+    public InGameLogic(){
         characterQueue = new PriorityQueue<>(Comparator.comparingDouble(CharacterInfo::getY));
-        this.scheduledExecutorService = scheduledExecutorService;
     }
     public void create(GameInfo gameInfo){
         gameInfo.tick();
@@ -212,7 +210,6 @@ public class InGameLogic {
             }
         }
 
-        scheduledExecutorService.schedule(()->{
             long dt1 = System.currentTimeMillis();
             gameInfo.applyStep();
             gameInfo.applyItem();
@@ -229,7 +226,6 @@ public class InGameLogic {
             gameInfo.sendBuffer();
             dt2 = System.currentTimeMillis();
             if (dt2-dt1>50) System.out.println("send"+(dt2-dt1));
-        },0, TimeUnit.SECONDS);
     }
     public boolean indexCheck(int idx, int size){
         return idx>=0 && idx<size;
