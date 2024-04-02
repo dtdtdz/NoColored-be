@@ -101,23 +101,35 @@ public class GameServiceImpl implements GameService {
 
         // 매칭이면
         if (userAccessInfo.getResultInfo().getGameInfo().getRoom()==null){
-            // 게스트 아니면
-            if( !userAccessInfo.getUserProfile().isGuest()){
-                String oldTier = userAccessInfo.getUserProfileDto().getTier();
-                String newTier = tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
-                        userAccessInfo.getUserProfile().getUserRating(), userAccessInfo.getUserProfile().getUserExp());
-                userAccessInfo.getUserProfileDto().setTier(newTier);
+            // 게스트여도 티어 계산
+            String oldTier = userAccessInfo.getUserProfileDto().getTier();
+            String newTier = tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
+                    userAccessInfo.getUserProfile().getUserRating(), userAccessInfo.getUserProfile().getUserExp());
+                    userAccessInfo.getUserProfileDto().setTier(newTier);
+            TierDto tierDto = new TierDto();
+            tierDto.setNewtier(newTier);
+            tierDto.setOldtier(oldTier);
+            boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
+            tierDto.setUpgrade(tierUpgrade);
+            resultDto.getReward().setTier(tierDto);
 
-                TierDto tierDto = new TierDto();
-                tierDto.setNewtier(newTier);
-                tierDto.setOldtier(oldTier);
-                boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
-                tierDto.setUpgrade(tierUpgrade);
-                resultDto.getReward().setTier(tierDto);
-            }else{
-                // 게스트면
-                resultDto.getReward().setTier(new TierDto());
-            }
+            // 게스트 아니면
+//            if( !userAccessInfo.getUserProfile().isGuest()){
+//                String oldTier = userAccessInfo.getUserProfileDto().getTier();
+//                String newTier = tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
+//                        userAccessInfo.getUserProfile().getUserRating(), userAccessInfo.getUserProfile().getUserExp());
+//                userAccessInfo.getUserProfileDto().setTier(newTier);
+//
+//                TierDto tierDto = new TierDto();
+//                tierDto.setNewtier(newTier);
+//                tierDto.setOldtier(oldTier);
+//                boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
+//                tierDto.setUpgrade(tierUpgrade);
+//                resultDto.getReward().setTier(tierDto);
+//            }else{
+//                // 게스트면
+//                resultDto.getReward().setTier(new TierDto());
+//            }
         }else{
             // 친선전이면
             userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom()); // 추가
@@ -375,9 +387,9 @@ public class GameServiceImpl implements GameService {
                         userCollection.getLabelIds().add(60);
                     }
 
-
-
-
+                    // mongo, redis 업데이트
+                    rankUtil.updateUserRankRedis(userProfile);
+                    rankUtil.getMyRank(userAccessInfo.getUserProfileDto()); // 순위, 티어 계산
 
                     userProfileRepository.save(userProfile);
                     userCollectionRepository.save(userCollection);
@@ -475,10 +487,9 @@ public class GameServiceImpl implements GameService {
             userProfile.setUserExp(calExp(userProfile.getUserExp(),rank, gameInfo.getUsers().size()));
             userProfile.setUserRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
 
-            // mongo, redis 업데이트
-            rankUtil.updateUserRankRedis(userProfile);
-
-            userAccessInfo.getUserProfileDto().setRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
+//            userAccessInfo.getUserProfileDto().setRating(calRating(userProfile.getUserRating(), rank, gameInfo.getUsers().size()));
+            userAccessInfo.getUserProfileDto().setRating(userProfile.getUserRating());
+            userAccessInfo.setUserProfile(userProfile);
         }
         ResultInfo resultInfo = new ResultInfo(gameInfo);
 
