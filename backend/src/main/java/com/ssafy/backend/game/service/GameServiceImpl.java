@@ -224,6 +224,8 @@ public class GameServiceImpl implements GameService {
                     System.out.println(userProfile.getUserCode()+" 의 exp는 "+userProfile.getUserExp());
                     System.out.println(userProfile.getUserCode()+" 의 rating는 "+userProfile.getUserRating());
 
+                    userProfile.setUserExp(entry.getKey().getUserProfile().getUserExp());
+                    userProfile.setUserRating(entry.getKey().getUserProfile().getUserRating());
                     UserAccessInfo userAccessInfo=entry.getKey();
                     UserCollection userCollection=userCollectionRepository.findByUserCode(userProfile.getUserCode());
                     UserAchievements userAchievements=userAchievementsRepository.findByUserCode(userProfile.getUserCode());
