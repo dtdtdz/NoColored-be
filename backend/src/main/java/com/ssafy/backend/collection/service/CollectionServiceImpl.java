@@ -189,7 +189,7 @@ public class CollectionServiceImpl implements CollectionService {
         labels.add(new Label(36,"럭키 세븐"));
         labels.add(new Label(37,"노컬러드 프로게이머"));
         labels.add(new Label(38,"칼드컵 우승을 향해"));
-        labels.add(new Label(39,"2보 전진을 위한 1보 후퇴"));
+        labels.add(new Label(39,"패배자"));
         labels.add(new Label(40,"야 바로 매칭 돌려."));
         labels.add(new Label(41,"작심삼일"));
         labels.add(new Label(42,"너 나보다 못하잖아."));
@@ -266,7 +266,7 @@ public class CollectionServiceImpl implements CollectionService {
         achievements.add(new Achievement(36, "누적 7승", "Google Blue"));
         achievements.add(new Achievement(37, "누적 10승", "Basic Blue Sunglass"));
         achievements.add(new Achievement(38, "누적 20승", "칼드컵 우승을 향해"));
-        achievements.add(new Achievement(39, "누적 1패", "NPC White"));
+        achievements.add(new Achievement(39, "누적 1패", "패배자"));
         achievements.add(new Achievement(40, "누적 2패", "Basic Green Sunglass"));
         achievements.add(new Achievement(41, "누적 3패", "작심삼일"));
         achievements.add(new Achievement(42, "누적 5패", "Basic Red Sunglass"));
