@@ -98,7 +98,7 @@ public class GameInfo {
         for (int[] arr:mapInfo.getFloorList()){
             for (int i=0; i<arr[2]; i++){
                 floor[arr[0]+i-WALL_WIDTH][arr[1]] = true;
-                floorPos.add(new int[]{arr[0]+i-WALL_WIDTH,arr[1]});
+                floorPos.add(new int[]{arr[0]+i,arr[1]});
             }
         }
 
@@ -106,13 +106,13 @@ public class GameInfo {
             idxs.add(i);
         }
         Collections.shuffle(idxs);
-        Collections.shuffle(floorPos);
+//        Collections.shuffle(floorPos);
 
         for (byte i=0; i<userList.size(); i++){
             UserGameInfo userGameInfo = new UserGameInfo(userList.get(i).getSession(),
                     idxs.get(i),i,(room==null)?"friendly":"ranking");
             CharacterInfo characterInfo = new CharacterInfo(
-                    (floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE,
+                    (floorPos.get(i)[0]+0.5f)*BLOCK_SIZE,
                     floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
                     (int) ((random.nextInt(2)-0.5f)*2),
                     userGameInfo
@@ -123,9 +123,9 @@ public class GameInfo {
             userGameInfoList.add(userGameInfo);
         }
 
-        for (int i= userList.size(); i<CHARACTER_NUM ; i++){
+        for (int i=userList.size(); i<CHARACTER_NUM ; i++){
             CharacterInfo characterInfo = new CharacterInfo(
-                    (floorPos.get(i)[0]+1/2f+WALL_WIDTH)*BLOCK_SIZE,
+                    (floorPos.get(i)[0]+0.5f)*BLOCK_SIZE,
                     floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
                     (int) ((random.nextInt(2)-0.5f)*2),
                     null
