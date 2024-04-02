@@ -108,7 +108,7 @@ public class GameInfo {
         }
         Collections.shuffle(idxs);
 //        Collections.shuffle(floorPos);
-        for (int i=0; i<10; i++){
+        for (int i=0; i<20; i++){
             floorPos.remove(0);
         }
 
@@ -117,7 +117,7 @@ public class GameInfo {
                     idxs.get(i),i,(room==null)?"friendly":"ranking");
             CharacterInfo characterInfo = new CharacterInfo(
                     (floorPos.get(i)[0]+0.5f)*BLOCK_SIZE,
-                    floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
+                    floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f-BLOCK_SIZE,
                     (int) ((random.nextInt(2)-0.5f)*2),
                     userGameInfo
             );
