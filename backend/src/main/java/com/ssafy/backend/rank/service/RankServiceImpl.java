@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static com.ssafy.backend.rank.util.RankUtil.tierCalculation;
 
@@ -86,6 +87,9 @@ public class RankServiceImpl implements RankService{
 
         AtomicInteger myRank = new AtomicInteger(0);
         for (String userCode : topRanks) {
+            String ratingStr = (String) redisTemplate.opsForValue().get(userCode);
+            int rating = Optional.ofNullable(ratingStr).map(Integer::parseInt).orElse(0); // rating이 없는 경우 기본값으로 0을 사용
+
             userProfileRepository.findByUserCode(userCode).ifPresent(userProfile -> {
                 RankDto rankDto = RankDto.builder()
                         .rank(myRank.incrementAndGet())
@@ -93,8 +97,8 @@ public class RankServiceImpl implements RankService{
                         .nickname(userProfile.getUserNickname())
                         .skin(userProfile.getUserSkin())
                         .label(userProfile.getUserLabel())
-                        .rating(userProfile.getUserRating())
-                        .tier(tierCalculation(myRank.get(), userProfile.getUserRating(), userProfile.getUserExp()))
+                        .rating(rating)
+                        .tier(tierCalculation(myRank.get(),rating, userProfile.getUserExp()))
                         .build();
                 players.add(rankDto);
             });
@@ -110,9 +114,8 @@ public class RankServiceImpl implements RankService{
         if(userProfile.isGuest()){
             return null;
         }
-        UserProfileDto userProfileDto=user.getUserProfileDto();
-        rankUtil.getMyRank(userProfileDto);
-        return userProfileDto;
+        rankUtil.getMyRank(user.getUserProfileDto());
+        return user.getUserProfileDto();
     }
 
 }
