@@ -297,9 +297,14 @@ public class UserServiceImpl implements UserService {
         UserProfile userProfile = userAccessInfo.getUserProfile();
 
         if (sessionCollection.userIdMap.containsKey(userProfile.getId())) {
-            WebSocketSession session = sessionCollection.userIdMap.get(userProfile.getId()).getSession();
-            if (session!=null&&session.isOpen()){
+            if (sessionCollection.userIdMap.get(userProfile.getId()).getGameInfo() ==null)
                 return null;
+
+            WebSocketSession session = sessionCollection.userIdMap.get(userProfile.getId()).getSession();
+            if (session!=null){
+                if (session.isOpen()){
+                    return null;
+                } else sessionCollection.userWebsocketMap.remove(session);
             }
         }
 

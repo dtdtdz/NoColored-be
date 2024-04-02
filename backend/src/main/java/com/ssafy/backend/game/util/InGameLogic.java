@@ -210,7 +210,6 @@ public class InGameLogic {
             }
         }
 
-            long dt1 = System.currentTimeMillis();
             gameInfo.applyStep();
             gameInfo.applyItem();
 
