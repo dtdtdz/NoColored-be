@@ -35,7 +35,7 @@ public class MatchingCollection {
 //        System.out.println("set!");
         MatchingInfo matchingInfo = new MatchingInfo(userAccessInfo);
         userAccessInfo.setMatchingInfo(matchingInfo);
-        matchingInfoMap.put(userAccessInfo, matchingInfo);
+//        matchingInfoMap.put(userAccessInfo, matchingInfo);
         synchronized (addQueue){
             addQueue.offer(userAccessInfo);
         }
@@ -77,12 +77,10 @@ public class MatchingCollection {
         synchronized (addQueue) {
             while (!addQueue.isEmpty()) {
                 UserAccessInfo userAccessInfo = addQueue.poll();
-                if (matchingInfoMap.containsKey(userAccessInfo)) {
-                    MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
-                    matchingQueue.get(matchingInfo.getRatingLevel()).add(userAccessInfo);
-
-                    matchingInfo.setExpandLevel(0);
-                }
+                matchingInfoMap.put(userAccessInfo, (MatchingInfo)userAccessInfo.getPosition());
+                MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
+                matchingQueue.get(matchingInfo.getRatingLevel()).add(userAccessInfo);
+                matchingInfo.setExpandLevel(0);
             }
         }
 
@@ -119,12 +117,9 @@ public class MatchingCollection {
             while (!matchingQueue.get(i).isEmpty()
                     && matchingQueue.get(i).size() >= getMatchingSize(matchingQueue.get(i),now)){
                 List<UserAccessInfo> list = new ArrayList<>();
-                if (matchingInfoMap.get(matchingQueue.get(i).get(0))==null) {
-                    delMatching(matchingQueue.get(i).get(0));
-                    continue;
-                }
-                int size = getMatchingSize(matchingQueue.get(i),now);
 
+                int size = getMatchingSize(matchingQueue.get(i),now);
+                if (size==Integer.MAX_VALUE) continue;
                 for (int j=0; j<size; j++){
                     try {
                         list.add(matchingQueue.get(i).get(0));
@@ -146,6 +141,13 @@ public class MatchingCollection {
 
     private int getMatchingSize(List<UserAccessInfo> userAccessInfos, long now){
         MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfos.get(0));
+
+        if (matchingInfo==null){
+            delMatching(userAccessInfos.get(0));
+            if (userAccessInfos.get(0).getPosition() instanceof MatchingInfo)
+                userAccessInfos.get(0).clearPosition();
+            return Integer.MAX_VALUE;
+        }
 
         long start = matchingInfo.getStartTime();
         if (now-start<7000){
