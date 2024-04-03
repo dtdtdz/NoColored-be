@@ -47,7 +47,7 @@ public class SynchronizedSend {
             System.out.println("Can't find session.");
             return;
         } else if (!session.isOpen()){
-            System.out.println("Session isn't open.");
+//            System.out.println("Session isn't open.");
             return;
         }
         try {
