@@ -508,13 +508,15 @@ public class UserServiceImpl implements UserService {
 
     }
 
-//    @Scheduled(cron = "0 0/20 * * * *")
+    @Scheduled(cron = "0 0/20 * * * *")
     public void scheduledUserLogout() {
-        for (UserAccessInfo userAccessInfo: sessionCollection.userIdMap.values()){
-            if (userAccessInfo.isExpire()){
+        Iterator<UserAccessInfo> iterator = sessionCollection.userIdMap.values().iterator();
+        while (iterator.hasNext()) {
+            UserAccessInfo userAccessInfo = iterator.next();
+            if (userAccessInfo.isExpire()) {
+                iterator.remove(); // Iterator를 사용하여 안전하게 삭제
                 logout(userAccessInfo);
             }
-
         }
     }
 
