@@ -11,8 +11,8 @@ import com.ssafy.backend.user.dto.UserProfileDto;
 import com.ssafy.backend.websocket.domain.SendTextMessageType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StreamUtils;
 
 import java.util.*;
 
@@ -430,7 +430,12 @@ public class FriendlyServiceImpl implements FriendlyService {
 
     public void quitRoom(UserAccessInfo userAccessInfo){
         RoomInfo roomInfo = userAccessInfo.getRoomInfo();
-        synchronized (roomInfo){
+        if (roomInfo == null) {
+            if (userAccessInfo.getRoomInfo()!=null)
+                userAccessInfo.clearPosition();
+            return;
+        }
+            synchronized (roomInfo){
             UserAccessInfo[] userAccessInfos=roomInfo.getUserAccessInfos();
             // 내 위치 찾기
             for(int i=0;i<4;i++) {
@@ -526,4 +531,14 @@ public class FriendlyServiceImpl implements FriendlyService {
             }
         }
     }
+//
+//    @Scheduled(cron = "0 0/10 * * * *") // 매 10분마다 실행
+//    public void deleteNotInRoom() {
+//        synchronized (roomInfoMap){
+//            for (RoomInfo roomInfo:roomInfoMap.values()){
+//
+//            }
+//        }
+//    }
+
 }
