@@ -29,7 +29,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     // 요청경로: /game
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(myWebSocketHandler(), "/game").setAllowedOrigins("*");//변경해야함
+        registry.addHandler(myWebSocketHandler(), "/game").setAllowedOrigins("https://nocolored.world");//변경해야함
     }
 
 

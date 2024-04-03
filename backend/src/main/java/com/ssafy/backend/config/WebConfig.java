@@ -9,7 +9,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
-                .allowedOriginPatterns("*")
+                .allowedOrigins("https://nocolored.world")
                 .allowedMethods("GET", "PUT", "POST", "DELETE", "PATCH");
 
 
