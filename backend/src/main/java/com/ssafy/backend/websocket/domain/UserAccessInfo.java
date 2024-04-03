@@ -19,14 +19,17 @@ import org.springframework.web.socket.WebSocketSession;
 @NoArgsConstructor
 public class UserAccessInfo {
     private WebSocketSession session;
-    private UserProfile userProfile;
-    private UserProfileDto userProfileDto;
     private Object position;//사용할때 상태 확인해야함
-    private UserAchievements userAchievements;
-    private UserCollection userCollection;
+
     private long expireTime;
 
     private static long USER_EXPIRE = 1000*3600;
+
+    private UserProfile userProfile;
+    private UserProfileDto userProfileDto;
+    private UserAchievements userAchievements;
+    private UserCollection userCollection;
+
 
 
     public UserAccessInfo(UserProfile userProfile){
