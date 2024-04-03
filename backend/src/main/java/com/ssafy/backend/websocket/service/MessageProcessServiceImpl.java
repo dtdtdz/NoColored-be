@@ -138,28 +138,20 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         if (!sessionCollection.userWebsocketMap.containsKey(session)) return;
 
         authScheduledExecutorService.schedule(()->{
-            System.out.println("test1");
             if (!sessionCollection.userWebsocketMap.containsKey(session)) return;//여전히 세션 재연결 안된상태, 재연결시 session 제거됨
             UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(session);
-            System.out.println("test1.1");
             if (userAccessInfo.getRoomInfo()==null) return;
-            System.out.println("test1.2");
             setRoomQuitTimeOut(session);
-            System.out.println("test1.3");
         },30, TimeUnit.SECONDS);
     }
 
     private void setRoomQuitTimeOut(WebSocketSession session) {
         authScheduledExecutorService.schedule(()->{
-            System.out.println("test2");
             if (!sessionCollection.userWebsocketMap.containsKey(session)) return;
             UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(session);
-            System.out.println("test2.1");
 
             if (userAccessInfo.getRoomInfo()==null) return;
-            System.out.println("test2.2");
             friendlyService.quitRoom(userAccessInfo);
-            System.out.println("test2.3");
         },30, TimeUnit.SECONDS);
     }
 
