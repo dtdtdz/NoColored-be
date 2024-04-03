@@ -35,7 +35,7 @@ public class UserController {
         }
     }
 
-//    @GetMapping("/guest")
+    @GetMapping("/guest")
     public ResponseEntity<String> guestSignUp(){
         UserAccessInfo userAccessInfo = userService.guestSignUp();
         String token = userService.generateToken(userAccessInfo);
