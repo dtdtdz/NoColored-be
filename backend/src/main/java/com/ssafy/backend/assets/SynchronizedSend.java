@@ -19,7 +19,7 @@ public class SynchronizedSend {
             buffer.clear();
             return;
         } else if (!session.isOpen()){
-            System.out.println("Session isn't open.");
+//            System.out.println("Session isn't open.");
             buffer.clear();
             return;
         }
