@@ -132,14 +132,15 @@ public class InGameLogic {
                     int nextBlockY = (int)(bottom/GameInfo.BLOCK_SIZE);
 
                     if (velY>=0 &&((bottom%GameInfo.BLOCK_SIZE<=4)||blockY<nextBlockY)){
-                        if (indexCheck(nextBlockY, floor[0].length)
-                                && ((indexCheck(blockLeft, floor.length)
-                                && floor[blockLeft][nextBlockY])
-                                || (indexCheck(blockRight, floor.length)
-                                && floor[blockRight][nextBlockY]))
-                        ){
-                            tarY = nextBlockY*GameInfo.BLOCK_SIZE-halfSize;
-                            isPlatForm = true;
+                        if (indexCheck(nextBlockY, floor[0].length)){
+                            for (int j=blockRight; j<=blockLeft; j++){
+                                if (indexCheck(j, floor.length)
+                                        && floor[j][nextBlockY]){
+                                    tarY = nextBlockY*GameInfo.BLOCK_SIZE-halfSize;
+                                    isPlatForm = true;
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
