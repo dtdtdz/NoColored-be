@@ -346,23 +346,44 @@ public class UserServiceImpl implements UserService {
         UserAchievements userAchievements=userAchievementsRepository.findByUserCode(userProfile.getUserCode());
         LocalDateTime today=LocalDateTime.now();
         LocalDateTime lastLoginDate=userAchievements.getLastLoginDate();
-        // 누적접속 +1
-        userAchievements.setCumulativeLoginDays(userAchievements.getCumulativeLoginDays()+1);
 
-        // 연속접속 수정
-        // 오늘 날짜=마지막 접속일의 바로 다음날이면
-        if(today.toLocalDate().isEqual(lastLoginDate.toLocalDate().plusDays(1))){
-            userAchievements.setConsecutiveLoginDays(userAchievements.getConsecutiveLoginDays()+1);
-            userAchievements.setConsecutiveLogin(true);
-        }else if(!today.toLocalDate().isEqual(lastLoginDate.toLocalDate())){
-            // 오늘 날짜=마지막 접속일 날짜 아니고
-            // 오늘 날짜=마지막 접속일의 다음날 아니라서 연속 접속이 끊긴 상태면
-            userAchievements.setConsecutiveLogin(false);
-            userAchievements.setConsecutiveLoginDays(1);
-            if(!userCollection.getLabelIds().contains(68))userCollection.getLabelIds().add(68);
-            if(!userCollection.getAchievementIds().contains(68))userCollection.getAchievementIds().add(68);
+        // 똑같은 날 접속했음
+        if(today.toLocalDate().isEqual(lastLoginDate.toLocalDate())){
+            userAchievements.setConsecutiveLogin(true); // 연속 로그인 처리
+        }else{
+            // 다른 날 접속했음
+
+            // 누적접속 +1
+            userAchievements.setCumulativeLoginDays(userAchievements.getCumulativeLoginDays()+1);
+
+            // 오늘 날짜=마지막 접속일의 바로 다음날이면
+            if(today.toLocalDate().isEqual(lastLoginDate.toLocalDate().plusDays(1))){
+                userAchievements.setConsecutiveLoginDays(userAchievements.getConsecutiveLoginDays()+1);
+                userAchievements.setConsecutiveLogin(true);
+            }else{
+                // 오늘 날짜=마지막 접속일의 다음날 아니라서 연속 접속이 끊긴 상태면
+                userAchievements.setConsecutiveLogin(false);
+                userAchievements.setConsecutiveLoginDays(1);
+                if(!userCollection.getLabelIds().contains(68))userCollection.getLabelIds().add(68);
+                if(!userCollection.getAchievementIds().contains(68))userCollection.getAchievementIds().add(68);
+            }
         }
         userAchievements.setLastLoginDate(today);
+
+//        // 연속접속 수정
+//        // 오늘 날짜=마지막 접속일의 바로 다음날이면
+//        if(today.toLocalDate().isEqual(lastLoginDate.toLocalDate().plusDays(1))){
+//            userAchievements.setConsecutiveLoginDays(userAchievements.getConsecutiveLoginDays()+1);
+//            userAchievements.setConsecutiveLogin(true);
+//        }else if(!today.toLocalDate().isEqual(lastLoginDate.toLocalDate())){
+//            // 오늘 날짜=마지막 접속일 날짜 아니고
+//            // 오늘 날짜=마지막 접속일의 다음날 아니라서 연속 접속이 끊긴 상태면
+//            userAchievements.setConsecutiveLogin(false);
+//            userAchievements.setConsecutiveLoginDays(1);
+//            if(!userCollection.getLabelIds().contains(68))userCollection.getLabelIds().add(68);
+//            if(!userCollection.getAchievementIds().contains(68))userCollection.getAchievementIds().add(68);
+//        }
+//        userAchievements.setLastLoginDate(today);
         
 //        // 연속접속
 //        if(lastLoginDate.equals(today.minusDays(1))){
