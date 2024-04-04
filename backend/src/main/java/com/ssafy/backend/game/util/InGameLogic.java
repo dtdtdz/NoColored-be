@@ -106,7 +106,7 @@ public class InGameLogic {
             try {
                 if (velY>=0&&bottom%GameInfo.BLOCK_SIZE<=4){
 
-                    if (!indexCheck(blockY,floor[0].length)){
+                    if (indexCheck(blockY,floor[0].length)){
                         for (int j=blockLeft; j<=blockRight; j++){
                             if (indexCheck(j, floor.length)
                                     && floor[j][blockY]){
