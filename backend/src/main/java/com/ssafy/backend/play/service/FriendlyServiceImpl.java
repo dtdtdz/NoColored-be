@@ -324,6 +324,7 @@ public class FriendlyServiceImpl implements FriendlyService {
                     roomDto.setRoomTitle(title);
                     roomDto.setRoomPassword(password);
                     roomInfo.setRoomDto(roomDto);
+                    roomDto.setMapId(mapId);
                     sendRoomDto(roomInfo);
                     return ResponseEntity.ok("The room information has been updated.");
                 }
