@@ -106,7 +106,7 @@ public class InGameLogic {
             try {
                 if (velY>=0&&bottom%GameInfo.BLOCK_SIZE<=4){
 
-                    for (int j=blockRight; j<=blockLeft; j++){
+                    for (int j=blockLeft; j<=blockRight; j++){
                         if (indexCheck(j, floor.length)
                         && floor[j][blockY]){
                             tarY = blockY*GameInfo.BLOCK_SIZE-halfSize;
@@ -133,7 +133,7 @@ public class InGameLogic {
 
                     if (velY>=0 &&((bottom%GameInfo.BLOCK_SIZE<=4)||blockY<nextBlockY)){
                         if (indexCheck(nextBlockY, floor[0].length)){
-                            for (int j=blockRight; j<=blockLeft; j++){
+                            for (int j=blockLeft; j<=blockRight ; j++){
                                 if (indexCheck(j, floor.length)
                                         && floor[j][nextBlockY]){
                                     tarY = nextBlockY*GameInfo.BLOCK_SIZE-halfSize;
