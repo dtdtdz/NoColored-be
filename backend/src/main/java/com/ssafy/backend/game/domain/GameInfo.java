@@ -85,7 +85,7 @@ public class GameInfo {
         if (room!=null && room.getRoomDto().getMapId()>0 && room.getRoomDto().getMapId()<=2){
             mapInfo = new MapInfo(room.getRoomDto().getMapId());
         } else {
-            mapInfo = new MapInfo((random.nextInt(2))+1);
+            mapInfo = new MapInfo((random.nextInt(MapInfo.MAPLIST_SIZE))+1);
         }
 
         stepList = new ArrayList<>();
@@ -132,7 +132,7 @@ public class GameInfo {
             CharacterInfo characterInfo = new CharacterInfo(
                     (floorPos.get(i)[0]+0.5f)*BLOCK_SIZE,
                     floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
-                    (int) ((random.nextInt(MapInfo.MAPLIST_SIZE)-0.5f)*2),
+                    (int) ((random.nextInt(2)-0.5f)*2),
                     null
             );
 
