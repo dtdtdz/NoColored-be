@@ -106,12 +106,14 @@ public class InGameLogic {
             try {
                 if (velY>=0&&bottom%GameInfo.BLOCK_SIZE<=4){
 
-                    for (int j=blockLeft; j<=blockRight; j++){
-                        if (indexCheck(j, floor.length)
-                        && floor[j][blockY]){
-                            tarY = blockY*GameInfo.BLOCK_SIZE-halfSize;
-                            isPlatForm = true;
-                            break;
+                    if (!indexCheck(blockY,floor[0].length)){
+                        for (int j=blockLeft; j<=blockRight; j++){
+                            if (indexCheck(j, floor.length)
+                                    && floor[j][blockY]){
+                                tarY = blockY*GameInfo.BLOCK_SIZE-halfSize;
+                                isPlatForm = true;
+                                break;
+                            }
                         }
                     }
                 }
