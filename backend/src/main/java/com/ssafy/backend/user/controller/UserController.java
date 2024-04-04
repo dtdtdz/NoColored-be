@@ -57,7 +57,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/signup")
+//    @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody UserSignDto user){
         if (user.getId().length() < 6 || user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
         if (!user.getId().matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
@@ -75,6 +75,17 @@ public class UserController {
     }
     @PostMapping("/login")
     private ResponseEntity<String> login(@RequestBody UserSignDto user){
+
+        if (!(user.getId().equals("gabgab")
+                || user.getId().equals("wooyeol")
+                || user.getId().equals("dolmeengii")
+                || user.getId().equals("CELINE")
+                || user.getId().equals("dam626")
+                || user.getId().equals("gardner"))) {
+            return ResponseEntity.badRequest().body("Login failed");
+        }
+
+
         try {
             String token = userService.login(user.getId(),user.getPassword());
             if (token==null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("잘못된 접근입니다.");
