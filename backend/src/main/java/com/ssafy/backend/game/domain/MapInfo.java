@@ -19,6 +19,7 @@ public class MapInfo {
 
     private final List<int[]> floorList;
     private static final List<List<int[]>> MapList;
+    public static final int MAPLIST_SIZE;
 
     static {
         MapList = new LinkedList<>();
@@ -38,21 +39,60 @@ public class MapInfo {
         MapList.add(list1);
 
         List<int[]> list2 = new LinkedList<>();
-        list2.add(new int[]{3,5,3});
-        list2.add(new int[]{10,5,4});
-        list2.add(new int[]{17,5,6});
-        list2.add(new int[]{26,5,4});
+        list2.add(new int[] {3,5,3});
+        list2.add(new int[] {10,5,4});
+        list2.add(new int[] {17,5,6});
+        list2.add(new int[] {26,5,4});
 
-        list2.add(new int[]{3,9,3});
-        list2.add(new int[]{9,9,6});
-        list2.add(new int[]{19,9,6});
+        list2.add(new int[] {3,9,3});
+        list2.add(new int[] {9,9,6});
+        list2.add(new int[] {19,9,6});
 
-        list2.add(new int[]{3,13,6});
-        list2.add(new int[]{13,13,6});
-        list2.add(new int[]{24,13,6});
+        list2.add(new int[] {3,13,6});
+        list2.add(new int[] {13,13,6});
+        list2.add(new int[] {24,13,6});
 
         list2.add(new int[] {9,17,15});
         MapList.add(list2);
+
+        List<int[]> list3 = new LinkedList<>();
+        list3.add(new int[] {3,5,6});
+        list3.add(new int[] {20,5,2});
+        list3.add(new int[] {25,5,4});
+
+        list3.add(new int[] {7,9,3});
+        list3.add(new int[] {14,9,4});
+        list3.add(new int[] {23,9,4});
+
+        list3.add(new int[] {3,13,5});
+        list3.add(new int[] {12,13,4});
+        list3.add(new int[] {20,13,2});
+        list3.add(new int[] {26,13,4});
+
+        list3.add(new int[] {9,17,15});
+        MapList.add(list3);
+
+        List<int[]> list4 = new LinkedList<>();
+        list4.add(new int[] {5,5,4});
+        list4.add(new int[] {12,5,1});
+        list4.add(new int[] {20,5,1});
+        list4.add(new int[] {24,5,4});
+
+        list4.add(new int[] {3,9,1});
+        list4.add(new int[] {8,9,4});
+        list4.add(new int[] {15,9,2});
+        list4.add(new int[] {20,9,4});
+        list4.add(new int[] {28,9,2});
+
+        list4.add(new int[] {3,13,5});
+        list4.add(new int[] {13,13,4});
+        list4.add(new int[] {21,13,1});
+        list4.add(new int[] {25,13,5});
+
+        list4.add(new int[] {9,17,15});
+        MapList.add(list4);
+
+        MAPLIST_SIZE = MapList.size();
     }
 
     public MapInfo(int mapId){

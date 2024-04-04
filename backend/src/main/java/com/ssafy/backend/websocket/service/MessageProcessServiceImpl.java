@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.backend.assets.SynchronizedSend;
 import com.ssafy.backend.game.domain.GameInfo;
+import com.ssafy.backend.game.domain.ResultInfo;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.play.service.FriendlyService;
 import com.ssafy.backend.user.entity.UserProfile;
@@ -136,22 +137,28 @@ public class MessageProcessServiceImpl implements MessageProcessService{
     @Override
     public void setRoomQuitWarningTimeOut(WebSocketSession session) {
         if (!sessionCollection.userWebsocketMap.containsKey(session)) return;
-
+        UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(session);
         authScheduledExecutorService.schedule(()->{
-            if (!sessionCollection.userWebsocketMap.containsKey(session)) return;//여전히 세션 재연결 안된상태, 재연결시 session 제거됨
-            UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(session);
-            if (userAccessInfo.getRoomInfo()==null) return;
-            setRoomQuitTimeOut(session);
+            if (userAccessInfo.getSession()!=session) return;
+            Object position =userAccessInfo.getPosition();
+            if (position instanceof GameInfo) setRoomQuitWarningTimeOut(session);
+            if (position instanceof ResultInfo) {
+                userAccessInfo.setRoomInfo(((ResultInfo) position).getGameInfo().getRoom());
+                setRoomQuitTimeOut(userAccessInfo, session);
+            }
+            if (position instanceof RoomInfo) setRoomQuitTimeOut(userAccessInfo, session);
+
+
         },30, TimeUnit.SECONDS);
     }
 
-    private void setRoomQuitTimeOut(WebSocketSession session) {
+    private void setRoomQuitTimeOut(UserAccessInfo userAccessInfo, WebSocketSession session) {
         authScheduledExecutorService.schedule(()->{
-            if (!sessionCollection.userWebsocketMap.containsKey(session)) return;
-            UserAccessInfo userAccessInfo = sessionCollection.userWebsocketMap.get(session);
+            if (userAccessInfo.getSession()!=session) return;
+            Object position =userAccessInfo.getPosition();
 
-            if (userAccessInfo.getRoomInfo()==null) return;
-            friendlyService.quitRoom(userAccessInfo);
+            if (position instanceof RoomInfo) friendlyService.quitRoom(userAccessInfo);
+
         },30, TimeUnit.SECONDS);
     }
 

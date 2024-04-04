@@ -61,7 +61,7 @@ public class GameInfo {
     public static final int ITEM_REMOVE_INTERVAL = 5;
     public static final int ITEM_SIZE = 32;
     public static final float ITEM_X = (WALL_WIDTH+MAP_WIDTH/2f)*BLOCK_SIZE;
-    public static final float[] ITEM_Y_ARR = new float[] {3*BLOCK_SIZE, 7*BLOCK_SIZE, 11*BLOCK_SIZE, 15*BLOCK_SIZE};
+    public static final float[] ITEM_Y_ARR = new float[] {7*BLOCK_SIZE, 11*BLOCK_SIZE, 15*BLOCK_SIZE};
     public static final int MOVE_CLONE_PROP = 250;
 
 
@@ -132,7 +132,7 @@ public class GameInfo {
             CharacterInfo characterInfo = new CharacterInfo(
                     (floorPos.get(i)[0]+0.5f)*BLOCK_SIZE,
                     floorPos.get(i)[1]*BLOCK_SIZE-CHARACTER_SIZE/2f,
-                    (int) ((random.nextInt(2)-0.5f)*2),
+                    (int) ((random.nextInt(MapInfo.MAPLIST_SIZE)-0.5f)*2),
                     null
             );
 
