@@ -124,7 +124,7 @@ public class InGameLogic {
                         tarY -= halfSize;
                     }
                     if (tarY<-halfSize){
-                        tarY += (GameInfo.MAP_HEIGHT * GameInfo.BLOCK_SIZE) + halfSize;
+                        tarY += (GameInfo.MAP_HEIGHT * GameInfo.BLOCK_SIZE) + 2*halfSize;
                     }
 
 
