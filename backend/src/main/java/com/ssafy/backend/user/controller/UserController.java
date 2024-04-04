@@ -85,6 +85,9 @@ public class UserController {
 //            return ResponseEntity.badRequest().body("Login failed");
 //        }
 
+        if (user.getId().length() < 6 || user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
+        if (!user.getId().matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
+        if (user.getPassword().length() < 6 || user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
 
         try {
             String token = userService.login(user.getId(),user.getPassword());
@@ -111,6 +114,8 @@ public class UserController {
                                                   @RequestBody Map<String, String> map){
         try {
             userService.updateNickname(token, map.get("nickname"));
+            if (map.get("nickname").length() < 2 || map.get("nickname").length() > 9) return ResponseEntity.badRequest().body("Nickname does not meet the length requirements (6-20 characters).");
+
             return ResponseEntity.ok("Nickname updated successfully.");
         } catch (Exception e){
             return ResponseEntity.internalServerError().body("Failed to update nickname");
@@ -135,13 +140,16 @@ public class UserController {
     }
 
     @GetMapping("/dup/{id}")
-    private ResponseEntity<Boolean> existsUserId(@PathVariable("id") String id){
+    private ResponseEntity<?> existsUserId(@PathVariable("id") String id){
+        if (id.length() < 6 || id.length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
+        if (!id.matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
         return ResponseEntity.ok(userService.existsUserId(id));
     }
 
 
     @GetMapping("/info/{userCode}")
     private ResponseEntity<?> findUserInfo(@PathVariable("userCode") String userCode){
+        if (userCode.length()!=8) return ResponseEntity.badRequest().body("require 8 character.");
         UserProfileDto userProfileDto = userService.findUserInfo(userCode);
         if (userProfileDto==null) return ResponseEntity.badRequest().body("Can't find user");
 

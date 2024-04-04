@@ -3,6 +3,7 @@ package com.ssafy.backend.user.service;
 import com.ssafy.backend.collection.document.UserCollection;
 import com.ssafy.backend.collection.repository.UserCollectionRepository;
 import com.ssafy.backend.game.domain.GameInfo;
+import com.ssafy.backend.game.domain.ResultInfo;
 import com.ssafy.backend.play.domain.MatchingInfo;
 import com.ssafy.backend.play.domain.RoomInfo;
 import com.ssafy.backend.play.dto.RoomDto;
@@ -447,6 +448,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updatePassword(String token, String pwd, String prePwd) {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
+
+        if (prePwd.length()<6 || prePwd.length()>20)
+            throw new RuntimeException("Password does not meet the length requirements (6-20 characters).");
+
         if (!prePwd.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId())))
             throw new RuntimeException("Wrong password");
         if (pwd.length()<6 || pwd.length()>20)
@@ -457,6 +462,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateNickname(String token, String nickname) {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
+
         userProfileRepository.updateNickname(user.getUserProfile().getId(), nickname);
         user.getUserProfile().setUserNickname(nickname);
         user.getUserProfileDto().setNickname(nickname);
@@ -465,6 +471,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean confirmUser(String token, String password) {
         UserAccessInfo user = jwtUtil.getUserAccessInfoRedis(token);
+        if (password.length()<6 || password.length()>20)
+            throw new RuntimeException("Password does not meet the length requirements (6-20 characters).");
 
         return password.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId()));
     }
@@ -550,9 +558,14 @@ public class UserServiceImpl implements UserService {
                     return;
                 } else if (position instanceof GameInfo){
                     return;
+                } else if (position instanceof ResultInfo){
+                    if (((ResultInfo) position).getGameInfo().getRoom()!=null){
+                        userAccessInfo.setRoomInfo(((ResultInfo) position).getGameInfo().getRoom());
+                        logoutRoomExit(userAccessInfo);
+                    }
                 }
             }
-            userAccessInfo.setPosition(null);
+            userAccessInfo.clearPosition();
             sessionCollection.userIdMap.remove(userAccessInfo.getUserProfile().getId());
             try {
                 userAccessInfo.getSession().close();
