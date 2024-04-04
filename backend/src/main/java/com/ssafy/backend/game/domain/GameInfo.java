@@ -82,7 +82,7 @@ public class GameInfo {
         random = new Random();
         gameCycle = GameCycle.CREATE;
         stepOrder = 1;
-        if (room!=null && room.getRoomDto().getMapId()>0 && room.getRoomDto().getMapId()<=2){
+        if (room!=null && room.getRoomDto().getMapId()>0 && room.getRoomDto().getMapId()<=MapInfo.MAPLIST_SIZE){
             mapInfo = new MapInfo(room.getRoomDto().getMapId());
         } else {
             mapInfo = new MapInfo((random.nextInt(MapInfo.MAPLIST_SIZE))+1);
