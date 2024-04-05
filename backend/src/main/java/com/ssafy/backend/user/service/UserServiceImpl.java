@@ -555,6 +555,7 @@ public class UserServiceImpl implements UserService {
     @Scheduled(cron = "0 0/20 * * * *")
     public void scheduledUserLogout() {
         Iterator<UserAccessInfo> iterator = sessionCollection.userIdMap.values().iterator();
+        System.out.print("logoutStart:"+sessionCollection.userIdMap.size());
         while (iterator.hasNext()) {
             UserAccessInfo userAccessInfo = iterator.next();
             if (userAccessInfo.isExpire()) {
@@ -562,6 +563,7 @@ public class UserServiceImpl implements UserService {
                 logout(userAccessInfo);
             }
         }
+        System.out.print("current:"+sessionCollection.userIdMap.size());
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -30,11 +31,15 @@ public class InGameCollection {
 //    }
     public void addGame(RoomInfo roomInfo){
         List<UserAccessInfo> users = new LinkedList<>();
+        StringBuilder sb = new StringBuilder();
+        sb.append("ingame:").append(LocalDateTime.now());
         for (UserAccessInfo user:roomInfo.getUserAccessInfos()){
             if (user != null) {
                 users.add(user); // null이 아닐 경우에만 리스트에 추가
+                sb.append(user.getUserProfile().getUserNickname()).append(", ");
             }
         }
+        System.out.println(sb);
 
 //        users.removeIf(Objects::isNull);//null값 제거
 
@@ -70,6 +75,7 @@ public class InGameCollection {
     public void updateGameList() throws Exception{
         while (!delQueue.isEmpty()){
             inGameList.remove(delQueue.poll());
+            System.out.println("gameCnt:"+inGameList.size());
         }
         while (!addQueue.isEmpty()){
             inGameList.offer(addQueue.poll());
