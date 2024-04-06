@@ -53,7 +53,7 @@ public class GameInfo {
     public static final int MAP_HEIGHT = 19;
     public static final int MAP_WIDTH = 27;
     public static final int WALL_WIDTH = 3;
-    public static final int GAME_TIME = 90;
+    public static final int GAME_TIME = 40;
     public static final int CHARACTER_NUM = 10;
     public static final int JUMP_VEL_Y = -300;
     public static final int STEP_VEL_Y = -200;
@@ -178,7 +178,7 @@ public class GameInfo {
         long dt = now - time;
         time = now;
 
-        itemManageProcess(dt);
+        itemManageProcess();
         applyTimeAtState(dt);
 
         return dt;
@@ -194,12 +194,14 @@ public class GameInfo {
         itemTime = time + 1000L*ITEM_CREATE_INTERVAL;
     }
 
-    private void itemManageProcess(long dt){
+    private void itemManageProcess(){
         if (curItem==null) return;
         if (curItem.equals(GameItemType.NO_ITEM)){
             if (itemTime<time){
                 idxItemY = random.nextInt(ITEM_Y_ARR.length);
-                curItem = GameItemType.valueOf((byte)(random.nextInt(GameItemType.size()-1)+1));
+                while (curItem!=GameItemType.NO_ITEM && curItem!=GameItemType.REBEL){
+                    curItem = GameItemType.valueOf((byte)(random.nextInt(GameItemType.size()-1)+1));
+                }
 //                curItem = GameItemType.STOP_NPC;
                 setItemTime();
             }
