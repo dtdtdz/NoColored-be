@@ -178,7 +178,7 @@ public class GameInfo {
         long dt = now - time;
         time = now;
 
-        itemManageProcess(dt);
+        itemManageProcess();
         applyTimeAtState(dt);
 
         return dt;
@@ -194,12 +194,14 @@ public class GameInfo {
         itemTime = time + 1000L*ITEM_CREATE_INTERVAL;
     }
 
-    private void itemManageProcess(long dt){
+    private void itemManageProcess(){
         if (curItem==null) return;
         if (curItem.equals(GameItemType.NO_ITEM)){
             if (itemTime<time){
                 idxItemY = random.nextInt(ITEM_Y_ARR.length);
-                curItem = GameItemType.valueOf((byte)(random.nextInt(GameItemType.size()-1)+1));
+                while (!curItem.equals(GameItemType.NO_ITEM) && !curItem.equals(GameItemType.REBEL)){
+                    curItem = GameItemType.valueOf((byte)(random.nextInt(GameItemType.size()-1)+1));
+                }
 //                curItem = GameItemType.STOP_NPC;
                 setItemTime();
             }
