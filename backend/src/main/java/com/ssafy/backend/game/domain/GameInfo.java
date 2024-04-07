@@ -199,7 +199,7 @@ public class GameInfo {
         if (curItem.equals(GameItemType.NO_ITEM)){
             if (itemTime<time){
                 idxItemY = random.nextInt(ITEM_Y_ARR.length);
-                while (!curItem.equals(GameItemType.NO_ITEM) && !curItem.equals(GameItemType.REBEL)){
+                while (curItem.equals(GameItemType.NO_ITEM) || curItem.equals(GameItemType.REBEL)){
                     curItem = GameItemType.valueOf((byte)(random.nextInt(GameItemType.size()-1)+1));
                 }
 //                curItem = GameItemType.STOP_NPC;
