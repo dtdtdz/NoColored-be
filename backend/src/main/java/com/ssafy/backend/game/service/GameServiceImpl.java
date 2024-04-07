@@ -501,7 +501,6 @@ public class GameServiceImpl implements GameService {
 
 
     private void gameClose(GameInfo gameInfo){
-        long dt1 = System.currentTimeMillis();
 
 //        roomUuid있으면 해당 룸으로 보낸다.
         System.out.println("game close");
@@ -564,9 +563,7 @@ public class GameServiceImpl implements GameService {
 
         dataSave(gameInfo);
         inGameCollection.removeGame(gameInfo);
-        long dt2 =System.currentTimeMillis();
 
-        if (dt2-dt1>50) System.out.println("close"+(dt2-dt1));
     }
 
 }
