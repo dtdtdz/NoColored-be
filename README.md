@@ -3,12 +3,20 @@
 
 -----
 ## 목차
-- [프로젝트 소개](#-프로젝트-소개)
-- [팀원 소개](#-팀원-소개)
-- [역할](#-역할)
-- [기술 스택](#-기술-스택)
-- [ERD 다이어그램](#-erd-다이어그램)
-- [폴더 구조 및 아키텍쳐 설계](#-폴더-구조-및-아키텍쳐-설계)
+- [목차](#목차)
+- [🍀 프로젝트 소개](#-프로젝트-소개)
+    - [main-service](#main-service)
+    - [sub-service](#sub-service)
+- [🎯 팀원 소개](#-팀원-소개)
+- [👨‍👩‍👧‍👦 역할](#-역할)
+- [👩‍💻 기술 스택](#-기술-스택)
+  - [language](#language)
+  - [framework](#framework)
+  - [sub](#sub)
+  - [database](#database)
+  - [ci/cd](#cicd)
+- [💾 ERD 다이어그램](#-erd-다이어그램)
+- [📂 아키텍처 설계 및 폴더 구조](#-아키텍처-설계-및-폴더-구조)
 
 
 -----
@@ -100,11 +108,9 @@
 ![ERD 다이어그램](https://github.com/NoColored/.github/blob/main/profile/docs/images/backend/nocolored_erd.png)
 
 
-
-
 ---
-## 📂 폴더 구조 및 아키텍쳐 설계
-
+## 📂 아키텍처 설계 및 폴더 구조
+![아키텍처 설계 및 폴더 구조](nocolored-architecture.png)
 ```tree
 ├─assets
 │  ├─dao
