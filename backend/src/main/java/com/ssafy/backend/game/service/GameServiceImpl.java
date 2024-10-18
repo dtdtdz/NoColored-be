@@ -75,7 +75,6 @@ public class GameServiceImpl implements GameService {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         GameInfo gameInfo = userAccessInfo.getGameInfo();
         if (gameInfo==null) return null;
-//        gameInfo.getUsers().get(userAccessInfo.getSession()).setAccess(true);
         return gameInfo.getGameRoomDto();
     }
 
@@ -96,9 +95,6 @@ public class GameServiceImpl implements GameService {
         tierList.put("rgb",7);
         tierList.put("origin",8);
 
-//        System.out.println("테스트 1234 1345");
-//        System.out.println("테스트 : "+userAccessInfo.getResultInfo().getGameInfo().getRoom());
-
         // 매칭이면
         if (userAccessInfo.getResultInfo().getGameInfo().getRoom()==null){
             // 게스트여도 티어 계산
@@ -114,23 +110,6 @@ public class GameServiceImpl implements GameService {
             resultDto.getReward().setTier(tierDto);
             userAccessInfo.clearPosition();
 
-            // 게스트 아니면
-//            if( !userAccessInfo.getUserProfile().isGuest()){
-//                String oldTier = userAccessInfo.getUserProfileDto().getTier();
-//                String newTier = tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
-//                        userAccessInfo.getUserProfile().getUserRating(), userAccessInfo.getUserProfile().getUserExp());
-//                userAccessInfo.getUserProfileDto().setTier(newTier);
-//
-//                TierDto tierDto = new TierDto();
-//                tierDto.setNewtier(newTier);
-//                tierDto.setOldtier(oldTier);
-//                boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
-//                tierDto.setUpgrade(tierUpgrade);
-//                resultDto.getReward().setTier(tierDto);
-//            }else{
-//                // 게스트면
-//                resultDto.getReward().setTier(new TierDto());
-//            }
         }else{
             // 친선전이면
             userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom()); // 추가
@@ -139,34 +118,7 @@ public class GameServiceImpl implements GameService {
         // 스킨 처리
         resultDto.getReward().setSkins(new ArrayList<>());
 
-//        if (userAccessInfo.getResultInfo().getGameInfo().getRoom()!=null){
-//            // System.out.println(userAccessInfo.getResultInfo().getGameInfo().getRoom().getRoomDto().getRoomTitle());
-//            userAccessInfo.setRoomInfo(userAccessInfo.getResultInfo().getGameInfo().getRoom());
-//
-//            System.out.println("roomuuid = "+resultDto.getRoomUuid());
-//            System.out.println("guest = "+userAccessInfo.getUserProfile().isGuest());
-//            // 매칭이고 게스트 아니면
-//            if(resultDto.getRoomUuid()==null&& !userAccessInfo.getUserProfile().isGuest()) {
-//
-//                String oldTier = userAccessInfo.getUserProfileDto().getTier();
-//                String newTier = tierCalculation(userAccessInfo.getUserProfileDto().getRank(),
-//                        userAccessInfo.getUserProfile().getUserRating(), userAccessInfo.getUserProfile().getUserExp());
-//                userAccessInfo.getUserProfileDto().setTier(newTier);
-//
-//                TierDto tierDto = new TierDto();
-//                tierDto.setNewtier(newTier);
-//                tierDto.setOldtier(oldTier);
-//                boolean tierUpgrade = tierList.get(newTier) - tierList.get(oldTier) > 0;
-//                tierDto.setUpgrade(tierUpgrade);
-//                resultDto.getReward().setTier(tierDto);
-//
-//            }else{
-//                resultDto.getReward().setTier(new TierDto());
-//            }
-//            resultDto.getReward().setSkins(new ArrayList<>());
-//        } else {
-//            userAccessInfo.clearPosition();
-//        }
+
         return resultDto;
     }
 
@@ -175,14 +127,9 @@ public class GameServiceImpl implements GameService {
         long initialDelay = 0; // 시작 지연 없음
         long period = 16_666; // 17ms
         
-        // 여기에 반복 실행할 태스크의 로직을 작성
-        future = scheduledExecutorService.scheduleAtFixedRate(this::gameLogic, initialDelay, period, TimeUnit.MICROSECONDS);
+        future = scheduledExecutorService
+        .scheduleAtFixedRate(this::gameLogic, initialDelay, period, TimeUnit.MICROSECONDS);
     }
-//    스프링 끝나면 스케줄러에서 함수 제거, 필요없긴하다.
-//    @EventListener
-//    public void onApplicationEvent(ContextClosedEvent event) {
-//        future.cancel(false);
-//    }
 
     private void gameLogic(){
         try {
@@ -197,9 +144,6 @@ public class GameServiceImpl implements GameService {
                         case READY -> inGameLogic.ready(gameInfo);
                         case PLAY -> inGameLogic.play(gameInfo);
                         case CLOSE -> gameClose(gameInfo);
-
-                        //        play(gameInfo);
-
                     }
                 } catch (Exception e){
                     e.printStackTrace();
@@ -211,6 +155,7 @@ public class GameServiceImpl implements GameService {
             e.printStackTrace();
         }
     }
+    
     private void dataSave(GameInfo gameInfo){
 
         saveScheduledExecutorService.schedule(()->{
