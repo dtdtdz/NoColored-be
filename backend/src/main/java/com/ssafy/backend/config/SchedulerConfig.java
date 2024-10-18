@@ -10,18 +10,28 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 스레드풀을 관리 하기 위한 설정 클래스
+ * 스프링에서 사용하는 API처리용 스레드와 스케줄링할 스레드를 분리함
+ */
 @Configuration
 public class SchedulerConfig {
-
+    // 스프링에서 사용하는 API처리용 스레드풀
     @Bean
     @Primary
     public ScheduledExecutorService primaryScheduledExecutorService() {
         return Executors.newScheduledThreadPool(5);
     }
+    /**
+     * 모든 게임플레이에서 작동하는 스레드풀
+     * 하나의 스레드에서 얼마나 많은 게임플레이가 가능한지 알기위해 하나로 설정
+     * 스레드풀을 늘려 부하분산을 고려가능
+     */ 
     @Bean
     public ScheduledExecutorService scheduledExecutorService() {
-        return Executors.newScheduledThreadPool(1); // 예: 스레드 풀 크기를 1로 설정
+        return Executors.newScheduledThreadPool(1);
     }
+    //로그아웃 처리가 되지 않은 유저를 서버에서 로그아웃 처리하기 위한 스레드풀
     @Bean
     public ScheduledExecutorService authScheduledExecutorService(){
         return Executors.newScheduledThreadPool(1);

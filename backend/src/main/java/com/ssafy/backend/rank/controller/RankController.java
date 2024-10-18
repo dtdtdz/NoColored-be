@@ -8,6 +8,11 @@ import com.ssafy.backend.websocket.domain.UserAccessInfo;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 랭킹 시스템에 대한 컨트롤러
+ * 자기 자신의 랭킹과 상위 100명의 랭킹 리스트를 조회
+ * 게스트 유저는 랭킹 리스트에서 제외됨
+ */
 @RestController
 @RequestMapping("/rank")
 public class RankController {

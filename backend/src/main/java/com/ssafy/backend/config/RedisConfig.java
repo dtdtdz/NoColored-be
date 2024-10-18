@@ -14,7 +14,9 @@ import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
-
+/**
+ * Redis에 <String, Object>형태로 객체를 저장
+ */
 @Configuration
 public class RedisConfig {
     @Value("${spring.redis.host}")
@@ -25,14 +27,6 @@ public class RedisConfig {
 
     @Value("${spring.redis.password}")
     private String password;
-
-    @Bean(name = "redisMessageTaskExecutor")
-    public Executor redisMessageTaskExecutor() {
-        ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-        threadPoolTaskExecutor.setCorePoolSize(1);
-        threadPoolTaskExecutor.setMaxPoolSize(3);
-        return threadPoolTaskExecutor;
-    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -49,14 +43,6 @@ public class RedisConfig {
         template.setKeySerializer(new GenericToStringSerializer<String>(String.class));
         template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
         return template;
-    }
-    @Bean
-    RedisMessageListenerContainer keyExpirationListenerContainer(RedisConnectionFactory connectionFactory, RedisKeyExpirationListener listener) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listener, new ChannelTopic("__keyevent@*__:expired"));
-        container.setTaskExecutor(redisMessageTaskExecutor());
-        return container;
     }
 
 }

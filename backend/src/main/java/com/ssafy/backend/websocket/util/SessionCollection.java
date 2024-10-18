@@ -7,12 +7,15 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.util.*;
 
+/**
+ * 유저의 토큰으로 Redis에서 해당하는 유저id(UUID)를 얻고 접근
+ * 유저의 웹소켓 세션으로 해당하는 유저 추적
+ */
 @Component
 public class SessionCollection {
-    //세션으로 유저찾기
+
     public final HashMap<WebSocketSession, UserAccessInfo> userWebsocketMap;
-    // 유저로 세션찾기
-//    public final static HashMap<String, UserAccessInfo> userCodeMap = new HashMap<>();
+
     public final HashMap<UUID, UserAccessInfo> userIdMap;
 
     public SessionCollection(){

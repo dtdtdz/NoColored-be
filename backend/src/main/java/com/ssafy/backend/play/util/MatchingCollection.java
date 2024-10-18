@@ -13,7 +13,16 @@ import org.springframework.web.socket.WebSocketSession;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-
+/**
+ * 매칭 로직을 처리하는 서비스 클래스
+ * 스프링 스케줄러로 매칭을 0.5s마다 진행
+ * 매칭 진행 전에 매칭 진입, 취소 요청을 우선 처리
+ * 하나의 컬렉션을 동시에 접근하면 에러가 발생하므로 sychronized로 락을 걸고 작업
+ * 매칭큐를 0~99단계로 만들고 현재점수/100에 해당하는 단계에 진입
+ * 0.5s 마다 1단계씩 위아래로 확장시켜 진입
+ * 높은 점수대에서 부터, 오래 기다린 유저 기준으로 매칭 인원을 만족하면 게임을 생성
+ * 매칭인원: 기본: 4인, 7초 대기: 3인, 12초 대기: 2인
+ */
 @Component
 public class MatchingCollection {
     private final List<List<UserAccessInfo>> matchingQueue;
@@ -32,10 +41,8 @@ public class MatchingCollection {
         }
     }
     public void setAddMatching(UserAccessInfo userAccessInfo){
-//        System.out.println("set!");
         MatchingInfo matchingInfo = new MatchingInfo(userAccessInfo);
         userAccessInfo.setMatchingInfo(matchingInfo);
-//        matchingInfoMap.put(userAccessInfo, matchingInfo);
         synchronized (addQueue){
             addQueue.offer(userAccessInfo);
         }
@@ -62,9 +69,6 @@ public class MatchingCollection {
     private void delMatching(UserAccessInfo userAccessInfo) {
         if (!matchingInfoMap.containsKey(userAccessInfo)) return;
         MatchingInfo matchingInfo = matchingInfoMap.get(userAccessInfo);
-//        int high = Math.min(matchingQueue.size()-1, matchingInfo.getRatingLevel() + matchingInfo.getExpandLevel());
-//        int low = Math.max(0, matchingInfo.getRatingLevel()-matchingInfo.getExpandLevel());
-//        System.out.println(high+" "+low);
         for (List<UserAccessInfo> list:matchingQueue){
             list.remove(userAccessInfo);
         }
@@ -97,7 +101,7 @@ public class MatchingCollection {
             int expandLevel = matchingInfo.getExpandLevel();
             int ratingLevel = matchingInfo.getRatingLevel();
             int timeDiff = (int)((now - matchingInfo.getStartTime())/500);
-            //매칭 리스트에 추가
+            //매칭 리스트에 추가, 시간이 진행되면 timeDiff만큼 expandLevel을 확장시킨다.
             while (timeDiff > expandLevel && expandLevel<matchingQueue.size()){
                 expandLevel++;
                 if (ratingLevel-expandLevel>=0){
@@ -129,12 +133,10 @@ public class MatchingCollection {
                     delMatching(matchingQueue.get(i).get(0));
                 }
 
-//                RoomDto roomDto = new RoomDto(list);
                 for (UserAccessInfo userAccessInfo:list){
                     SynchronizedSend.textSend(userAccessInfo.getSession(), SendTextMessageType.MATCHING.getValue(), null);
                 }
                 inGameCollection.addGame(list);
-//                System.out.println(SendTextMessageType.MATCHING.getValue());
             }
         }
     }

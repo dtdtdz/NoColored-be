@@ -8,6 +8,12 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 랭킹전 매칭을 위한 컨트롤러
+ * 랭킹전 매칭큐 진입, 매칭 취소
+ * 매칭 결과는 웹소켓으로 전달된다.
+ * 매칭 로직은 MatchingCollection.java에서 처리
+ */
 @RestController
 @RequestMapping("/play/ranking")
 public class RankingController {

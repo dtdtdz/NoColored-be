@@ -16,5 +16,6 @@ public class Label {
 
     @Id
     private int id;
+    // 칭호
     private String name;
 }

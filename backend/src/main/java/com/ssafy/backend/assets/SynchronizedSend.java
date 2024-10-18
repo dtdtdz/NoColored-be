@@ -10,7 +10,10 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
+/**
+ * 웹소켓 세션을 동기화하여 안전하게 보내기 위한 클래스
+ * 이진데이터와 문자열데이터를 따로 처리
+ */
 public class SynchronizedSend {
     public static void binarySend(WebSocketSession session, ByteBuffer buffer){
         long dt1 = System.currentTimeMillis();
@@ -74,6 +77,5 @@ public class SynchronizedSend {
             this.action = type;
             this.data = data;
         }
-        // getter, setter 생략
     }
 }

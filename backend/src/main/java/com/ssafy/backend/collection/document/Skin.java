@@ -16,6 +16,8 @@ public class Skin {
 
     @Id
     private int id;
+    // 스킨 이름
     private String name;
+    // S3 링크
     private String link;
 }

@@ -15,7 +15,10 @@ import java.util.List;
 public class UserCollection {
     @Id
     private String userCode;
-    private List<Integer> skinIds; // 가지고 있는 스킨
-    private List<Integer> labelIds; // 가지고 있는 칭호
-    private List<Integer> achievementIds; // 가지고 있는 업적
+    // 가지고 있는 스킨 리스트
+    private List<Integer> skinIds;
+    // 가지고 있는 칭호 리스트 
+    private List<Integer> labelIds; 
+    // 가지고 있는 업적 리스트
+    private List<Integer> achievementIds; 
 }

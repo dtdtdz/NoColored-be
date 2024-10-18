@@ -11,6 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/**
+ * 유저의 인증을 위한 컨트롤러
+ * 게스트 생성, 회원전환
+ * 유저 생성, 삭제, 로그인, pw변경, 닉네임 변경, 로그아웃
+ * 유저 id 중복 확인, 유저 검색, 토큰 유효성 확인
+ * 유저, 게스트 생성 및 로그인시 토큰을 생성하여 redis에 저장
+ * 유저는 자신이 유효함을 token으로 인증 (중복 로그인시 이전 토큰 삭제)
+ */
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -75,16 +83,6 @@ public class UserController {
     }
     @PostMapping("/login")
     private ResponseEntity<String> login(@RequestBody UserSignDto user){
-
-//        if (!(user.getId().equals("gabgab")
-//                || user.getId().equals("wooyeol")
-//                || user.getId().equals("dolmeengii")
-//                || user.getId().equals("CELINE")
-//                || user.getId().equals("dam626")
-//                || user.getId().equals("gardener"))) {
-//            return ResponseEntity.badRequest().body("Login failed");
-//        }
-
         if (user.getId().length() < 6 || user.getId().length() > 20) return ResponseEntity.badRequest().body("ID does not meet the length requirements (6-20 characters).");
         if (!user.getId().matches("[a-zA-Z0-9]*")) return ResponseEntity.badRequest().body("ID must contain only letters and numbers.");
         if (user.getPassword().length() < 6 || user.getPassword().length() > 20) return ResponseEntity.badRequest().body("Password does not meet the length requirements (6-20 characters).");
@@ -121,7 +119,7 @@ public class UserController {
             return ResponseEntity.internalServerError().body("Failed to update nickname");
         }
     }
-
+    //유저 삭제를 위한 pw확인
     @PostMapping("/confirm")
     private ResponseEntity<Boolean> confirm(@RequestHeader("Authorization") String token,
                                             @RequestBody Map<String, String> map){

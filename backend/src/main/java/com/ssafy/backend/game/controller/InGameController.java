@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedList;
 import java.util.List;
-
+/**
+ * 유저가 게임으로 이동한 후 사용하는 컨트롤러
+ * 유저 준비상태 확인, 게임결과 데이터 요청을 처리
+ */
 @RestController
 @RequestMapping("/ingame")
 public class InGameController {
@@ -24,7 +27,11 @@ public class InGameController {
     public InGameController(GameService gameService){
         this.gameService = gameService;
     }
-
+    /**
+     * 유저가 게임씬으로 성공적으로 이동후 요청
+     * 요청 결과로 유저가 필요한 게임 정보를 클라이언트로 보냄
+     * 모든 유저의 준비가 확인되거나 대기시간이 지나면 게임을 시작
+     */ 
     @GetMapping("/ready")
     private ResponseEntity<?> ready(@RequestHeader("Authorization") String token){
         System.out.println("ready");
@@ -36,73 +43,11 @@ public class InGameController {
         return ResponseEntity.ok(gameRoomDto);
     }
 
-    @GetMapping("/ready/dummy")
-    private ResponseEntity<?> readyDummy(@RequestHeader("Authorization") String token){
-        System.out.println("dummy");
-        GameRoomDto gameRoomDto = new GameRoomDto();
-        gameRoomDto.setMapId(1);
-        List<String> list = new LinkedList<>();
-        list.add("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-butterfly.png");
-        list.add("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-magichat.png");
-        gameRoomDto.setSkins(list);
-
-        List<int[]> list2 = new LinkedList<>();
-        list2.add(new int[]{5,5,6});
-        list2.add(new int[]{15,5,5});
-        list2.add(new int[]{23,5,5});
-        list2.add(new int[]{7,9,8});
-        list2.add(new int[]{20,9,5});
-        list2.add(new int[]{3,13,6});
-        list2.add(new int[]{13,13,7});
-        list2.add(new int[]{24,13,6});
-        list2.add(new int[]{9,17,15});
-
-        gameRoomDto.setFloorList(list2);
-//        if (gameRoomDto!=null){
-//            return ResponseEntity.internalServerError().body("Game containing the player not found");
-//        }
-
-        return ResponseEntity.ok(gameRoomDto);
-    }
-
-
-    // 플레이어마다 다른 resultdto
+    // 플레이어마다 다른 결과를 제공
     @GetMapping
     public ResponseEntity<?> getGameResultData(@RequestHeader("Authorization") String token){
 
         return ResponseEntity.ok(gameService.getResult(token));
-    }
-
-//    @GetMapping
-    public ResponseEntity<?> getGameResultDummy(){
-
-        ResultDto resultDto = new ResultDto();
-        List<UserResultDto> list = new LinkedList<>();
-        for (int i=1; i<=3; i++){
-            UserResultDto userResultDto = new UserResultDto();
-            userResultDto.setSkin("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-magichat.png");
-            userResultDto.setIndex(i-1);
-            userResultDto.setRank(i);
-            userResultDto.setNickname("유저"+i);
-            userResultDto.setScore(i*3);
-            userResultDto.setLabel("칭호"+i);
-            list.add(userResultDto);
-        }
-        resultDto.setPlayers(list);
-        RewardDto reward = new RewardDto();
-        List<String> skins = new LinkedList<>();
-        skins.add("https://nocolored.s3.ap-northeast-2.amazonaws.com/character-240px-sheet-basicblue-butterfly.png");
-        reward.setSkins(skins);
-        TierDto tierDto = new TierDto();
-        tierDto.setOldtier("nocolored");
-        tierDto.setNewtier("bronze");
-        tierDto.setUpgrade(true);
-        reward.setTier(tierDto);
-
-        resultDto.setReward(reward);
-        return ResponseEntity.ok(resultDto);
-
-
     }
 
 }

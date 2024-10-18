@@ -15,7 +15,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Achievement {
     @Id
     private int id;
-    private String name;
-    private String reward;
+    //업적 이름
+    private String name; 
+    //업적 보상(칭호, 스킨)
+    private String reward; 
 
 }

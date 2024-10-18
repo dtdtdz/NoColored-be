@@ -12,7 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.UUID;
 
-
+/**
+ * 친선전 대기실을 위한 컨트롤러
+ * 친선전 리스트를 페이징해서 조회
+ * 친선전 대기실 생성, 입장, 퇴장, 변경
+ * 대기실 유저의 준비 상태, 게임 시작 요청
+ * 대기실은 갱신될 때마다 대기실 내 유저들에게 웹소켓으로 변경사항 전달
+ */
 @RestController
 @RequestMapping("/play/friendly")
 public class FriendlyController {
@@ -48,7 +54,6 @@ public class FriendlyController {
 
     @PostMapping
     private ResponseEntity<?> createRoom(@RequestHeader("Authorization") String token, @RequestBody Map<String, Object> requestBody){
-        // requestbody를 service로 보내서 한번에 처리 가능한거 아님??? 나중에 고쳐라
         String roomTitle = (String) requestBody.get("roomTitle");
         String roomPassword = (String) requestBody.get("roomPassword");
         int mapId = Integer.parseInt(requestBody.get("mapId").toString());

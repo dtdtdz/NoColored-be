@@ -15,6 +15,11 @@ import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 웹소켓의 이진 메세지, 문자열 메세지를 분리하여 처리
+ * 문자열 메세지는 유저의 토큰으로 웹소켓을 매핑하기 위해 사용
+ * 이진 메세지는 60프레임으로 전송되는 게임 데이터를 경량화하기 위해 사용
+ */
 @Component
 public class MyWebSocketHandler extends AbstractWebSocketHandler {
 
@@ -26,9 +31,6 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
 
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
-        // 필요에 따라 응답 보내기
-//         session.sendMessage(new BinaryMessage("response".getBytes()));
-//        if (binaryMessageService==null) System.out.println(11);
         messageProcessService.binaryMessageProcessing(session, message);
     }
 
@@ -47,7 +49,6 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         System.out.println("Connection closed: " + status);
         messageProcessService.setRoomQuitWarningTimeOut(session);
-//        close logic
     }
 
 

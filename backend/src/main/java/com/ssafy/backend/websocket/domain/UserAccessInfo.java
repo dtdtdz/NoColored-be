@@ -14,6 +14,15 @@ import lombok.Setter;
 import org.springframework.web.socket.WebSocketSession;
 
 
+/**
+ * 유저 관리 및 추적을 위한 클래스
+ * 유저와 매핑된 웹소켓 세션 관리
+ * 유저는 로그아웃 요청없이 서비스에서 나갈 수 있음 -> expireTime(1시간)으로 유효성 확인
+ * 유저의 웹페이지 이동이 자유로우므로, 게임과 관련된 요청은 적절한 위치에서만 이뤄져야함
+ * 유저의 위치(position) 매칭, 친선전 대기실, 게임, 결과창, 기본값으로 나뉨
+ * 위치가 잘못된 요청을 무효화
+ * 유저 정보를 저장 -> Redis에 캐싱하는 방법 고려
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,7 +35,7 @@ public class UserAccessInfo {
     private static long USER_EXPIRE = 1000*3600;
 
     private UserProfile userProfile;
-    private UserProfileDto userProfileDto;
+    private UserProfileDto userProfileDto;//Dto 객체 생성비용을 아끼기 위해서 Dto를 저장하는건 나쁜 생각이었다
     private UserAchievements userAchievements;
     private UserCollection userCollection;
 
@@ -36,8 +45,6 @@ public class UserAccessInfo {
         this.userProfile = userProfile;
         setExpireTime();
     }
-
-
 
 
     public void setExpireTime() {

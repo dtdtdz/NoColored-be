@@ -12,6 +12,9 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 import java.util.concurrent.ScheduledExecutorService;
 
+/**
+ * 웹소켓 설정 클래스
+ */
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
@@ -29,7 +32,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     // 요청경로: /game
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(myWebSocketHandler(), "/game").setAllowedOrigins("https://nocolored.world");//변경해야함
+        registry.addHandler(myWebSocketHandler(), "/game").setAllowedOrigins("https://nocolored.world");
     }
 
 

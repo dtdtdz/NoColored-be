@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
+/**
+ * 유저의 컬렉션(스킨, 칭호, 업적) 정보를 불러오고, 유저의 칭호, 스킨을 변경하기 위한 컨트롤러
+ * getCollection, changeSkin, changeLabel만 클라이언트에서 호출됨
+ */
 @RestController
 @RequestMapping("/collection")
 public class CollectionController {

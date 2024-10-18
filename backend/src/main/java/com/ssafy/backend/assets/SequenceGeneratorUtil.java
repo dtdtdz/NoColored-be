@@ -9,7 +9,10 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-
+/**
+ * MongoDb에서 순차적 index를 만들기 위한 클래스
+ * 사용하지 않음
+ */
 @Component
 public class SequenceGeneratorUtil {
     private final MongoOperations mongoOperations;

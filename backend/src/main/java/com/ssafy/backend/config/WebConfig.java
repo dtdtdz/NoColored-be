@@ -4,6 +4,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * 웹 Cors 설정 클래스
+ */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Override
@@ -11,19 +14,5 @@ public class WebConfig implements WebMvcConfigurer {
         corsRegistry.addMapping("/**")
                 .allowedOrigins("https://nocolored.world")
                 .allowedMethods("GET", "PUT", "POST", "DELETE", "PATCH");
-
-
-//        corsRegistry.addMapping("/**")
-//                .allowedOrigins("*");
-
-
-    //                .allowedOrigins("https://i10a709.p.ssafy.io");
-
-//        corsRegistry.addMapping("/**")
-//                .allowedOrigins("http://localhost:5173")
-//                .allowedOrigins("http://nocolored.store")
-//                .allowedOrigins("http://nocolored.store:18080")
-//                .allowedOrigins("http://nocolored.store:8080");
-//                .allowedOrigins("https://i10a709.p.ssafy.io");
     }
 }
