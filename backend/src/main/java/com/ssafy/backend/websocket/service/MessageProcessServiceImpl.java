@@ -65,7 +65,6 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         String action = jsonNode.get("action").asText();
 
         Function<JsonNode, Object> handler = actionHandlers.get(action);
-//        System.out.println("text");
         if (handler != null) {
             UserAccessInfo result = (UserAccessInfo)handler.apply(jsonNode.get("data"));
             if (result!=null) { //토큰 결과 userAccessInfo 있는가?
@@ -84,8 +83,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
                     SynchronizedSend.textSend(session, SendTextMessageType.AUTHORIZED.getValue(), null);
                 }
                 result.setSession(session);
-//                System.out.println(result.getUserProfile().getUserNickname());
-//                System.out.println(result.getUserProfile().getId());
+
             } else {
                 SynchronizedSend.textSend(session, SendTextMessageType.INVALID_TOKEN.getValue(), null);
                 session.close();
@@ -93,7 +91,6 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         } else {
             SynchronizedSend.textSend(session, SendTextMessageType.UNKNOWN_ACTION.getValue(), null);
             session.close();
-//            System.out.println("Unknown action: " + action);
         }
     }
 
@@ -103,11 +100,9 @@ public class MessageProcessServiceImpl implements MessageProcessService{
 
         // 여기에서 바이너리 데이터 처리
         byte[] arr = byteBuffer.array();
-//        System.out.println("Received binary message of size: " + byteBuffer.remaining());
 
         ReceiveBinaryMessageType binaryMessageType = ReceiveBinaryMessageType.valueOf(arr[0]);
         if (binaryMessageType==null) return;
-//        System.out.println(binaryMessageType);
         switch (binaryMessageType){
             case READY -> applyReady(session);
             case DIRECTION_CHANGE -> applyDirectionChange(session);
@@ -181,10 +176,7 @@ public class MessageProcessServiceImpl implements MessageProcessService{
             System.out.println("can't find game");
             return;
         }
-//        System.out.println(sessionCollection.userWebsocketMap==null);
-//        System.out.println(sessionCollection.userWebsocketMap.get(session)==null);
-//        System.out.println(gameInfo.getUsers()==null);
-//        System.out.println(gameInfo.getUsers().get(sessionCollection.userWebsocketMap.get(session))==null);
+
         int idx = gameInfo.getUsers().get(sessionCollection.userWebsocketMap.get(session)).getCharacterNum();
         int dir = gameInfo.getCharacterInfoArr()[idx].getDir();
         if (dir<0){
@@ -192,7 +184,6 @@ public class MessageProcessServiceImpl implements MessageProcessService{
         }else {
             gameInfo.toLeft(idx);
         }
-//        System.out.println(0);
     }
 
     private void applyJump(WebSocketSession session){

@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
     private final UserAchievementsRepository userAchievementsRepository;
     private final FriendlyService friendlyService;
     private final MatchingCollection matchingCollection;
+
     public UserServiceImpl(UserProfileRepository userProfileRepository,
                            UserInfoRepository userInfoRepository,
                            JwtUtil jwtUtil,
@@ -205,7 +206,7 @@ public class UserServiceImpl implements UserService {
         UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
                 .userId(userSignDto.getId())
-                .userPwd(userSignDto.getPassword())
+                .userPwd(jwtUtil.hashpw(userSignDto.getPassword()))
                 .userProfile(userProfile)
                 .isDeleted(false)
                 .build();
@@ -281,7 +282,7 @@ public class UserServiceImpl implements UserService {
         UserInfo userInfo = UserInfo.builder()
 //                .id(userProfile.getId()) 넣으면 안된다.
                 .userId(id)
-                .userPwd(password)
+                .userPwd(jwtUtil.hashpw(password))
                 .userProfile(userProfile)
                 .isDeleted(false)
                 .build();
@@ -337,9 +338,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(String id, String password) {
-        UserProfile userProfile = userInfoRepository.findByUser(id, password);
-        if (userProfile==null) return null;
-
+        UserInfo userInfo = userInfoRepository.findByUserId(id);
+        if (userInfo==null || !jwtUtil.checkpw(password, userInfo.getUserPwd())) return null;
+        Optional<UserProfile> userProfileOpt = userProfileRepository.findById(userInfo.getId());
+        if (userProfileOpt.isEmpty()) return null;
+        UserProfile userProfile = userProfileOpt.get();
         UserCollection userCollection=userCollectionRepository.findByUserCode(userProfile.getUserCode());
 
         // 누적, 연속접속 확인
@@ -487,12 +490,11 @@ public class UserServiceImpl implements UserService {
 
         if (prePwd.length()<6 || prePwd.length()>20)
             throw new RuntimeException("Password does not meet the length requirements (6-20 characters).");
-
-        if (!prePwd.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId())))
+        if (!jwtUtil.checkpw(userInfoRepository.findUserPwdById(user.getUserProfile().getId()),prePwd))
             throw new RuntimeException("Wrong password");
         if (pwd.length()<6 || pwd.length()>20)
             throw new RuntimeException("Password does not meet the length requirements (6-20 characters).");
-        userInfoRepository.updatePassword(user.getUserProfile().getId(), pwd);
+        userInfoRepository.updatePassword(user.getUserProfile().getId(), jwtUtil.hashpw(pwd));
     }
 
     @Override
@@ -510,7 +512,7 @@ public class UserServiceImpl implements UserService {
         if (password.length()<6 || password.length()>20)
             throw new RuntimeException("Password does not meet the length requirements (6-20 characters).");
 
-        return password.equals(userInfoRepository.findUserPwdById(user.getUserProfile().getId()));
+        return jwtUtil.checkpw(userInfoRepository.findUserPwdById(user.getUserProfile().getId()),password);
     }
 
     @Override
@@ -578,6 +580,7 @@ public class UserServiceImpl implements UserService {
         UserAccessInfo userAccessInfo = jwtUtil.getUserAccessInfoRedis(token);
         return (userAccessInfo!=null);
     }
+
 
     public void logoutRoomExit(UserAccessInfo userAccessInfo){
 

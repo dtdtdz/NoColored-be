@@ -15,11 +15,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.mindrot.jbcrypt.BCrypt;
 
 @Component
 public class JwtUtil {
     @Value("${jwt.secretKey}")
     private String secretKey;
+    @Value("${Bcrypt.round}")
+    private int round;
+
     private final SessionCollection sessionCollection;
     private final RedisTemplate<String, Object> redisTemplate;
     public JwtUtil(SessionCollection sessionCollection,
@@ -78,6 +82,14 @@ public class JwtUtil {
             return userAccessInfo;
         }
         return null;
+    }
+
+    public String hashpw(String pw){
+        return BCrypt.hashpw(pw, BCrypt.gensalt(round));
+    }
+
+    public boolean checkpw(String raw, String hashed){
+        return BCrypt.checkpw(raw, hashed);
     }
 
     private String tokenKey(String token){

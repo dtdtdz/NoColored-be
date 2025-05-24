@@ -25,7 +25,7 @@ public class UserInfo {
     @Column(length = 30, unique = true)
     private String userId;
 
-    @Column(length = 30)
+    @Column(length = 100, nullable = false)
     private String userPwd;
 
     @CreatedDate

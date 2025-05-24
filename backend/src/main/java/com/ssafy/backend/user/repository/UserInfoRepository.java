@@ -29,4 +29,7 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, UUID> {
 
     @Query("SELECT u.userPwd FROM UserInfo u WHERE u.id = ?1")
     String findUserPwdById(UUID id);
+
+    UserInfo findByUserId(String userId);
+
 }
