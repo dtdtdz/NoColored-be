@@ -20,4 +20,5 @@ public interface UserService {
     UserProfileDto findUserInfo(String userCode);
     void activeLogout(String token);
     boolean isTokenValid(String token);
+    void bcrypt();
 }

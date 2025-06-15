@@ -70,7 +70,7 @@ public class GameInfo {
     private GameCycle gameCycle;
     public GameInfo(List<UserAccessInfo> userList, RoomInfo room) {
         for (int i=0; i<buffer.length; i++){
-            buffer[i] = ByteBuffer.allocate(2048);
+            buffer[i] = ByteBuffer.allocate(1024);
         }
         users = new LinkedHashMap<>();
         userGameInfoList = new LinkedList<>();

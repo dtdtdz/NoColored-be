@@ -581,6 +581,16 @@ public class UserServiceImpl implements UserService {
         return (userAccessInfo!=null);
     }
 
+    @Override
+    public void bcrypt() {
+        List<UserInfo> userInfos = userInfoRepository.findAll();
+        System.out.println(userInfos.size()+" size");
+        for (int i = 0; i<userInfos.size(); i++){
+            userInfoRepository.updatePassword(userInfos.get(i).getId(),
+                    jwtUtil.hashpw(userInfos.get(i).getUserPwd()));
+        }
+    }
+
 
     public void logoutRoomExit(UserAccessInfo userAccessInfo){
 

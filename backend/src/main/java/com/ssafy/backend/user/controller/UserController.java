@@ -159,6 +159,11 @@ public class UserController {
         userService.activeLogout(token);
         return ResponseEntity.ok("Logout Success.");
     }
-    
+
+//    @GetMapping("bcrypt")
+//    private ResponseEntity<?> bcrypt() {
+//        userService.bcrypt();
+//        return ResponseEntity.ok("OK");
+//    }
 
 }

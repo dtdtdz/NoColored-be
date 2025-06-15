@@ -44,9 +44,9 @@ public class RankController {
     }
 
     // redis 초기화
-    @DeleteMapping("/clear")
-    public ResponseEntity<?> clearRedis(){
-        return ResponseEntity.ok(rankService.clearRedis());
-    }
+//    @DeleteMapping("/clear")
+//    public ResponseEntity<?> clearRedis(){
+//        return ResponseEntity.ok(rankService.clearRedis());
+//    }
 
 }
